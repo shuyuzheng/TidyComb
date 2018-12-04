@@ -16,3 +16,4 @@ LazyData: true
 Imports: 
     XML,
     RCurl
+RoxygenNote: 6.1.1

@@ -10,29 +10,32 @@ GetChembl <- function(ids, quiet = TRUE){
   curlHandle <- getCurlHandle()
   out <- data.frame(stringsAsFactors = FALSE)
   new_item <- NA
-  
+
   stepi <- 0
   n <- length(ids)
   for (compound in ids) {
-    
+
     message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
     flush.console()
-    
+
     tryCatch({
       chembl_phase <- integer()
       chembl_id <- character()
       res <- dynCurlReader()
-      url <- paste0("https://www.ebi.ac.uk/chembl/api/data/molecule/", compound)
+      url <- paste0("https://www.ebi.ac.uk/chembl/api/data/molecule/",
+                    gsub("^\\s+|\\s+$", "",compound)) # trim whitespaces
       curlPerform(url = url, curl = curlHandle, writefunction = res$update)
       doc <- xmlInternalTreeParse(res$value())
+      # clinical phase
       new_item <- xpathApply(doc, "//max_phase", xmlValue)
       new_item <- as.integer(unlist(new_item))
       if (is.null(new_item)) {
-        new_item <- NA
+        new_item <- 0
       }
       chembl_phase <- c(chembl_phase, new_item)
-     
-      new_item <- xpathApply(doc, "//molecule_hierarchy/molecule_chembl_id", xmlValue)
+
+      # Chembl ID
+      new_item <- xpathApply(doc, "//molecule/molecule_chembl_id", xmlValue)
       new_item <- unlist(new_item)
       if (is.null(new_item)) {
         new_item <- NA
