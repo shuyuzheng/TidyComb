@@ -11,9 +11,9 @@ GetNames(node)
 which was extracted from Cellosaurus xml file.}
 }
 \value{
-A data frame contains two variables: name (the primary name of cell
-line) and synonyms (all the synonyms of the cell line pasted into one
-character and separated by ";")
+A data frame contains two variables:
+  \item{name}{the primary name of cell line.}
+  \item{synonyms}{synonyms of the cell line separated by semicolons.}
 }
 \description{
 This function extracts the primary name (as "name") and synonyms(as"synonyms"
@@ -21,4 +21,14 @@ This function extracts the primary name (as "name") and synonyms(as"synonyms"
 Cellosaurus xml file. Combining this function with \conde{\link[base]{apply}}
 or \code{\link[base]{sapply}} can extract names information from an
 XMLNodeSet object.
+}
+\examples{
+node <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
+cell <- GetCell(node, "name", c("U251", "U87"))
+
+# get first cell line's name and synonyms
+name <- GetNames(cell[[1]])
+
+# get all cell lines' name and synonyms
+names <- sapply(cell, GetNames)
 }

@@ -9,28 +9,26 @@ GetCellInfo(node)
 \arguments{
 \item{node}{An "XMLInternalElementNode" extracted from the Cellosaurus XML
 file by either \code{\link{GetAllCell}} or \code{\link{GetCell}}}
-
-\item{term}{A vector of character. The type of information you want to
-extract. A valible values are: "synonyms", "accession", "disease",
-"diseaseID", "name", "all".}
 }
 \value{
-A data frame containing the information selected by \code{term}
-extracted from the \code{node} item.
+A data frame contains 5 variables are:
+  \item{name}{primary name of cell line.}
+  \item{synonyms}{synonyms of cell lines separated by semicolons.}
+  \item{accession}{Cellosaurus Accession ID for cell lines.}
+  \item{disease}{diseases that are associated with the cell lines.}
+  \item{disease_id}{NCI Thesaurus entry code of the disease.}
 }
 \description{
-This function will extract the information required by DrugComb database (
-including cell name, cell synonyms, disease, disease_id ) of the cell lines.
-The input should be "XMLInternalElementNode" that contains the information
-of the cell lines. It could be output of either  \code{\link{GetAllCell}} (
-all Cellosaurus archived cell lines) or \code{\link{GetCell}} (cell lines
-you're interested in).
+This function will extract the primary name, synonyms, Cellosausurs Accession
+ID, disease, disease_id) of the cell lines and Wrap them into one data frame.
+If you prefer some not all of these data, \code{\link{GetNames}},
+\code{\link{GetDisease}}, or \code{\link{GetAccession}} are recommended.
 }
 \examples{
 all.cells <- GetAllCell(system.file("extdata",
                                     "cellosaurus.xml",
                                      package = "TidyComb"))
 cell.lines <- GetCell(all.cells, c("U87", "A549"))
-cell.info <- GetCellInfo(cell.lines, "synonyms")
+cell.info <- GetCellInfo(cell.lines)
 
 }

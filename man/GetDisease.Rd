@@ -11,7 +11,9 @@ GetDisease(node)
 which was extracted from Cellosaurus xml file.}
 }
 \value{
-A data frame contains two variables: disease and disease_id
+A data frame contains two variables:
+\item{disease}{name of the cell line associated disease.}
+\item{disease_id}{NCI Thesaurus entry code of the associated disease.}
 }
 \description{
 This function extract the cell line associated disease and disease ID (NCI
@@ -19,4 +21,14 @@ Thesaurus entry code) which the cell line associated with from an
 XMLIntervalElementNode object extracted from Cellosaurus xml file. Combining
 this function with \conde{\link[base]{apply}} or \code{\link[base]{sapply}}
 can extract disease information from an XMLNodeSet object.
+}
+\examples{
+node <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
+cell <- GetCell(node, "name", c("U251", "U87"))
+
+# get first cell line associated disease and disease ID
+disease <- GetDisease(cell[[1]])
+
+# get all cell lines associated diseases and disease IDs
+diseases <- sapply(cell, GetDisease)
 }

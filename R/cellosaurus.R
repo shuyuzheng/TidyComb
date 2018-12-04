@@ -13,9 +13,9 @@
 #' @param node An XMLInternalElementNode with only one cell line's information
 #' which was extracted from Cellosaurus xml file.
 #'
-#' @return A data frame contains two variables: name (the primary name of cell
-#' line) and synonyms (all the synonyms of the cell line pasted into one
-#' character and separated by ";")
+#' @return A data frame contains two variables:
+#'   \item{name}{the primary name of cell line.}
+#'   \item{synonyms}{synonyms of the cell line separated by semicolons.}
 #'
 #' @examples
 #' node <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
@@ -49,7 +49,10 @@ GetNames <- function(node) {
 #' @param node An XMLInternalElementNode with only one cell line's information
 #' which was extracted from Cellosaurus xml file.
 #'
-#' @return A data frame contains two variables: disease and disease_id
+#' @return A data frame contains two variables:
+#' \item{disease}{name of the cell line associated disease.}
+#' \item{disease_id}{NCI Thesaurus entry code of the associated disease.}
+#'
 #' @examples
 #' node <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
 #' cell <- GetCell(node, "name", c("U251", "U87"))
@@ -202,14 +205,12 @@ GetCell <- function(node, type, id){
 #' @param node An "XMLInternalElementNode" extracted from the Cellosaurus XML
 #' file by either \code{\link{GetAllCell}} or \code{\link{GetCell}}
 #'
-#' @return A data frame.It contains the information of cell lines extracted from
-#' the \code{node}. Variables are:
-#' \describe{
-#'   \item{name}{primary name of cell line}
-#'   \item{synonyms}{synonyms of cell lines separated by ";"}
-#'   \item{accession}{Cellosaurus Accession ID for cell lines}
-#'   \item{disease}{diseases that are associated with the cell lines}
-#'   \item{disease_id}{}
+#' @return A data frame contains 5 variables are:
+#'   \item{name}{primary name of cell line.}
+#'   \item{synonyms}{synonyms of cell lines separated by semicolons.}
+#'   \item{accession}{Cellosaurus Accession ID for cell lines.}
+#'   \item{disease}{diseases that are associated with the cell lines.}
+#'   \item{disease_id}{NCI Thesaurus entry code of the disease.}
 #'
 #' @examples
 #' all.cells <- GetAllCell(system.file("extdata",

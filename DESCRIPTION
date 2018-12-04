@@ -15,5 +15,6 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     XML,
-    RCurl
+    RCurl,
+    jsonlite
 RoxygenNote: 6.1.1
