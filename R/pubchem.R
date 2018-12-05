@@ -2,7 +2,7 @@
 # Functions for retrieving or updating celline information from Cellosaurus.
 # Copyrighte Shuyu Zheng
 
-#' Match CID from other identifiers
+#' Match CID according to other identifiers
 #'
 #' \code{GetCid} matches CIDs of drugs according to user-provided identifiers.
 #'
@@ -32,6 +32,7 @@
 #'   \item \strong{formula} Molecule formula of the drugs.
 #'   \item \strong{name} Name for drugs. This type could be used for searching
 #'   synonyms, NCGC IDs, Chembl IDs, CAS or any other kind of identifiers.
+#'   \item \strong{sdf} The SDF
 #'   }
 #' @param quiet
 #'
