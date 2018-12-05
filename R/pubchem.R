@@ -1,3 +1,6 @@
+# TidyComb
+# Functions for retrieving or updating celline information from Cellosaurus.
+# Copyrighte Shuyu Zheng
 
 #' Match CID from other identifiers
 #'
