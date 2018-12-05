@@ -7,26 +7,39 @@
 GetNames(node)
 }
 \arguments{
-\item{node}{An XMLInternalElementNode with only one cell line's information
-which was extracted from Cellosaurus xml file.}
+\item{node}{An \code{XMLInternalElementNode} with only one
+\emph{cell-line-list} node extracted from \emph{Cellosaurus xml file}.}
 }
 \value{
 A data frame contains two variables:
-  \item{name}{the primary name of cell line.}
-  \item{synonyms}{synonyms of the cell line separated by semicolons.}
+\itemize{
+  \item \code{name} the primary name of cell line.
+  \item \code{synonyms} synonyms of the cell line separated by semicolons.
+}
 }
 \description{
-This function extracts the primary name (as "name") and synonyms(as"synonyms"
-) of one cell line from an XMLIntervalElementNode object extracted from
-Cellosaurus xml file. Combining this function with \conde{\link[base]{apply}}
-or \code{\link[base]{sapply}} can extract names information from an
-XMLNodeSet object.
+\code{GetNames} extract primary name and synonyms from only one
+\emph{cell-line-list} node in Cellosaurus xml file.
+}
+\details{
+This function extracts the primary name (as "name") and synonyms (as
+"synonyms") of an \code{\link[XML]{XMLIntervalElementNode}} object containing
+one \emph{cell-line-list} node extracted from Cellosaurus xml file.
+
+If you'd like to extract information from multiple \emph{cell-line-list}
+nodes, combining this function with \code{\link[XML]{xpathSapply}} or
+\code{\link[base]{sapply}} is recommanded.
 }
 \examples{
-node <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
+# parse the Cellosaurus xml file.
+node <- GetAllCell(system.file("extdata",
+                               "cellosaurus.xml",
+                               package = "TidyComb"))
+
+# extract "cell-line-list" nodes of "U251" and "U87" cell lines.
 cell <- GetCell(node, "name", c("U251", "U87"))
 
-# get first cell line's name and synonyms
+# get first cell line (U251)'s primary name and synonyms
 name <- GetNames(cell[[1]])
 
 # get all cell lines' name and synonyms

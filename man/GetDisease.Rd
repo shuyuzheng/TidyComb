@@ -16,10 +16,15 @@ A data frame contains two variables:
 \item{disease_id}{NCI Thesaurus entry code of the associated disease.}
 }
 \description{
+\code{GetDisease} extracts the cell line associated diseases and NCI
+Thesaurus entry code from one \code{cell-line-list} node in Cellosaurus xml
+file.
+}
+\details{
 This function extract the cell line associated disease and disease ID (NCI
 Thesaurus entry code) which the cell line associated with from an
 XMLIntervalElementNode object extracted from Cellosaurus xml file. Combining
-this function with \conde{\link[base]{apply}} or \code{\link[base]{sapply}}
+this function with \code{\link[base]{apply}} or \code{\link[base]{sapply}}
 can extract disease information from an XMLNodeSet object.
 }
 \examples{

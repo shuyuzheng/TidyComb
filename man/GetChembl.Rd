@@ -2,7 +2,7 @@
 % Please edit documentation in R/chembl.R
 \name{GetChembl}
 \alias{GetChembl}
-\title{Extract information from Chembl database}
+\title{Get Chembl ID and max clinical phase}
 \usage{
 GetChembl(ids, quiet = TRUE)
 }
@@ -14,14 +14,15 @@ leading and tailing whitespaces are not allowed.}
 not show during runing the function.}
 }
 \value{
-A data frame. It contains 3 variables:
+A data frame contains 3 columns:
  \item{inchikey}{Identifiers inputted in the function.}
  \item{chembl_id}{Chembl ID of the matched drugs.}
  \item{chembl_phase}{Max clinical trial phase of the matched drugs.}
 }
 \description{
-This function retrieves the Chembl ID and max clinical trial phase of drug
-via \href{https://www.ebi.ac.uk/chembl/ws}{ChEMBL Web Services}.
+This function retrieves the Chembl ID and max clinical trial phase of drugs
+by provided InChiKeys.
+API: \href{https://www.ebi.ac.uk/chembl/ws}{ChEMBL Web Services}.
 }
 \examples{
 drug.info <- GetChembl("PMATZTZNYRCHOR-CGLBZJNRSA-N")

@@ -7,7 +7,7 @@
 ChemblVer()
 }
 \value{
-A  vector of named characters contains the update information of
+A vector of named characters contains the update information of
 Chembl.
 }
 \description{

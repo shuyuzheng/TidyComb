@@ -16,7 +16,7 @@ A character. The Cellosaurus accession ID of cell line
 \description{
 This function extract Cellosaurus accession ID of one cell line from an
 XMLIntervalElementNode object extracted from Cellosaurus xml file. Combining
-this function with \conde{\link[base]{apply}} or \code{\link[base]{sapply}}
+this function with \code{\link[base]{apply}} or \code{\link[base]{sapply}}
 can extract disease information from an XMLNodeSet object.
 }
 \examples{

@@ -1,50 +1,78 @@
-library(XML)
-library(RCurl)
-library(jsonlite)
-#-----------1. get.cid function get the CID of drugs from other identifiers,
-# including name(or synonyms), smiles, inchi, sdf, inchikey, molecula formula.
-GetCid <- function(name, idtype = NULL, quiet = TRUE){
-  # Input: character vector of compound names
-  # Output: data.frame with matched names, PubChem CIDs, synonyms and CAS flag
-  #
-  # API Documentation: https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html
-  #
-  # USAGE POLICY: Please note that PUG REST is not designed for very large
-  # volumes (millions) of requests. We ask that any script or application not
-  # make more than 5 requests per second, in order to avoid overloading the
-  # PubChem servers. If you have a large data set that you need to compute
-  # with, please contact us for help on optimizing your task, as there are
-  # likely more efficient ways to approach such bulk queries.
 
-  idtypes <- c("name", "smiles", "inchi", "sdf", "inchikey", "formula")
+#' Match CID from other identifiers
+#'
+#' \code{GetCid} matches CIDs of drugs according to user-provided identifiers.
+#'
+#' This function using the PubChem API
+#' (\href{https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html}{PUG REST}
+#' to seach mached drugs. Available
+#' identifiers are: name, SID, SMILES, InChI, SDF, InChIKey, molecula formula.
+#'
+#' \strong{API USAGE POLICY:}
+#' Please note that PUG REST is not designed for very large volumes (millions)
+#' of requests. We ask that any script or application not make more than 5
+#' requests per second, in order to avoid overloading the PubChem servers. If
+#' you have a large data set that you need to compute with, please contact us
+#' for help on optimizing your task, as there are likely more efficient ways to
+#' approach such bulk queries.
+#'
+#' @param ids A vector of characters contains the identifiers of drugs you are
+#' interested in.
+#'
+#' @param type A character indicates the type of identifiers passed by \code{id}
+#'   argument. Available types are:
+#'   \itemize{
+#'   \item \strong{smiles} Identifiers of drugs in the simplified molecular-input
+#'   line-entry system (SMILES).
+#'   \item \strong{inchi} The IUPAC International Chemical Identifier (InChI).
+#'   \item \strong{inchikey} Standard InChIKey of the drugs.
+#'   \item \strong{formula} Molecule formula of the drugs.
+#'   \item \strong{name} Name for drugs. This type could be used for searching
+#'   synonyms, NCGC IDs, Chembl IDs, CAS or any other kind of identifiers.
+#'   }
+#' @param quiet
+#'
+#' @return A data frame contains two columns:
+#' \itemize{
+#'   \item \code{id} The identifiers inputted by user.
+#'   \item \code{cid} The matched CID.
+#' }
+#'
+#' @export
+#'
+#' @examples
+#' GetCid("aspirin", "name", quiet = TRUE)
+GetCid <- function(ids, type = NULL, quiet = TRUE){
 
-  if (!idtype %in% idtypes) {
-    stop("Invalid idtype specified, valiable idtypes are: ", idtypes)
+  types <- c("name", "smiles", "inchi", "sdf", "inchikey", "formula")
+
+  if (!(type %in% types)) {
+    stop("Invalid idtype specified, valiable idtypes are: ", types)
   }
 
   curlHandle <- getCurlHandle()
   out <- data.frame(stringsAsFactors = FALSE)
-  
+
   stepi <- 0
-  n <- length(name)
-  for (compound in name) {
-    
+  n <- length(ids)
+  for (id in ids) {
+
     message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
     flush.console()
-    
+
     tryCatch({
       res <- dynCurlReader()
       url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound",
                     "/%s/%s", "/synonyms/XML")
       curlPerform(
-        url = sprintf(url, idtype, URLencode(compound)),
+        url = sprintf(url, type, URLencode(id)),
         curl = curlHandle, writefunction = res$update)
       doc <- xmlInternalTreeParse(res$value())
       rootNode <- xmlName(xmlRoot(doc))
       if (rootNode == "InformationList") {
-        xpathApply(doc, "//x:Information", namespaces = "x", function(x) { 
+        xpathApply(doc, "//x:Information", namespaces = "x", function(x) {
           cid <- xpathSApply(x, "./x:CID", namespaces = "x", xmlValue)
-          df <- data.frame(name = compound, cid = cid,
+          df <- data.frame(id = id, cid = cid,
                            stringsAsFactors = FALSE)
           out <<- rbind.data.frame(out, df)
         })
@@ -52,9 +80,9 @@ GetCid <- function(name, idtype = NULL, quiet = TRUE){
         xpathApply(doc, "//x:Details", namespaces = "x", function(x){
         fault <- xpathApply(doc, "//x:Details", namespaces = "x", xmlValue)
         if (!quiet) {
-          print( paste(compound, fault[[1]], sep = ": ") )
+          print( paste(id, fault[[1]], sep = ": ") )
         }
-        df <- data.frame(name = compound, cid = NA,
+        df <- data.frame(id = id, cid = NA,
                          stringsAsFactors = FALSE)
         out <<- rbind.data.frame(out, df)
        })
@@ -119,7 +147,7 @@ GetDrug <- function(cids, quiet = TRUE){
       inchikey <- c(inchikey, new_item)
 
       # extract smiles
-      new_item <- xpathApply(doc, 
+      new_item <- xpathApply(doc,
                     "//tocheading[contains(text(), 'Canonical SMILES')]",
                     function(x){
                       xpathSApply(x, "..//stringvalue", xmlValue)
@@ -143,7 +171,7 @@ GetDrug <- function(cids, quiet = TRUE){
       molecula_formula <- c(molecula_formula, new_item)
 
       # extract names
-      new_item <- xpathApply(doc, 
+      new_item <- xpathApply(doc,
                   "//description[contains(text(), 'Primary Identifying Name')]",
                   function(x){
                     xpathApply(x, "..//information/stringvalue", xmlValue)
@@ -174,7 +202,7 @@ GetDrug <- function(cids, quiet = TRUE){
   finally = Sys.sleep(0.2)
   )
 
-  # clean 
+  # clean
   remove(curlHandle)
   gc()
   return(info)
@@ -183,13 +211,13 @@ GetDrug <- function(cids, quiet = TRUE){
 GetClinicalPhase <- function(cids, quiet = TRUE){
 
   # Input: character vector of compound CIDs
-  # Output: data.frame with matched max clinical phase. 
+  # Output: data.frame with matched max clinical phase.
   #
   # API: "https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi"
   #
-  # USAGE POLICY: Please note that PUG View is not designed for very large 
-  # volumes (millions) of requests. We ask that any script or application not 
-  # make more than 5 requests per second, in order to avoid overloading the 
+  # USAGE POLICY: Please note that PUG View is not designed for very large
+  # volumes (millions) of requests. We ask that any script or application not
+  # make more than 5 requests per second, in order to avoid overloading the
   # PubChem servers. To check additional request volume limitations, please read
   # this document. If you have a large data set that you need to compute with,
   # please contact us for help on optimizing your task, as there are likely more
@@ -209,7 +237,7 @@ GetClinicalPhase <- function(cids, quiet = TRUE){
                     '"start":1,"limit":10000}')
       res <- fromJSON(url)
       status <- res$SDQOutputSet[[1]][[1]]
-     
+
     if (status == 0) {
       # extract max clinical phase
       phase <- res$SDQOutputSet[[5]][[1]]
@@ -220,7 +248,7 @@ GetClinicalPhase <- function(cids, quiet = TRUE){
         new_item <- res$SDQOutputSet[[5]][[1]][1,]
         clinical_phase <- rbind.data.frame(clinical_phase, new_item)
       }
-      
+
    } else if (status != 0) {
       error <- res$SDQOutputSet[[1]][[2]]
       if (!quiet) {
@@ -237,7 +265,7 @@ GetClinicalPhase <- function(cids, quiet = TRUE){
   finally = Sys.sleep(0.2)
   )
 
-  # clean 
+  # clean
   gc()
   return(clinical_phase)
 }
@@ -287,7 +315,7 @@ GetCidFromAid <- function(aids, quiet = TRUE){
   finally = Sys.sleep(0.2)
   )
 
-  # clean 
+  # clean
   gc()
-  return(res) 
+  return(res)
 }
