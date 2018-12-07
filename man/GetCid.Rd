@@ -2,28 +2,35 @@
 % Please edit documentation in R/pubchem.R
 \name{GetCid}
 \alias{GetCid}
-\title{Match CID from other identifiers}
+\title{Match CID according to other identifiers}
 \usage{
-GetCid(id, type = NULL, quiet = TRUE)
+GetCid(ids, type = NULL, quiet = TRUE)
 }
 \arguments{
-\item{id}{A vector of characters contains the identifiers of drugs you are
+\item{ids}{A vector of characters contains the identifiers of drugs you are
 interested in.}
 
 \item{type}{A character indicates the type of identifiers passed by \code{id}
 argument. Available types are:
 \itemize{
-\item \strong{sid} The primary identifiers for the substance assigned by
-PubChem.
 \item \strong{smiles} Identifiers of drugs in the simplified molecular-input
-line-entry system (SMILES)
-\item \strong{inchi} The IUPAC International Chemical Identifier (InChI)
-\item \strong{inchikey} Standard InChIKey of the drugs
-\item \strong{name} Name for drugs. This type could be used for searching synonyms,
-NCGC IDs, Chembl IDs, CAS or any other kind of identifiers.
+line-entry system (SMILES).
+\item \strong{inchi} The IUPAC International Chemical Identifier (InChI).
+\item \strong{inchikey} Standard InChIKey of the drugs.
+\item \strong{formula} Molecule formula of the drugs.
+\item \strong{name} Name for drugs. This type could be used for searching
+synonyms, NCGC IDs, Chembl IDs, CAS or any other kind of identifiers.
+\item \strong{sdf} The SDF
 }}
 
 \item{quiet}{}
+}
+\value{
+A data frame contains two columns:
+\itemize{
+  \item \code{id} The identifiers inputted by user.
+  \item \code{cid} The matched CID.
+}
 }
 \description{
 \code{GetCid} matches CIDs of drugs according to user-provided identifiers.
@@ -41,4 +48,7 @@ requests per second, in order to avoid overloading the PubChem servers. If
 you have a large data set that you need to compute with, please contact us
 for help on optimizing your task, as there are likely more efficient ways to
 approach such bulk queries.
+}
+\examples{
+GetCid("aspirin", "name", quiet = TRUE)
 }

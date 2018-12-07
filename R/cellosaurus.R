@@ -88,6 +88,35 @@ GetDisease <- function(node){
   return(diseases)
 }
 
+
+
+#' Extract the source tissue of one cell line.
+#'
+#' This function extract source tissue from linked "CCLE" names of one cell line
+#' from an XMLIntervalElementNode object extracted from Cellosaurus xml file.
+#' Combining this function with \code{\link[base]{apply}} or
+#' \code{\link[base]{sapply}} can extract disease information from an XMLNodeSet
+#' object.
+#'
+#' @param node An XMLInternalElementNode with only one cell line's information
+#' which was extracted from Cellosaurus xml file.
+#'
+#' @return A character. The Cellosaurus accession ID of cell line
+#'
+#' @examples
+#' node <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
+#' cell <- GetCell(node, "name", c("U251", "U87"))
+#'
+#' # get Cellosaurus Accession for first cell line
+#' accession <- GetAccession(cell[[1]])
+#'
+#' # get Cellosaurus Accession for all cell lines
+#' accessions <- sapply(cell, GetAccession)
+GetTissue <- function(node){
+  ref.list <- XML::xmlChildren(node)$`xref-list`
+  ccle <- sapply(XML::xmlChildren(ref.list), XML::xmlAttrs)
+}
+
 #' Extract the Cellosaurus accession ID of one cell line.
 #'
 #' This function extract Cellosaurus accession ID of one cell line from an
@@ -234,7 +263,7 @@ GetCell <- function(node, type, id){
 #' all.cells <- GetAllCell(system.file("extdata",
 #'                                     "cellosaurus.xml",
 #'                                      package = "TidyComb"))
-#' cell.lines <- GetCell(all.cells, c("U87", "A549"))
+#' cell.lines <- GetCell(all.cells, "name", c("U87", "A549"))
 #' cell.info <- GetCellInfo(cell.lines)
 #'
 #' @export

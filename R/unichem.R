@@ -8,29 +8,73 @@ UnichemVer <- function() {
 
 
 
-#' Extract information from Chembl database
+#' Get other identifiers from InChIKey
 #'
-#' This function retrieves the Chembl ID and max clinical trial phase of drug
+#' \code{GetIds} matches the identifiers of
+#' \href{https://www.ebi.ac.uk/unichem/ucquery/listSources}{UniChem sources},
+#' including DrugBank, KEGG, Zinc...
+#'
+#' This function retrieves the of drug
 #' via \href{https://www.ebi.ac.uk/unichem/info/webservices}{UniChem Web
 #' Services}.
 #'
 #' @param ids A vector of characters. It contains identifiers of the drug.
 #'
-#' @param type A character. It specifies the type of identifiers passed to
-#' \code{ids}. Acceptable inputs are:
+#' @param type A character or an integer. It specifies the type of identifiers
+#' passed to \code{ids}. Acceptable values are:
 #' \enumerate{
-#'   \item src_compound_id: It is the individual compound identifier provided by
-#' each of the sources.
-#'   \item src_id: It is integers that represent the various sources in UniChem.
-#' A list of valid src_id's can be found either on the
-#' \href{https://www.ebi.ac.uk/unichem/ucquery/listSources}
-#' {UniChem sources page} or by using \code{\link{GetAllSrcIds}} function.
-#'   \item InChIKey:
+#'   \item \strong{An integer} indicates the "src_id" that UniChem assigned to
+#'    various sources. A list of valid "src_id" can be found either on the
+#'    \href{https://www.ebi.ac.uk/unichem/ucquery/listSources}
+#'    {UniChem sources page} or by using \code{\link{GetAllSrcIds}} function.
+#'   \item \strong{inchikey} Standard InChIKey of the drugs.
 #' }
 #'
-#' @return
+#' @return A data frame with first column is the identifier passed to \code{ids}
+#' argument and following columns are indentifiers of all resources integrated
+#' by UniChem.
 #'
-GetUnichem <- function(ids, type) {
+#' @export
+#'
+#' @examples
+#' aspirin <- GetIds(ids = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N", type = "inchikey")
+GetIds <- function(ids, type) {
+  src.id <- GetAllSrcIds()
+  # building base url
+  if (type == "inchikey") {
+    url.base <- "https://www.ebi.ac.uk/unichem/rest/inchikey/"
+  } else if (type == "src.id")
+
+  df <- data.frame() # result container
+  i <- 1 # indicator
+  n <- length(inchikey)
+
+  # retrieving IDs
+
+  for (id in inchikey) {
+    # progress indicator
+    message(round(i/n * 100), "%", "\r", appendLF = FALSE)
+    flush.console()
+
+    # requesting server via API
+    url <- paste0(url.base, id) # establishing data
+    res <- fromJSON(url) # parsing JSON file
+
+    # extracting IDs
+    drugbank <- ifelse(2 %in% res[,1], res[which(res[,1] == 2), 2], NA)
+    kegg <- ifelse(6 %in% res[,1], res[which(res[,1] == 6), 2], NA)
+
+    # assembling results
+    temp <- data.frame(inchikey = id,
+                       drugbank = drugbank,
+                       kegg = kegg,
+                       stringsAsFactors = FALSE)
+    df <- rbind.data.frame(df, temp)
+
+    # cleaning up temporary variable and updating indicator .
+    temp <- data.frame()
+    i <- i + 1
+  }
 
 }
 

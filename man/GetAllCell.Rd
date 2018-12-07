@@ -22,3 +22,9 @@ information in "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xsd")
 This function will parse the XML file and extract "cell-line-list" node which
 includes all information about cell lines as a XML document object.
 }
+\examples{
+CellDoc <- GetAllCell(system.file("extdata",
+                                  "cellosaurus.xml",
+                                  package = "TidyComb"))
+
+}
