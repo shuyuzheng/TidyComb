@@ -201,7 +201,9 @@ GetDrug <- function(cids, quiet = TRUE){
   info <- cbind(name, inchikey, smiles, cid, molecula_formula, clinical_phase)
   },
   error = function(e){
-    print(e)
+    if (!quiet) {
+      print(e)
+    }
   },
   finally = Sys.sleep(0.2)
   )
@@ -210,6 +212,50 @@ GetDrug <- function(cids, quiet = TRUE){
   remove(curlHandle)
   gc()
   return(info)
+}
+
+GetSid <- function(cids) {
+  url.base <- "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/%s/sids/JSON"
+  df <- data.frame()
+  for (cid in cids) {
+    message(cid, "\r", appendLF = FALSE)
+    flush.console()
+
+    url <- sprintf(url.base, cid)
+    temp <- as.data.frame(fromJSON(url))
+    df <- rbind.data.frame(df, temp)
+    temp <- NA
+  }
+  return(df)
+}
+GetInchikey <- function(cids, quiet = TRUE) {
+  tryCatch({
+    # build containers
+    url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
+                      "%s/property/InChIKey/JSON")
+    df <- data.frame()
+    for (cid in cids) {
+      message(cid, "\r", appendLF = FALSE)
+      flush.console()
+
+      url <- sprintf(url.base, cid)
+      temp <- as.data.frame(fromJSON(url))
+      df <- rbind.data.frame(df, temp)
+      temp <- NA
+    }
+  },
+  error = function(e) {
+    print(e)
+    temp <- data.frame(cid = cid, inchikey = NA)
+    df <- rbind.data.frame(df, temp)
+    temp <- NA
+  },
+  finally = Sys.sleep(0.2)
+  )
+
+  # clean
+  gc()
+  return(df)
 }
 
 GetClinicalPhase <- function(cids, quiet = TRUE){

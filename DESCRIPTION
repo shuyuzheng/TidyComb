@@ -16,5 +16,8 @@ LazyData: true
 Imports: 
     XML,
     RCurl,
-    jsonlite
+    jsonlite,
+    dplyr,
+    RMySQL,
+    RMariaDB
 RoxygenNote: 6.1.1
