@@ -304,7 +304,10 @@ GetCellInfo <- function(node, info = "accession") {
     message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
     flush.console()
 
-    temp <- fun(node[[i]])
+    temp <- fun(cell[[1]])
+    if (length(temp) == 0) {
+      temp <- rep(NA, length(colname))
+      }
     mat <- rbind(mat, temp)
     temp <- NULL
 

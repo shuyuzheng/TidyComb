@@ -1,6 +1,6 @@
 node <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
 cell <- GetCell(node, "U87", "name")
-info <- GetCellInfo(cell, "name")
+info <- GetCellInfo(cell, "tissue")
 
 ref.list <- XML::xmlChildren(cell[[1]])$`xref-list`
 ref <- sapply(XML::xmlChildren(ref.list), XML::xmlAttrs)
