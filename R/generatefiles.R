@@ -8,14 +8,14 @@
 #' @param type
 GenerateCell <- function(name){
   # Get all cell lines' cellosaurus accession
-  doc <- GetAllCell(system.file("extdate", "database", "cellosaurus.xml", package = "TidyComb"))
+  doc <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
   cell <- GetCell(doc, ids = name, type = "name")
   acc <- GetCellInfo(cell, "accession")
 
   # Checking whether cell lines have been in DrugComb
-  exist <- CheckCell(accession = acc)
+  exist.cell <- CheckCell(acc)
 
-  if (length(exist$new) == 0) {
+  if (length(exist.cell$new) == 0) {
   cell_line <- data.frame(name = character(), synonyms = character(),
                         cellosaurus_accession = character(),
                         disease_id = character(),
@@ -24,25 +24,29 @@ GenerateCell <- function(name){
   disease <- data.frame(name = character(), id = character())
   tissue <- data.frame(id = numeric(), name = character())
   } else {
-    cell <- GetCell(doc, ids = exist$new, type = "accession")
+    cell <- GetCell(doc, ids = as.character(exist.cell$new), type = "accession")
     name <- GetCellInfo(cell, "name")
-    dis <- GetCellInfo(cell, "disease")
-    tis <- GetCellInfo(cell, "tissue")
+    dis <- unique(GetCellInfo(cell, "disease"))
+    tis <- unique(GetCellInfo(cell, "tissue"))
     accession <- GetCellInfo(cell, "accession")
-    id <- seq(exist$n + 1, length.out = length(exist$new))
+    id <- seq(exist.cell$n + 1, length.out = length(exist.cell$new))
 
-    exist.disease <- CheckDisease(dis)
+    exist.disease <- CheckDisease(as.character(dis[, 2]))
     disease <- exist.disease$new
 
-    exist.tissue <- CheckTissue(tis)
-    tissue <- data.frame(id = seq(exist.tissue$n + 1,
-                                  length.out = length(exist.tissue$new)),
-                         name = exist.tissue$new)
-    tissue_id <- cbind.data.frame(exist.tissue$old, tissue$id)
-    tissue_id <- tissue_id$id[match(tis, tissue_id$name)]
+    exist.tissue <- CheckTissue(tis[,1])
+    if (length(exist.tissue$new) == 0) {
+      tissue <- data.frame(id = numeric(), name = character())
+      tissue_id <- exist.tissue$old[match(tis, exist.tissue$old[ ,1]), 2]
+    } else {
+      tissue <- data.frame(id = seq(exist.tissue$n + 1,
+                           length.out = length(exist.tissue$new)),
+                           name = exist.tissue$new)
+      tissue_id <- rbind(exist.tissue$old, tissue)
+      tissue_id <- tissue_id$id[match(tis, tissue_id$name)]
+    }
 
-    cell_line <- cbind.data.frame(name, accession, dis$disease_id,
-                                  id, tissue_id)
+    cell_line <- cbind(name, accession, dis[, "disease_id"], id, tissue_id)
     colnames(cell_line) <- c("name", "synonyms", "cellosaurus_accession",
                              "disease_id", "id", "tissue_id")
   }

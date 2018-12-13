@@ -48,7 +48,7 @@ GetNames <- function(node) {
                      function(x) {
                        paste(x[-1], collapse = "; ")
                      })
-  names <- data.frame(name = name, synonyms = synonyms)
+  names <- cbind(name = name, synonyms = synonyms)
   return(names)
 }
 
@@ -84,7 +84,7 @@ GetDisease <- function(node){
   disease.list <- XML::xmlChildren(node)$'disease-list'
   disease <- XML::xmlValue(disease.list)
   disease.id <- sapply(XML::xmlChildren(disease.list), XML::xmlAttrs)[2]
-  diseases <- data.frame(name = disease, disease_id = disease.id)
+  diseases <- cbind(disease, disease.id)
   return(diseases)
 }
 
@@ -117,7 +117,7 @@ GetTissue <- function(node){
   ref.list <- XML::xmlChildren(node)$`xref-list`
   ref <- sapply(XML::xmlChildren(ref.list), XML::xmlAttrs)
   ccle <- ref[3, which(ref[1,] == "CCLE")]
-  tissue <- gsub("_", " ", tolower(gsub("^[^_]+(?=_)_", "",ccle, perl = TRUE)))
+  tissue <- tolower(gsub("^[^_]+(?=_)_", "",ccle, perl = TRUE))
 }
 
 #' Extract the Cellosaurus accession ID of one cell line.
@@ -278,22 +278,25 @@ GetCell <- function(node, ids, type = "name"){
 #' @export
 GetCellInfo <- function(node, info = "accession") {
 
-  fun <- NULL
   if (info == "name") {
     fun <- function(x) {GetNames(x)}
+    colname <- c("name", "synonyms")
   } else if (info == "accession") {
     fun <- function(x) {GetAccession(x)}
+    colname <- c("cellosaurus_accession")
   } else if (info == "disease") {
     fun <- function(x) {GetDisease(x)}
+    colname <- c("disease_name", "disease_id")
   } else if (info == "tissue") {
     fun <- function(x) {GetTissue(x)}
+    colname <- c("tissue_name")
   } else {
     stop("Info ", info, 'is not allowed. Available values are: "name",',
          '"accession", "disease", "tissue".')
   }
 
-  df <- data.frame()
-  temp <- NA
+  temp <- NULL
+  mat <- NULL
 
   stepi <- 1
   n <- length(node)
@@ -302,11 +305,13 @@ GetCellInfo <- function(node, info = "accession") {
     flush.console()
 
     temp <- fun(node[[i]])
-    df <- rbind.data.frame(df, temp, stringsAsFactors = FALSE)
-    temp <- NA
+    mat <- rbind(mat, temp)
+    temp <- NULL
 
     stepi <- stepi + 1
   }
-  return(df)
+
+  colnames(mat) <- colname
+  return(mat)
 }
 
