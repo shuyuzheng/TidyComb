@@ -1,0 +1,3 @@
+GenerateDrug <- function(cids) {
+
+}

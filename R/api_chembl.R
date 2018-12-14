@@ -10,7 +10,7 @@
 #'
 #' @examples
 #' print(ChemblVer())
-ChemblVer <- function(){
+ChemblVersion <- function(){
   url <- "https://www.ebi.ac.uk/chembl/api/data/status?format=json"
   res <- fromJSON(url, flatten = TRUE)
   res <- unlist(res)
@@ -37,7 +37,7 @@ ChemblVer <- function(){
 #'
 #' @examples
 #' drug.info <- GetChembl("PMATZTZNYRCHOR-CGLBZJNRSA-N")
-GetChembl <- function(ids, quiet = TRUE){
+GetChemblPhase <- function(ids, quiet = TRUE){
 
   curlHandle <- getCurlHandle()
   out <- data.frame(stringsAsFactors = FALSE)

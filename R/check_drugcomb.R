@@ -9,6 +9,7 @@
 #' study: id
 #'
 CheckCell <- function(test) {
+  message("Checking Cell lines...")
   exist <- read.csv(system.file("extdata", "cell_line.csv",
                                 package = "TidyComb"),
                     header = FALSE,
@@ -17,7 +18,7 @@ CheckCell <- function(test) {
   n <- nrow(exist)
   old <- exist[match(test, exist$cellosaurus_accession), ] %>% na.omit()
   new <- test[!test %in% exist$cellosaurus_accession]
-  message("There are ", n, " cell lines have been archived in DrugComb.", "\n",
+  message("DrugComb has archived ", n, "cell lines.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
           " of checked cell line(s) have/has been in DrugComb: ",
           paste(old$cellosaurus_accession, collapse = ", "), "\n",
@@ -28,6 +29,7 @@ CheckCell <- function(test) {
 }
 
 CheckTissue <- function(test) {
+  message("Checking tissues...")
   exist <- read.csv(system.file("extdata", "tissue.csv",
                                 package = "TidyComb"),
                     header = FALSE,
@@ -36,7 +38,7 @@ CheckTissue <- function(test) {
   n <- nrow(exist)
   old <- exist[match(test, exist$name), ] %>% na.omit()
   new <- test[!test %in% exist$name]
-  message("There are ", n, " tissues have been archived in DrugComb.", "\n",
+  message("DrugComb has archived ", n, "tissues.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
           " of checked tissue(s) have/has been in DrugComb: ",
           paste(old$name, collapse = ", "), "\n",
@@ -47,6 +49,7 @@ CheckTissue <- function(test) {
 }
 
 CheckDisease <- function(test) {
+  message("Checking  diseases...")
   exist <- read.csv(system.file("extdata", "disease.csv",
                                 package = "TidyComb"),
                     header = FALSE,
@@ -55,7 +58,7 @@ CheckDisease <- function(test) {
   n <- nrow(exist)
   old <- exist[match(test, exist$id), ] %>% na.omit()
   new <- test[!test %in% exist$id]
-  message("There are ", n, " disaeses have been archived in DrugComb.", "\n",
+  message("DrugComb has archived ", n, "diseases.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
           " of checked disease(s) have/has been in DrugComb: ",
           paste(old$name, collapse = ", "), "\n",
@@ -65,16 +68,17 @@ CheckDisease <- function(test) {
   return(list(n = n, old = old, new = new))
 }
 
-CheckDrug <- function(test) {
+CheckDrug <- function(cids) {
+  message("Checking drugs...")
   exist <- read.csv(system.file("extdata", "drug.csv",
                                 package = "TidyComb"),
                     header = FALSE,
                     col.names = c("id", "cid"),
                     stringsAsFactors = FALSE)
   n <- nrow(exist)
-  old <- exist[match(test, exist$cid), ] %>% na.omit()
-  new <- test[!test %in% exist$cid]
-  message("There are ", n, " drugs have been archived in DrugComb.", "\n",
+  old <- exist[match(cids, exist$cid), ] %>% na.omit()
+  new <- cids[!cids %in% exist$cid]
+  message("DrugComb has archived ", n, "drugs.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
           " of checked drug(s) have/has been in DrugComb: ",
           paste(old$name, collapse = ", "), "\n",

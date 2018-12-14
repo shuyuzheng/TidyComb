@@ -29,7 +29,7 @@ GenerateCell <- function(name){
     dis <- GetCellInfo(cell, "disease")
     dis.uni <- unique(dis)
     tis <- GetCellInfo(cell, "tissue")
-    tis.uni <- unique(tis)
+    tis.uni <- unique(tis) %>% na.omit()
     accession <- GetCellInfo(cell, "accession")
     id <- seq(exist.cell$n + 1, length.out = length(exist.cell$new))
 
@@ -38,12 +38,15 @@ GenerateCell <- function(name){
 
     exist.tissue <- CheckTissue(tis.uni[,1])
     if (length(exist.tissue$new) == 0) {
-      tissue <- data.frame(id = numeric(), name = character())
+      tissue <- data.frame(id = numeric(),
+                           name = character(),
+                           stringsAsFactors = FALSE)
       tissue_id <- exist.tissue$old[match(tis, exist.tissue$old[ ,1]), 2]
     } else {
       tissue <- data.frame(id = seq(exist.tissue$n + 1,
                            length.out = length(exist.tissue$new)),
-                           name = exist.tissue$new)
+                           name = exist.tissue$new,
+                           stringsAsFactors = FALSE)
       tissue_id <- rbind(exist.tissue$old, tissue)
       tissue_id <- tissue_id$id[match(tis, tissue_id$name)]
     }

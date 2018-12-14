@@ -142,7 +142,9 @@ GetTissue <- function(node){
 #' # get Cellosaurus Accession for all cell lines
 #' accessions <- sapply(cell, GetAccession)
 GetAccession <- function(node){
-  accession <- XML::xmlValue(XML::xmlChildren(node)$`accession-list`)
+  accession <- XML::xpathSApply(node,
+                                './accession-list/accession[@type="primary"]',
+                                XML::xmlValue)
 }
 
 #' Check the Cellosaurus data version.
@@ -304,7 +306,7 @@ GetCellInfo <- function(node, info = "accession") {
     message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
     flush.console()
 
-    temp <- fun(cell[[1]])
+    temp <- fun(node[[i]])
     if (length(temp) == 0) {
       temp <- rep(NA, length(colname))
       }

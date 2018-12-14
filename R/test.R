@@ -7,3 +7,10 @@ ref <- sapply(XML::xmlChildren(ref.list), XML::xmlAttrs)
 ccle <- ref[3, which(ref[1,] == "CCLE")]
 tissue <- gsub("_", " ", tolower(gsub("^[^_]+(?=_)_","",ccle, perl = TRUE)))
 
+drug <- read.csv(system.file("extdata", "drug.csv", package = "TidyComb"),
+                 header = FALSE,
+                 col.names = c("id", "cid"))
+
+template <- read.csv(system.file("extdata", "template.csv", package = "TidyComb"),
+                     stringsAsFactors = FALSE)
+cids <- unique(c(template$drug_row_cid, template$drug_col_cid)) %>% na.omit()
