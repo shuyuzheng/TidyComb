@@ -12,12 +12,14 @@ file by either \code{\link{GetAllCell}} or \code{\link{GetCell}}}
 
 \item{info}{A Character indicate about what kind of infomation you want to
 extract. Available values are:
-  \item{name}{primary name and synonyms of cell lines.}
-  \item{accession}{Cellosaurus Accession ID for cell lines.}
-  \item{disease}{diseases that are associated with the cell lines and
-   corresponding NCI Thesaurus entry code.}
-  \item{tissue}{Tissues that the cell line generated from. Following the CCLE
-   category.}}
+\itemize{
+  \item \strong{name} primary name and synonyms of cell lines.
+  \item \strong{accession} Cellosaurus Accession ID for cell lines.
+  \item \strong{disease} diseases that are associated with the cell lines and
+   corresponding NCI Thesaurus entry code.
+  \item \strong{tissue} Tissues that the cell line generated from. Following the CCLE
+   category.
+}}
 }
 \value{
 A data frame contains cell line information selected by \code{info}

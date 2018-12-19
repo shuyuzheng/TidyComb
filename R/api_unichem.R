@@ -18,17 +18,7 @@ UnichemVer <- function() {
 #' via \href{https://www.ebi.ac.uk/unichem/info/webservices}{UniChem Web
 #' Services}.
 #'
-#' @param ids A vector of characters. It contains identifiers of the drug.
-#'
-#' @param type A character or an integer. It specifies the type of identifiers
-#' passed to \code{ids}. Acceptable values are:
-#' \enumerate{
-#'   \item \strong{An integer} indicates the "src_id" that UniChem assigned to
-#'    various sources. A list of valid "src_id" can be found either on the
-#'    \href{https://www.ebi.ac.uk/unichem/ucquery/listSources}
-#'    {UniChem sources page} or by using \code{\link{GetAllSrcIds}} function.
-#'   \item \strong{inchikey} Standard InChIKey of the drugs.
-#' }
+#' @param inchikey A vector of characters. It contains identifiers of the drug.
 #'
 #' @return A data frame with first column is the identifier passed to \code{ids}
 #' argument and following columns are indentifiers of all resources integrated
@@ -37,13 +27,11 @@ UnichemVer <- function() {
 #' @export
 #'
 #' @examples
-#' aspirin <- GetIds(ids = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N", type = "inchikey")
-GetIds <- function(ids, type) {
+#' aspirin <- GetIds(inchikey = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N")
+GetIds <- function(inchikey) {
   src.id <- GetAllSrcIds()
   # building base url
-  if (type == "inchikey") {
     url.base <- "https://www.ebi.ac.uk/unichem/rest/inchikey/"
-  } else if (type == "src.id")
 
   df <- data.frame() # result container
   i <- 1 # indicator
@@ -58,7 +46,7 @@ GetIds <- function(ids, type) {
 
     # requesting server via API
     url <- paste0(url.base, id) # establishing data
-    res <- fromJSON(url) # parsing JSON file
+    res <- jsonlite::fromJSON(url) # parsing JSON file
 
     # extracting IDs
     drugbank <- ifelse(2 %in% res[,1], res[which(res[,1] == 2), 2], NA)
@@ -102,7 +90,7 @@ GetAllSrcIds <- function(){
     temp <- data.frame()
 
     url <- paste0(url.base, id)
-    temp <- fromJSON(url)[c("name", "src_id", "description")]
+    temp <- jsonlite::fromJSON(url)[c("name", "src_id", "description")]
     df <- rbind.data.frame(df, temp)
   }
   return(df)

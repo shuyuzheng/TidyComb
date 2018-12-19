@@ -18,6 +18,7 @@ Imports:
     RCurl,
     jsonlite,
     dplyr,
-    RMySQL,
-    RMariaDB
+    stringr
 RoxygenNote: 6.1.1
+Suggests: 
+    testthat

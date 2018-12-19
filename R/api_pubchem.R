@@ -34,7 +34,8 @@
 #'   synonyms, NCGC IDs, Chembl IDs, CAS or any other kind of identifiers.
 #'   \item \strong{sdf} The SDF
 #'   }
-#' @param quiet
+#' @param quiet A logical value. Describe wether or not show error message
+#' during retrieving data.
 #'
 #' @return A data frame contains two columns:
 #' \itemize{
@@ -54,7 +55,7 @@ GetCid <- function(ids, type = NULL, quiet = TRUE){
     stop("Invalid idtype specified, valiable idtypes are: ", types)
   }
 
-  curlHandle <- getCurlHandle()
+  curlHandle <- RCurl::getCurlHandle()
   out <- data.frame(stringsAsFactors = FALSE)
 
   stepi <- 0
@@ -65,24 +66,25 @@ GetCid <- function(ids, type = NULL, quiet = TRUE){
     flush.console()
 
     tryCatch({
-      res <- dynCurlReader()
+      res <- RCurl::dynCurlReader()
       url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound",
                     "/%s/%s", "/synonyms/XML")
-      curlPerform(
+      RCurl::curlPerform(
         url = sprintf(url, type, URLencode(id)),
         curl = curlHandle, writefunction = res$update)
-      doc <- xmlInternalTreeParse(res$value())
-      rootNode <- xmlName(xmlRoot(doc))
+      doc <- XML::xmlInternalTreeParse(res$value())
+      rootNode <- XML::xmlName(XML::xmlRoot(doc))
       if (rootNode == "InformationList") {
-        xpathApply(doc, "//x:Information", namespaces = "x", function(x) {
-          cid <- xpathSApply(x, "./x:CID", namespaces = "x", xmlValue)
+        XML::xpathApply(doc, "//x:Information", namespaces = "x", function(x) {
+          cid <- XML::xpathSApply(x, "./x:CID", namespaces = "x", XML::xmlValue)
           df <- data.frame(id = id, cid = cid,
                            stringsAsFactors = FALSE)
           out <<- rbind.data.frame(out, df)
         })
       } else if (rootNode == "Fault") {
-        xpathApply(doc, "//x:Details", namespaces = "x", function(x){
-        fault <- xpathApply(doc, "//x:Details", namespaces = "x", xmlValue)
+        XML::xpathApply(doc, "//x:Details", namespaces = "x", function(x){
+        fault <- XML::xpathApply(doc, "//x:Details", namespaces = "x",
+                                 XML::xmlValue)
         if (!quiet) {
           print( paste(id, fault[[1]], sep = ": ") )
         }
@@ -106,14 +108,21 @@ GetCid <- function(ids, type = NULL, quiet = TRUE){
   return(out)
 }
 
-#' Title
+#' Get drug synonyms from PubChem
 #'
-#' @param cids
+#' @param cids A vector of characters or integers. contains CID of interested drugs
 #'
-#' @return
+#' @return A Data frame contains:
+#' \itemize{
+#'   \item \strong{cid} Inputted CIDs.
+#'   \item \strong{name} The first name in the synonyms list retrieved from
+#'   PubChem.
+#'   \item \strong{synonyms} Synonyms retrieved from PubChem
+#' }
 #' @export
 #'
 #' @examples
+#' GetPubNames("2244")
 GetPubNames <- function(cids){
 
   url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
@@ -133,7 +142,7 @@ GetPubNames <- function(cids){
         flush.console()
 
         url <- sprintf(url.base, compound)
-        res <- fromJSON(url)
+        res <- jsonlite::fromJSON(url)
         cid <- c(cid, res[[1]][[1]]$CID)
         name <- c(name, unlist(res[[1]][[1]]$Synonym)[1])
         synonyms <- c(synonyms,
@@ -192,6 +201,7 @@ GetPubchemPro <- function(cids){
   },
   finally = Sys.sleep(0.2)
   )
+  colnames(res) <- c("cid", "inchikey", "smiles", "molecular_formula")
   return(res)
 }
 
@@ -214,7 +224,7 @@ GetPubPhase <- function(cids, quiet = TRUE){
                     '"where":{"ands":[{"cid":"', compound, '"}]},',
                     '"order":["phase,desc"],',
                     '"start":1,"limit":10000}')
-      res <- fromJSON(url)
+      res <- jsonlite::fromJSON(url)
       status <- res$SDQOutputSet[[1]][[1]]
       temp <- matrix(c(compound, 0), nrow = 1)
       colnames(temp) <- c("cid", "phase")
@@ -244,27 +254,150 @@ GetPubPhase <- function(cids, quiet = TRUE){
 
   # clean
   gc()
+  clinical_phase$cid <- as.integer(clinical_phase$cid)
   return(clinical_phase)
 }
 
-GetPubIDs <- fuction(cids) {
-  url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
-                     "%s", "/xrefs/SourceName,RegistryID/JSON")
-  i <- 1
-  n <- length(cids)
+# GetPubIDs <- fuction(cids) {
+#   url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
+#                      "%s", "/xrefs/SourceName,RegistryID/JSON")
+#   i <- 1
+#   n <- length(cids)
+#
+#   for (compound in cids) {
+#     message(round(i/n, 2)*100, "%", "completed", "\r", appendLF = FALSE)
+#     flush.console()
+#
+#     tryCatch({
+#       url <- sprintf(url.base, compound)
+#       res <- fromJSON(url, flatten = TRUE)
+#       cid <- res[[1]][[1]]$CID
+#       ids <- res[[1]][[1]]$RegistryID[[1]]
+#       resource <- res[[1]][[1]]$SourceName[[1]]
+#     })
+#
+#   }
+#
+# }
 
-  for (compound in cids) {
-    message(round(i/n, 2)*100, "%", "completed", "\r", appendLF = FALSE)
-    flush.console()
+# GetPugKEGGXML <- function(cids) {
+#   query <- XML::xmlParse(system.file('api',
+#                                     "pugquery.xml",
+#                                     package='TidyComb'))
+#   parent <- XML::getNodeSet(query, "//PCT-ID-List_uids")[[1]]
+#   n <- lapply(cids, function(x) {XML::newXMLNode("PCT-ID-List_uids_E", x)})
+#   addChildren(parent, kids = n)
+#   query <- saveXML(query)
+#   query <- gsub("\\n", "", query)
+#   query <- gsub('<\\?xml version="1\\.0"\\?>', '', query)
+#   return(query)
+# }
+#
+# GetPollBody <- function(reqid) {
+#   doc <- XML::xmlParse(system.file('api',
+#                                    "pugpoll.xml",
+#                                    package='TidyComb'))
+#   node <- XML::getNodeSet(doc, "//PCT-Request_reqid")[[1]]
+#   XML::xmlValue(node) <- reqid
+#   doc <- saveXML(doc)
+#   doc <- gsub('<\\?xml version="1\\.0"\\?>', '', doc)
+#   doc <- gsub("\\n", "", doc)
+#   return(doc)
+# }
 
-    tryCatch({
-      url <- sprintf(url.base, compound)
-      res <- fromJSON(url, flatten = TRUE)
-      cid <- res[[1]][[1]]$CID
-      ids <- res[[1]][[1]]$RegistryID[[1]]
-      resource <- res[[1]][[1]]$SourceName[[1]]
-    })
 
-  }
-
-}
+# h <- RCurl::basicTextGatherer()
+# RCurl::curlPerform(url = "http://pubchem.ncbi.nlm.nih.gov/pug/pug.cgi",
+#             postfields = query,
+#             writefunction = h$update)
+# xml <- xmlTreeParse(h$value(), asText = TRUE, asTree = TRUE)
+# root <- xmlRoot(xml)
+#
+#
+#
+#
+# PollPug <- function(reqid) {
+#   root <- NA
+#   pstring <- GetPollXml(reqid)
+#   reqid <- NA
+#   while(TRUE) {
+#     h = RCurl::basicTextGatherer()
+#     RCurl::curlPerform(url = 'http://pubchem.ncbi.nlm.nih.gov/pug/pug.cgi',
+#                       postfields = pstring,
+#                       writefunction = h$update)
+#     ## see if we got a waiting response
+#     root <- xmlRoot(xmlTreeParse(h$value(), asText=TRUE, asTree=TRUE))
+#     reqid <- xmlElementsByTagName(root, 'PCT-Waiting', recursive=TRUE)
+#     if (length(reqid) != 0) next
+#     break
+#   }
+#   return(root)
+# }
+#
+# .get.aid.by.cid.old <- function(cid, type='raw', quiet=TRUE) {
+#
+#   if (!(type %in% c('tested','active','inactive','discrepant','raw')))
+#     stop("Invalid type specified")
+#
+#   url <- "http://pubchem.ncbi.nlm.nih.gov/pug/pug.cgi"
+#
+#   ## perform query
+#   qstring <- gsub("\\n", "", sprintf(.queryString, cid))
+#   h = basicTextGatherer()
+#   curlPerform(url = 'http://pubchem.ncbi.nlm.nih.gov/pug/pug.cgi',
+#               postfields = qstring,
+#               writefunction = h$update)
+#
+#   ## extract query id
+#   xml <- xmlTreeParse(h$value(), asText=TRUE, asTree=TRUE)
+#   root <- xmlRoot(xml)
+#   reqid <- xmlElementsByTagName(root, 'PCT-Waiting_reqid', recursive=TRUE)
+#   if (length(reqid) != 1) {
+#     if (!quiet) warning("Malformed request id document")
+#     return(NULL)
+#   }
+#   reqid <- xmlValue(reqid[[1]])
+#
+#   ## start polling
+#   if (!quiet) cat("Starting polling using reqid:", reqid, "\n")
+#   root <- .poll.pubchem(reqid)
+#
+#   ## OK, got the link to our result
+#   link <- xmlElementsByTagName(root, 'PCT-Download-URL_url', recursive=TRUE)
+#   if (length(link) != 1) {
+#     if (!quiet) warning("Polling finished but no download URL")
+#     return(NULL)
+#   }
+#   link <- xmlValue(link[[1]])
+#   if (!quiet) cat("Got link to download:", link, "\n")
+#
+#   ## OK, get data file
+#   tmpdest <- tempfile(pattern = 'abyc')
+#   tmpdest <- paste(tmpdest, '.gz', sep='', collapse='')
+#   status <- try(download.file(link,
+#                               destfile=tmpdest,
+#                               method='internal',
+#                               mode='wb', quiet=TRUE),
+#                 silent=TRUE)
+#   if (class(status) == 'try-error') {
+#     if (!quiet) warning(status)
+#     return(NULL)
+#   }
+#
+#   ## OK, load the data
+#   dat <- read.csv(tmpdest,header=TRUE,fill=TRUE,row.names=NULL)
+#   unlink(tmpdest)
+#
+#   valid.rows <- grep("^[[:digit:]]*$", dat[,1])
+#   dat <- dat[valid.rows,c(1,3,4,5)]
+#   row.names(dat) <- 1:nrow(dat)
+#   names(dat) <- c('aid', 'active', 'inactive', 'tested')
+#   ret <- dat
+#
+#   type <- type[1]
+#   switch(type,
+#          active = dat[dat$active == 1,1],
+#          inactive = dat[dat$inactive == 1,1],
+#          tested = dat[,1],
+#          raw = ret[,-5])
+# }

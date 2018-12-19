@@ -12,16 +12,16 @@ GetPubchemPro(cids)
 \value{
 A data frame contains 4 columns:
 \itemize{
-\item \strong{CID} CID of drugs which is inputted to \code{cids} argument.
-\item \strong{InChIKey} Standard InChIKey of matched drugs.
-\item \strong{CanonicalSMILES} Standard Canonical SMILES of matched drugs.
-\item \strong{MolecularFormula} Molecular formula for matched drugs.
+  \item \strong{CID} CID of drugs which is inputted to \code{cids} argument.
+  \item \strong{InChIKey} Standard InChIKey of matched drugs.
+  \item \strong{CanonicalSMILES} Standard Canonical SMILES of matched drugs.
+  \item \strong{MolecularFormula} Molecular formula for matched drugs.
 }
 }
 \description{
-\code{GetPubchemPro} functions retrieves the properties (InChIKey, Canonical
+\code{GetPubchemPro} function retrieves the properties (InChIKey, Canonical
 SMILES, and molecula formula) of drugs from PubChem database via
-\href{https://pubchemdocs.ncbi.nlm.nih.gov/pug-rest$_Toc494865567}{PUG REST}
+\href{https://pubchemdocs.ncbi.nlm.nih.gov/pug-rest$_Toc494865567}{PUG REST}.
 }
 \examples{
 property <- GetPubchemPro(c(1,2,3,4))

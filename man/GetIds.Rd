@@ -4,20 +4,10 @@
 \alias{GetIds}
 \title{Get other identifiers from InChIKey}
 \usage{
-GetIds(ids, type)
+GetIds(inchikey)
 }
 \arguments{
-\item{ids}{A vector of characters. It contains identifiers of the drug.}
-
-\item{type}{A character or an integer. It specifies the type of identifiers
-passed to \code{ids}. Acceptable values are:
-\enumerate{
-  \item \strong{An integer} indicates the "src_id" that UniChem assigned to
-   various sources. A list of valid "src_id" can be found either on the
-   \href{https://www.ebi.ac.uk/unichem/ucquery/listSources}
-   {UniChem sources page} or by using \code{\link{GetAllSrcIds}} function.
-  \item \strong{inchikey} Standard InChIKey of the drugs.
-}}
+\item{inchikeys}{A vector of characters. It contains identifiers of the drug.}
 }
 \value{
 A data frame with first column is the identifier passed to \code{ids}
@@ -35,5 +25,5 @@ via \href{https://www.ebi.ac.uk/unichem/info/webservices}{UniChem Web
 Services}.
 }
 \examples{
-aspirin <- GetIds(ids = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N", type = "inchikey")
+aspirin <- GetIds(inchikey = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N")
 }

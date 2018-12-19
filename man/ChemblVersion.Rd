@@ -14,5 +14,5 @@ Chembl.
 Check version of Chembl database
 }
 \examples{
-print(ChemblVer())
+print(ChemblVersion())
 }

@@ -9,10 +9,10 @@
 #' @export
 #'
 #' @examples
-#' print(ChemblVer())
+#' print(ChemblVersion())
 ChemblVersion <- function(){
   url <- "https://www.ebi.ac.uk/chembl/api/data/status?format=json"
-  res <- fromJSON(url, flatten = TRUE)
+  res <- jsonlite::fromJSON(url, flatten = TRUE)
   res <- unlist(res)
 }
 
@@ -37,9 +37,9 @@ ChemblVersion <- function(){
 #'
 #' @examples
 #' drug.info <- GetChembl("PMATZTZNYRCHOR-CGLBZJNRSA-N")
-GetChemblPhase <- function(ids, quiet = TRUE){
+GetChembl <- function(ids, quiet = TRUE){
 
-  curlHandle <- getCurlHandle()
+  curlHandle <- RCurl::getCurlHandle()
   out <- data.frame(stringsAsFactors = FALSE)
   new_item <- NA
 
@@ -54,13 +54,16 @@ GetChemblPhase <- function(ids, quiet = TRUE){
 
       chembl_phase <- integer()
       chembl_id <- character()
-      res <- dynCurlReader()
+      res <- RCurl::dynCurlReader()
 
       url <- paste0("https://www.ebi.ac.uk/chembl/api/data/molecule/", id)
-      curlPerform(url = url, curl = curlHandle, writefunction = res$update)
-      doc <- xmlInternalTreeParse(res$value())
+      RCurl::curlPerform(
+        url = url,
+        curl = curlHandle, writefunction = res$update, verbose = TRUE)
+      doc <- XML::xmlInternalTreeParse(res$value())
+
       # clinical phase
-      new_item <- xpathApply(doc, "//max_phase", xmlValue)
+      new_item <- XML::xpathApply(doc, "//max_phase", XML::xmlValue)
       new_item <- as.integer(unlist(new_item))
       if (is.null(new_item)) {
         new_item <- 0
@@ -68,13 +71,13 @@ GetChemblPhase <- function(ids, quiet = TRUE){
       chembl_phase <- c(chembl_phase, new_item)
 
       # Chembl ID
-      new_item <- xpathApply(doc, "//molecule/molecule_chembl_id", xmlValue)
+      new_item <- XML::xpathApply(doc, "//molecule/molecule_chembl_id",
+                                  XML::xmlValue)
       new_item <- unlist(new_item)
       if (is.null(new_item)) {
         new_item <- NA
       }
       chembl_id <- c(chembl_id, new_item)
-
       },
     error = function(e) {
       chembl_id <<- NA

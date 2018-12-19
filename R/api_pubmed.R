@@ -26,11 +26,11 @@ get.pubmed <- function(pmid, tool = "R", email = NULL ) {
       your email address as a parameter when calling this function.")
   }
 
-  url  <- str_c("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/",
+  url  <- stringr::str_c("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/",
                 "esummary.fcgi?", "db=pubmed", "&id=", pmid, "&tool=R",
                 "&email=", email, "&retmode=json", sep = "")
-  res <- fromJSON(url)
-  result <- unlist(res[[2]], recursive = TRUE, use.name = TRUE)
+  res <- jsonlite::fromJSON(url)
+  result <- unlist(res[[2]], recursive = TRUE, use.names = TRUE)
   info <- as.data.frame(t(result[str_c(pmid, ".", c("pubdate", "authors.name1"
                   , "title", "fulljournalname", "elocationid"))]))
   colnames(info) <- c("year", "name", "title", "journal", "doi")

@@ -23,11 +23,11 @@ A data frame contains two variables:
 }
 \details{
 This function extracts the primary name (as "name") and synonyms (as
-"synonyms") of an \code{\link[XML]{XMLIntervalElementNode}} object containing
+"synonyms") of an \code{XMLIntervalElementNode} object containing
 one \emph{cell-line-list} node extracted from Cellosaurus xml file.
 
 If you'd like to extract information from multiple \emph{cell-line-list}
-nodes, combining this function with \code{\link[XML]{xpathSapply}} or
+nodes, combining this function with \code{xpathSapply} or
 \code{\link[base]{sapply}} is recommanded.
 }
 \examples{

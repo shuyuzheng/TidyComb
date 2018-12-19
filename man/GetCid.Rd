@@ -23,7 +23,8 @@ synonyms, NCGC IDs, Chembl IDs, CAS or any other kind of identifiers.
 \item \strong{sdf} The SDF
 }}
 
-\item{quiet}{}
+\item{quiet}{A logical value. Describe wether or not show error message
+during retrieving data.}
 }
 \value{
 A data frame contains two columns:

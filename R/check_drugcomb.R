@@ -1,20 +1,16 @@
-#' Check current status of DrugComb
-#'
-#' Get the updated csv files from DrugComb database:
-#' cell_line: cellosaurus_accession, id
-#' select * from drug into outfile '/var/lib/mysql-files/dr.csv' fields terminated by ',' enclosed by '"' lines terminated by '\n';
-#' drug: id, cid
-#' tissue: id, name (*)
-#' disease: name, id (*)
-#' study: id
-#'
+# Check current status of DrugComb
+#
+# Get the updated csv files from DrugComb database:
+# cell_line: cellosaurus_accession, id
+# select * from drug into outfile '/var/lib/mysql-files/dr.csv' fields terminated by ',' enclosed by '"' lines terminated by '\n';
+# drug: id, cid
+# tissue: id, name (*)
+# disease: name, id (*)
+# study: id
+#
 CheckCell <- function(test) {
   message("Checking Cell lines...")
-  exist <- read.csv(system.file("extdata", "cell_line.csv",
-                                package = "TidyComb"),
-                    header = FALSE,
-                    col.names = c("cellosaurus_accession", "id"),
-                    stringsAsFactors = FALSE)
+  exist <- drugcomb$cell_line
   n <- nrow(exist)
   old <- exist[match(test, exist$cellosaurus_accession), ] %>% na.omit()
   new <- test[!test %in% exist$cellosaurus_accession]
@@ -30,11 +26,7 @@ CheckCell <- function(test) {
 
 CheckTissue <- function(test) {
   message("Checking tissues...")
-  exist <- read.csv(system.file("extdata", "tissue.csv",
-                                package = "TidyComb"),
-                    header = FALSE,
-                    col.names = c("id", "name"),
-                    stringsAsFactors = FALSE)
+  exist <- drugcomb$tissue
   n <- nrow(exist)
   old <- exist[match(test, exist$name), ] %>% na.omit()
   new <- test[!test %in% exist$name]
@@ -50,11 +42,7 @@ CheckTissue <- function(test) {
 
 CheckDisease <- function(test) {
   message("Checking  diseases...")
-  exist <- read.csv(system.file("extdata", "disease.csv",
-                                package = "TidyComb"),
-                    header = FALSE,
-                    col.names = c("name", "id"),
-                    stringsAsFactors = FALSE)
+  exist <- drugcomb$disease
   n <- nrow(exist)
   old <- exist[match(test, exist$id), ] %>% na.omit()
   new <- test[!test %in% exist$id]
@@ -70,11 +58,7 @@ CheckDisease <- function(test) {
 
 CheckDrug <- function(cids) {
   message("Checking drugs...")
-  exist <- read.csv(system.file("extdata", "drug.csv",
-                                package = "TidyComb"),
-                    header = FALSE,
-                    col.names = c("id", "cid"),
-                    stringsAsFactors = FALSE)
+  exist <- drugcomb$drug
   n <- nrow(exist)
   old <- exist[match(cids, exist$cid), ] %>% na.omit()
   new <- cids[!cids %in% exist$cid]

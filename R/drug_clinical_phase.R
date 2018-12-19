@@ -1,7 +1,7 @@
-GetMaxPhase <- function(cids) {
+GetMaxPhase <- function(cids, inchikeys) {
   pub.phase <- GetPubPhase(cids, quiet = FALSE)
-  pub.phase$cid <- as.numeric(clinical_phase$cid)
+  pub.phase$cid <- as.numeric(pub.phase$cid)
 
-  chemb.phase <- GetChemblPhase(cids)
-  drug <- left_join(drug, clinical_phase, by = "cid")
+  chemb.phase <- GetChemblPhase(inchikeys)
+  drug <- dplyr::left_join(drug, chemb.phase, by = "cid")
 }

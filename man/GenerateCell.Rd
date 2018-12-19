@@ -6,6 +6,17 @@
 \usage{
 GenerateCell(name)
 }
+\arguments{
+\item{name}{A vector of charactors contains names of interested cell lines}
+}
+\value{
+A list with 3 data frame contains
+\itemize{
+  \item \strong{cell_line} The cell_line table prepared for uploading.
+  \item \strong{tissue} The tissue table prepared for uploading.
+  \item \strong{disease} The disease table prepared for uploading.
+}
+}
 \description{
 Generate "cell_line" and "tissue" file
 }

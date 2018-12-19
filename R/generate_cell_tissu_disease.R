@@ -4,11 +4,19 @@
 
 #' Generate "cell_line" and "tissue" file
 #'
-#' @param ids
-#' @param type
+#' @param name A vector of charactors contains names of interested cell lines
+#'
+#' @return  A list with 3 data frame contains
+#' \itemize{
+#'   \item \strong{cell_line} The cell_line table prepared for uploading.
+#'   \item \strong{tissue} The tissue table prepared for uploading.
+#'   \item \strong{disease} The disease table prepared for uploading.
+#' }
+#' @export
+#'
 GenerateCell <- function(name){
   # Get all cell lines' cellosaurus accession
-  doc <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
+  doc <- GetAllCell()
   cell <- GetCell(doc, ids = name, type = "name")
   acc <- GetCellInfo(cell, "accession")
 

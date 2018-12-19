@@ -2,17 +2,19 @@
 # Functions for retrieving or updating celline information from Cellosaurus.
 # Copyrighte Shuyu Zheng
 
+
+
 #' Extract primary name and synonyms of one cell line.
 #'
 #' \code{GetNames} extract primary name and synonyms from only one
 #' \emph{cell-line-list} node in Cellosaurus xml file.
 #'
 #' This function extracts the primary name (as "name") and synonyms (as
-#' "synonyms") of an \code{\link[XML]{XMLIntervalElementNode}} object containing
+#' "synonyms") of an \code{XMLIntervalElementNode} object containing
 #' one \emph{cell-line-list} node extracted from Cellosaurus xml file.
 #'
 #' If you'd like to extract information from multiple \emph{cell-line-list}
-#' nodes, combining this function with \code{\link[XML]{xpathSapply}} or
+#' nodes, combining this function with \code{xpathSapply} or
 #' \code{\link[base]{sapply}} is recommanded.
 #'
 #' @param node An \code{XMLInternalElementNode} with only one
@@ -23,8 +25,6 @@
 #'   \item \code{name} the primary name of cell line.
 #'   \item \code{synonyms} synonyms of the cell line separated by semicolons.
 #' }
-#'
-#' @export
 #'
 #' @examples
 #' # parse the Cellosaurus xml file.
@@ -156,12 +156,16 @@ GetAccession <- function(node){
 #'
 #' @param file A character. The xml file contains the Cellosaurus dataset.
 #'
+#' @param ... Other arguments.
+#'
 #' @examples
 #' # Check the online Cellosaurus database version.
 #' CellVersion()
 #'
 #' # Check the local Cellosaurus XML document version.
-#' CellVersion(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
+#' CellVersion(system.file("extdata",
+#'                         "cellosaurus.xml",
+#'                         package = "TidyComb"))
 #'
 #' @export
 CellVersion <- function(
@@ -181,7 +185,6 @@ CellVersion <- function(
                                handlers = list(startElement = startElement)))
 }
 
-
 #' Loading a Cellosaurus XML dataset
 #'
 #' Cellosaus published "cellosaurus.xml" contains 5 part of information:
@@ -190,23 +193,14 @@ CellVersion <- function(
 #' This function will parse the XML file and extract "cell-line-list" node which
 #' includes all information about cell lines as a XML document object.
 #'
-#' @param file A Cellosaurus XML file. It could be the URL point to online file
-#' ("ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml") or a local
-#' file already downloaded (recommend).
-#'
 #' @return An XMLNode containing all cell lines' information archieved in
 #' Cellosaurus dataset.
-#'
-#' @examples
-#' Doc <- GetAllCell(system.file("extdata",
-#'                               "cellosaurus.xml",
-#'                               package = "TidyComb"))
-#'
-#' @export
-GetAllCell <- function(file){
-    doc <- XML::xmlInternalTreeParse(file)
-    all.cells <- XML::xmlRoot(doc)[[2]]
-    return(all.cells)
+GetAllCell <- function() {
+  doc <- XML::xmlInternalTreeParse(system.file("extdata",
+                                               "cellosaurus.xml",
+                                               package = "TidyComb"))
+  all.cell <- XML::xmlRoot(doc)[[2]]
+  return(all.cell)
 }
 
 #' Find matitching cell-lines
@@ -228,14 +222,12 @@ GetAllCell <- function(file){
 #' cell line is matched, a NULL list will be return.
 #'
 #' @examples
-#' all.cells <- GetAllCell(system.file("extdata",
-#'                                     "cellosaurus.xml",
-#'                                      package = "TidyComb"))
-#' cell.lines <- GetCell(all.cells, c("U87", "A549"), "name")
+#' node <- GetAllCell()
+#' cell.lines <- GetCell(c("U87", "A549"), "name")
 #'
-#' @export
 GetCell <- function(node, ids, type = "name"){
   if(type == "name"){
+
     xpath <- paste0("//name[text()='",
                     paste(ids, collapse = "' or text() = '"),
                     "']/ancestor::cell-line")
@@ -261,20 +253,19 @@ GetCell <- function(node, ids, type = "name"){
 #'
 #' @param info A Character indicate about what kind of infomation you want to
 #' extract. Available values are:
-#'   \item{name}{primary name and synonyms of cell lines.}
-#'   \item{accession}{Cellosaurus Accession ID for cell lines.}
-#'   \item{disease}{diseases that are associated with the cell lines and
-#'    corresponding NCI Thesaurus entry code.}
-#'   \item{tissue}{Tissues that the cell line generated from. Following the CCLE
-#'    category.}
+#' \itemize{
+#'   \item \strong{name} primary name and synonyms of cell lines.
+#'   \item \strong{accession} Cellosaurus Accession ID for cell lines.
+#'   \item \strong{disease} diseases that are associated with the cell lines and
+#'    corresponding NCI Thesaurus entry code.
+#'   \item \strong{tissue} Tissues that the cell line generated from. Following the CCLE
+#'    category.
+#'}
 #'
 #' @return A data frame contains cell line information selected by \code{info}
 #'
 #' @examples
-#' all.cells <- GetAllCell(system.file("extdata",
-#'                                     "cellosaurus.xml",
-#'                                      package = "TidyComb"))
-#' cell.lines <- GetCell(all.cells, c("U87", "A549"), "name")
+#' cell.lines <- GetCell(cellosaurus, c("U87", "A549"), "name")
 #' cell.info <- GetCellInfo(cell.lines)
 #'
 #' @export

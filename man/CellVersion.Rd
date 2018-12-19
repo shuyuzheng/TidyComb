@@ -10,6 +10,8 @@
 }
 \arguments{
 \item{file}{A character. The xml file contains the Cellosaurus dataset.}
+
+\item{...}{Other arguments.}
 }
 \description{
 Cellosaurus publishes its dataset as an XML file which could be downloaded
