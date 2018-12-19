@@ -59,7 +59,7 @@ GetChembl <- function(ids, quiet = TRUE){
       url <- paste0("https://www.ebi.ac.uk/chembl/api/data/molecule/", id)
       RCurl::curlPerform(
         url = url,
-        curl = curlHandle, writefunction = res$update, verbose = TRUE)
+        curl = curlHandle, writefunction = res$update)
       doc <- XML::xmlInternalTreeParse(res$value())
 
       # clinical phase

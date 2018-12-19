@@ -43,7 +43,9 @@ GetIds <- function(inchikey) {
     # progress indicator
     message(round(i/n * 100), "%", "\r", appendLF = FALSE)
     flush.console()
-
+    drugbank <- NA
+    kegg <- NA
+    tryCatch({
     # requesting server via API
     url <- paste0(url.base, id) # establishing data
     res <- jsonlite::fromJSON(url) # parsing JSON file
@@ -52,18 +54,18 @@ GetIds <- function(inchikey) {
     drugbank <- ifelse(2 %in% res[,1], res[which(res[,1] == 2), 2], NA)
     kegg <- ifelse(6 %in% res[,1], res[which(res[,1] == 6), 2], NA)
 
-    # assembling results
+    },
+    error = function(e){
+      print(e)
+    })
     temp <- data.frame(inchikey = id,
-                       drugbank = drugbank,
-                       kegg = kegg,
+                       uni_drugbank = drugbank,
+                       uni_kegg_c = kegg,
                        stringsAsFactors = FALSE)
     df <- rbind.data.frame(df, temp)
-
-    # cleaning up temporary variable and updating indicator .
-    temp <- data.frame()
     i <- i + 1
   }
-
+  return(df)
 }
 
 

@@ -18,7 +18,13 @@ Imports:
     RCurl,
     jsonlite,
     dplyr,
-    stringr
+    stringr,
+    plyr,
+    reshape2,
+    drc,
+    nleqslv,
+    gplots,
+    SpatialExtremes
 RoxygenNote: 6.1.1
 Suggests: 
     testthat
