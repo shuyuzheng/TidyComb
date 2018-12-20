@@ -24,7 +24,7 @@
 #' @examples
 #' aspirin <- GetIds(inchikey = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N")
 GetIds <- function(inchikey) {
-  src.id <- GetAllSrcIds()
+  message("Getting identifiers from UniChem...")
   # building base url
     url.base <- "https://www.ebi.ac.uk/unichem/rest/inchikey/"
 

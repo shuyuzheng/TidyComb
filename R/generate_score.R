@@ -9,8 +9,8 @@
 
 GenerateScore = function(response){
   # add row and column numbers
-  response <- plyr::ddply(response, c("cell_line_name", "drug_row" ,
-                                      "drug_col", "block_id"),
+  response <- plyr::ddply(response, c("cell_line_id", "drug_row_id" ,
+                                      "drug_col_id", "block_id"),
                           transform,
                           row = own_rank(conc_r),
                           col = own_rank(conc_c))

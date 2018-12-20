@@ -48,7 +48,7 @@
 #' @examples
 #' GetCid("aspirin", "name", quiet = TRUE)
 GetCid <- function(ids, type = NULL, quiet = TRUE){
-
+  message("Getting CIDs from PubChem...")
   types <- c("name", "smiles", "inchi", "sdf", "inchikey", "formula")
 
   if (!(type %in% types)) {
@@ -124,7 +124,7 @@ GetCid <- function(ids, type = NULL, quiet = TRUE){
 #' @examples
 #' GetPubNames("2244")
 GetPubNames <- function(cids){
-
+  message("Getting names from PubChem...")
   url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
                      "%s", "/synonyms/JSON")
 
@@ -136,24 +136,21 @@ GetPubNames <- function(cids){
   i <- 1
   n <- length(cids)
   for (compound in cids) {
-    tryCatch(
-      {
-        message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
-        utils::flush.console()
+    tryCatch({
+      message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
+      utils::flush.console()
 
-        url <- sprintf(url.base, compound)
-        res <- jsonlite::fromJSON(url)
-        cid <- c(cid, res[[1]][[1]]$CID)
-        name <- c(name, unlist(res[[1]][[1]]$Synonym)[1])
-        synonyms <- c(synonyms,
-                      paste0(unlist(res[[1]][[1]]$Synonym), collapse = "; "))
-        i <- i + 1
-      },
-      error = function(e){
-        print(e)
-      },
-      finally = Sys.sleep(0.2)
+      url <- sprintf(url.base, compound)
+      res <- jsonlite::fromJSON(url)
+      cid <- c(cid, res[[1]][[1]]$CID)
+      name <- c(name, unlist(res[[1]][[1]]$Synonym)[1])
+      synonyms <- c(synonyms,
+                    paste0(unlist(res[[1]][[1]]$Synonym), collapse = "; "))
+    }, error = function(e){
+      print(e)
+    }, finally = Sys.sleep(0.2)
     )
+    i <- i + 1
   }
   df <- data.frame(cid = cid, name = name, synonyms = synonyms,
                    stringsAsFactors = FALSE)
@@ -179,34 +176,33 @@ GetPubNames <- function(cids){
 #'
 #' @examples
 #' property <- GetPubchemPro(c(1,2,3,4))
-GetPubchemPro <- function(cids){
-  tryCatch({
+GetPubchemPro <- function(cids) {
+  message("Getting drug properties from PubChem...")
+
   res <- NULL
   batch <- split(cids, ceiling(seq_along(cids)/100))
 
   for (i in 1:length(batch)) {
-  temp <- NULL
-  compound <- paste0(batch[[i]], collapse = ",")
-  property <- paste0(c("InChIKey", "CanonicalSMILES", "MolecularFormula"),
-                     collapse = ",")
-  url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
-                     compound, "/property/", property, "/CSV")
-  temp <- utils::read.csv(url, stringsAsFactors = FALSE)
-  res <- rbind.data.frame(res, temp)
+    tryCatch({
+      temp <- NULL
+      compound <- paste0(batch[[i]], collapse = ",")
+      property <- paste0(c("InChIKey", "CanonicalSMILES", "MolecularFormula"),
+                         collapse = ",")
+      url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
+                         compound, "/property/", property, "/CSV")
+      temp <- utils::read.csv(url, stringsAsFactors = FALSE)
+      res <- rbind.data.frame(res, temp)
+    }, error = function(e){
+        print(e)
+    }, finally = Sys.sleep(0.2)
+    )
   }
-
-  },
-  error = function(e){
-    print(e)
-  },
-  finally = Sys.sleep(0.2)
-  )
-  colnames(res) <- c("cid", "inchikey", "smiles", "molecular_formula")
-  return(res)
+      colnames(res) <- c("cid", "inchikey", "smiles", "molecular_formula")
+      return(res)
 }
 
-GetPubPhase <- function(cids, quiet = TRUE){
-  message("Getting clinical phases from PubChem.")
+GetPubPhase <- function(cids, quiet = TRUE) {
+  message("Getting clinical phases from PubChem...")
   # build container
   clinical_phase <- NULL
   # set indicator
@@ -214,10 +210,11 @@ GetPubPhase <- function(cids, quiet = TRUE){
   n <- length(cids)
 
   for (compound in cids) {
-    tryCatch({
-      message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
-      utils::flush.console()
 
+    message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
+    utils::flush.console()
+
+    tryCatch({
       url <- paste0('https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?',
                     'infmt=json&outfmt=json&query={"select":["cid","phase"],',
                     '"collection":"clinicaltrials",',
@@ -241,15 +238,13 @@ GetPubPhase <- function(cids, quiet = TRUE){
           print( strsplit(error, ". ", fixed = T)[[1]][1] )
         }
       }
-
-      clinical_phase <- rbind(clinical_phase, temp)
-      i <- i + 1
-    },
-    error = function(e){
+    }, error = function(e){
       if (!quiet) print(e)
-    },
-    finally = Sys.sleep(0.2)
+    }, finally = Sys.sleep(0.2)
     )
+
+    clinical_phase <- rbind(clinical_phase, temp)
+    i <- i + 1
   }
 
   # clean

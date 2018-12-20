@@ -14,7 +14,7 @@ CheckCell <- function(test) {
   n <- nrow(exist)
   old <- stats::na.omit(exist[match(test, exist$cellosaurus_accession), ])
   new <- test[!test %in% exist$cellosaurus_accession]
-  message("DrugComb has archived ", n, "cell lines.\n",
+  message("DrugComb has archived ", n, " cell lines.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
           " of checked cell line(s) have/has been in DrugComb: ",
           paste(old$cellosaurus_accession, collapse = ", "), "\n",
@@ -30,7 +30,7 @@ CheckTissue <- function(test) {
   n <- nrow(exist)
   old <- stats::na.omit(exist[match(test, exist$name), ])
   new <- test[!test %in% exist$name]
-  message("DrugComb has archived ", n, "tissues.\n",
+  message("DrugComb has archived ", n, " tissues.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
           " of checked tissue(s) have/has been in DrugComb: ",
           paste(old$name, collapse = ", "), "\n",
@@ -46,7 +46,7 @@ CheckDisease <- function(test) {
   n <- nrow(exist)
   old <- stats::na.omit(exist[match(test, exist$id), ])
   new <- test[!test %in% exist$id]
-  message("DrugComb has archived ", n, "diseases.\n",
+  message("DrugComb has archived ", n, " diseases.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
           " of checked disease(s) have/has been in DrugComb: ",
           paste(old$name, collapse = ", "), "\n",
@@ -62,10 +62,10 @@ CheckDrug <- function(cids) {
   n <- nrow(exist)
   old <- stats::na.omit(exist[match(cids, exist$cid), ])
   new <- cids[!cids %in% exist$cid]
-  message("DrugComb has archived ", n, "drugs.\n",
+  message("DrugComb has archived ", n, " drugs.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
           " of checked drug(s) have/has been in DrugComb: ",
-          paste(old$name, collapse = ", "), "\n",
+          paste(old$cid, collapse = ", "), "\n",
           ifelse(is.null(length(new)), 0, length(new)),
           " of checked drug(s) are/is not in DrugComb: ",
           paste0(new, collapse = ", "))

@@ -38,7 +38,7 @@ ChemblVersion <- function(){
 #' @examples
 #' drug.info <- GetChembl("PMATZTZNYRCHOR-CGLBZJNRSA-N")
 GetChembl <- function(ids, quiet = TRUE){
-
+  message("Getting information from ChEMBL...")
   curlHandle <- RCurl::getCurlHandle()
   out <- data.frame(stringsAsFactors = FALSE)
   new_item <- NA

@@ -3,7 +3,20 @@
 # Copyrighte Shuyu Zheng
 
 
-# Get all cell lines' cellosaurus accession
+#' Match cell line name with cellosaurus accession
+#'
+#' @param name A vector of charactors contains names of interested cell lines
+#'
+#' @return A data frame contains:
+#' \itemize{
+#'   \item \strong{input_name} The input cell lines names
+#'   \item \strong{cellosaurus_accession} The cellosaurus accession matched with
+#'   cell line names.
+#'   \item \strong{all_name} All names for the mached cell lines, including
+#'   primary name and synonyms.
+#' }
+#' @export
+#'
 MatchCellAcc <- function(name){
   doc <- GetAllCell()
   cell <- GetCell(doc, ids = name, type = "name")
@@ -82,7 +95,14 @@ GenerateCell <- function(acc){
     id <- seq(exist.cell$n + 1, length.out = length(exist.cell$new))
 
     exist.disease <- CheckDisease(as.character(dis.uni[, 2]))
-    disease <- exist.disease$new
+    if (length(exist.disease$new) == 0) {
+      disease <- data.frame(name = character(),
+                            id = character(),
+                            stringsAsFactors = FALSE)
+    } else {
+      disease <- exist.disease$new
+    }
+
 
     exist.tissue <- CheckTissue(tis.uni[,1])
     if (length(exist.tissue$new) == 0) {

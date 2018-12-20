@@ -1,6 +1,3 @@
-library(jsonlite)
-library(RCurl)
-library(stringr)
 get.pubmed <- function(pmid, tool = "R", email = NULL ) {
   # Input:
   #    1. pmid: PubMed ID of publications
@@ -22,7 +19,7 @@ get.pubmed <- function(pmid, tool = "R", email = NULL ) {
   #    2. email: should be the e-mail address of the maintainer of the tool,
   # and should be a valid e-mail address.
   if (is.null(email)) {
-      stop ("As the PMC API ask for user's contact information, please provide
+      stop("As the PMC API ask for user's contact information, please provide
       your email address as a parameter when calling this function.")
   }
 

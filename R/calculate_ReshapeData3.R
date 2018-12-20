@@ -1,12 +1,12 @@
 # ReshapeData
 # Version 3: for analying all the scores simultaneously
 ReshapeData3 = function (data) {
-  if (!all(c("block_id", "drug_row", "drug_col", "row", "col", "response",
+  if (!all(c("block_id", "drug_row_id", "drug_col_id", "row", "col", "response",
              "synergy_zip", "synergy_loewe", "synergy_bliss", "synergy_hsa",
              "conc_r", "conc_c", "conc_r_unit", "conc_c_unit") %in%
            colnames(data)))
     stop("The input data must contain the following columns:",
-         " block_id, drug_row, drug_col, row, col, response, synergy_zip, ",
+         " block_id, drug_row_id, drug_col_id, row, col, response, synergy_zip, ",
          "synergy_loewe, synergy_bliss, synergy_hsa \n",
          "conc_r, conc_c, conc_r_unit, conc_c_unit")
   id.drug.comb <- unique(data$block_id)
@@ -51,8 +51,8 @@ ReshapeData3 = function (data) {
     conc.runit <- unique(tmp.mat$conc_r_unit)
     conc.cunit <- unique(tmp.mat$conc_c_unit)
 
-    drug.row <- unique(tmp.mat$drug_row)
-    drug.col <- unique(tmp.mat$drug_col)
+    drug.row <- unique(tmp.mat$drug_row_id)
+    drug.col <- unique(tmp.mat$drug_col_id)
 
     drug.pairs$drug.row[i] <- drug.row
     drug.pairs$drug.col[i] <- drug.col
