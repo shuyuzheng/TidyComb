@@ -48,7 +48,7 @@ GetChembl <- function(ids, quiet = TRUE){
   for (id in ids) {
 
     message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
-    flush.console()
+    utils::flush.console()
 
     tryCatch({
 

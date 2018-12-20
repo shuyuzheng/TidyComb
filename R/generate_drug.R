@@ -7,33 +7,39 @@
 #'  another one is drug id cid index table.
 #' @export
 #'
+#' @importFrom magrittr %>%
+#'
 #' @examples
-#' input <- read.csv(system.file("extdata",
+#' input <- utils::read.csv(system.file("extdata",
 #'                               "template.csv",
 #'                                package = "TidyComb"),
 #'                   stringsAsFactors = FALSE)
-#' cids <- unique(c(input$drug_row_cid, input$drug_col_cid)) %>% na.omit()
+#' cids <- na.omit(unique(c(input$drug_row_cid, input$drug_col_cid)))
 #' drug <- GenerateDrug(cids)
 GenerateDrug <- function(cids) {
   # 1. Check whether drug have been archived in DrugComb database.
   check <- CheckDrug(cids = cids)
 
   # 2. Get name, synonyms, and properties from PubChem
+  message("Getting information from PubChem...")
   pub.info <- GetPubNames(check$new) %>%
      dplyr::left_join(GetPubchemPro(check$new), by = "cid") %>%
      dplyr::left_join(GetPubPhase(check$new), by="cid")
 
   # 3. Get Chembl ID, clinical phase from ChEMBL.
+  message("Getting information from ChEMBL...")
   pub.chembl <- GetChembl(pub.info$inchikey, quiet = TRUE) %>%
      dplyr::right_join(pub.info, by = "inchikey") %>%
      dplyr::mutate(clinical_phase = max(phase, chembl_phase))
 
   # 4. Get DrugBank ID, KEGG ID from UniChem.
+  message("Getting information from UniChem...")
   pub.chembl.uni <- GetIds(pub.info$inchikey) %>%
     dplyr::right_join(pub.chembl, by = "inchikey")
 
   # 5. Get DrugBank ID, KEGG ID from DrugBank.
-  drugbank <- read.csv(system.file("extdata",
+  message("Getting information from DrugBank...")
+  drugbank <- utils::read.csv(system.file("extdata",
                                    "drugbank.csv",
                                    package = "TidyComb"),
                        stringsAsFactors = FALSE)
@@ -45,6 +51,7 @@ GenerateDrug <- function(cids) {
      dplyr::right_join(pub.chembl.uni, by = c("cid" = "cid"))
 
   # 6. clean IDs
+  message("Combining drug information...")
   # KEGG Coumpound ID
   kegg.compound <- dplyr::select(pub.chembl.uni.db, cid, uni_kegg_c, db_kegg_c)
   kegg.compound$db_kegg_c <- as.character(kegg.compound$db_kegg_c)
@@ -92,6 +99,7 @@ GenerateDrug <- function(cids) {
                  molecular_formula, clinical_phase)
 
   # 7. Generate drug ID index table.
+  message("Generating drug ID...")
   drug.id <- dplyr::select(drug, id, cid) %>%
      rbind.data.frame(check$old)
 

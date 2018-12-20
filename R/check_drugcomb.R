@@ -10,9 +10,9 @@
 #
 CheckCell <- function(test) {
   message("Checking Cell lines...")
-  exist <- drugcomb$cell_line
+  exist <- TidyComb:::drugcomb$cell_line
   n <- nrow(exist)
-  old <- exist[match(test, exist$cellosaurus_accession), ] %>% na.omit()
+  old <- stats::na.omit(exist[match(test, exist$cellosaurus_accession), ])
   new <- test[!test %in% exist$cellosaurus_accession]
   message("DrugComb has archived ", n, "cell lines.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
@@ -26,9 +26,9 @@ CheckCell <- function(test) {
 
 CheckTissue <- function(test) {
   message("Checking tissues...")
-  exist <- drugcomb$tissue
+  exist <- TidyComb:::drugcomb$tissue
   n <- nrow(exist)
-  old <- exist[match(test, exist$name), ] %>% na.omit()
+  old <- stats::na.omit(exist[match(test, exist$name), ])
   new <- test[!test %in% exist$name]
   message("DrugComb has archived ", n, "tissues.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
@@ -42,9 +42,9 @@ CheckTissue <- function(test) {
 
 CheckDisease <- function(test) {
   message("Checking  diseases...")
-  exist <- drugcomb$disease
+  exist <- TidyComb:::drugcomb$disease
   n <- nrow(exist)
-  old <- exist[match(test, exist$id), ] %>% na.omit()
+  old <- stats::na.omit(exist[match(test, exist$id), ])
   new <- test[!test %in% exist$id]
   message("DrugComb has archived ", n, "diseases.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
@@ -58,9 +58,9 @@ CheckDisease <- function(test) {
 
 CheckDrug <- function(cids) {
   message("Checking drugs...")
-  exist <- drugcomb$drug
+  exist <- TidyComb:::drugcomb$drug
   n <- nrow(exist)
-  old <- exist[match(cids, exist$cid), ] %>% na.omit()
+  old <- stats::na.omit(exist[match(cids, exist$cid), ])
   new <- cids[!cids %in% exist$cid]
   message("DrugComb has archived ", n, "drugs.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),

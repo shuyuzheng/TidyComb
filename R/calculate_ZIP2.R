@@ -23,11 +23,13 @@ ZIP2 <- function (response.mat, correction = TRUE, Emin = NA, Emax = NA,
     # print(i)
     tmp <- as.data.frame(mat.or.vec(nrow(response.mat) - 1, 0))
     tmp$dose <- as.numeric(rownames(response.mat))[-1]
-    tmp$dose[which(tmp$dose==0)] =  10^-10 # nonzero concentrations to take the log
+    # nonzero concentrations to take the log
+    tmp$dose[which(tmp$dose==0)] <- 10^-10
     tmp$inhibition <- response.mat[c(2:nrow(response.mat)), i]
 
     tmp.min <- updated.single.mat[1, i]
-    if (var(tmp$inhibition, na.rm = TRUE) == 0 | length(tmp$inhibition) == 1) {
+    if (stats::var(tmp$inhibition, na.rm = TRUE) == 0 |
+                   length(tmp$inhibition) == 1) {
       tmp$inhibition[1] <- tmp$inhibition[1] - 10^-10
     }
 
@@ -38,25 +40,28 @@ ZIP2 <- function (response.mat, correction = TRUE, Emin = NA, Emax = NA,
       tmp.model = tryCatch(
         {
           tmp.model <- drc::drm(inhibition ~ dose, data = tmp,
-                           fct = LL.4(fixed = c(NA, tmp.min, 100, NA)),
-                           na.action = na.omit,
-                           control = drmc(errorm = FALSE, noMessage = T))
+                           fct = drc::LL.4(fixed = c(NA, tmp.min, 100, NA)),
+                           na.action = stats::na.omit,
+                           control = drc::drmc(errorm = FALSE,
+                                               noMessage = TRUE))
         },
         warning = function(w) {
          tmp.model <- drc::drm(inhibition ~ log(dose), data = tmp,
-                          fct = L.4(fixed = c(NA, tmp.min, 100, NA)),
-                          na.action = na.omit,
-                          control = drmc(errorm = FALSE, noMessage = T))
+                          fct = drc::L.4(fixed = c(NA, tmp.min, 100, NA)),
+                          na.action = stats::na.omit,
+                          control = drc::drmc(errorm = FALSE,
+                                              noMessage = TRUE))
         },
         error = function(e) {
           tmp.model <- drc::drm(inhibition ~ log(dose), data = tmp,
-                           fct = L.4(fixed = c(NA, tmp.min, 100, NA)),
-                           na.action = na.omit,
-                           control = drmc(errorm = FALSE, noMessage = T))
+                           fct = drc::L.4(fixed = c(NA, tmp.min, 100, NA)),
+                           na.action = stats::na.omit,
+                           control = drc::drmc(errorm = FALSE,
+                                               noMessage = TRUE))
 
         }
       )
-      fitted.inhibition = suppressWarnings(fitted(tmp.model))
+      fitted.inhibition = suppressWarnings(stats::fitted(tmp.model))
     }
 
     tmp$fitted.inhibition <- fitted.inhibition
@@ -77,7 +82,8 @@ ZIP2 <- function (response.mat, correction = TRUE, Emin = NA, Emax = NA,
     tmp$inhibition <- response.mat[i, c(2:ncol(response.mat))]
     tmp.min <- updated.single.mat[i, 1]
 
-    if (var(tmp$inhibition, na.rm = TRUE) == 0 | length(tmp$inhibition) == 1) {
+    if (stats::var(tmp$inhibition, na.rm = TRUE) == 0 |
+        length(tmp$inhibition) == 1) {
       tmp$inhibition[1] <- tmp$inhibition[1] - 10^-10
     }
 
@@ -87,26 +93,29 @@ ZIP2 <- function (response.mat, correction = TRUE, Emin = NA, Emax = NA,
       tmp.model = tryCatch(
         {
           tmp.model <- drc::drm(inhibition ~ dose, data = tmp,
-                                fct = LL.4(fixed = c(NA, tmp.min, 100, NA)),
-                                na.action = na.omit,
-                                control = drmc(errorm = FALSE, noMessage = T))
+                               fct = drc::LL.4(fixed = c(NA, tmp.min, 100, NA)),
+                               na.action = stats::na.omit,
+                               control = drc::drmc(errorm = FALSE,
+                                                   noMessage = TRUE))
         },
         warning = function(w) {
           tmp.model <- drc::drm(inhibition ~ log(dose), data = tmp,
-                                fct = L.4(fixed = c(NA, tmp.min, 100, NA)),
-                                na.action = na.omit,
-                                control = drmc(errorm = FALSE, noMessage = T))
+                                fct = drc::L.4(fixed = c(NA, tmp.min, 100, NA)),
+                                na.action = stats::na.omit,
+                                control = drc::drmc(errorm = FALSE,
+                                                    noMessage = TRUE))
 
         },
         error = function(w) {
           tmp.model<-drc::drm(inhibition ~ log(dose), data = tmp,
-                              fct = L.4(fixed = c(NA, tmp.min, 100, NA)),
-                              na.action = na.omit,
-                              control = drmc(errorm = FALSE, noMessage = T))
+                              fct = drc::L.4(fixed = c(NA, tmp.min, 100, NA)),
+                              na.action = stats::na.omit,
+                              control = drc::drmc(errorm = FALSE,
+                                                  noMessage = TRUE))
         }
 
       )
-      fitted.inhibition <- suppressWarnings(fitted(tmp.model))
+      fitted.inhibition <- suppressWarnings(stats::fitted(tmp.model))
     }
 
     # if (tmp$fitted.inhibition[ncol(response.mat) - 1] < 0)

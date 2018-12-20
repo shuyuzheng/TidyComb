@@ -31,10 +31,8 @@ If you prefer some not all of these data, \code{\link{GetNames}},
 \code{\link{GetDisease}}, or \code{\link{GetAccession}} are recommended.
 }
 \examples{
-all.cells <- GetAllCell(system.file("extdata",
-                                    "cellosaurus.xml",
-                                     package = "TidyComb"))
-cell.lines <- GetCell(all.cells, c("U87", "A549"), "name")
+node <- GetAllCell()
+cell.lines <- GetCell(node, c("U87", "A549"), "name")
 cell.info <- GetCellInfo(cell.lines)
 
 }

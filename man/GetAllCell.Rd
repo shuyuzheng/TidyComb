@@ -4,12 +4,7 @@
 \alias{GetAllCell}
 \title{Loading a Cellosaurus XML dataset}
 \usage{
-GetAllCell(file)
-}
-\arguments{
-\item{file}{A Cellosaurus XML file. It could be the URL point to online file
-("ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml") or a local
-file already downloaded (recommend).}
+GetAllCell()
 }
 \value{
 An XMLNode containing all cell lines' information archieved in
@@ -23,8 +18,5 @@ This function will parse the XML file and extract "cell-line-list" node which
 includes all information about cell lines as a XML document object.
 }
 \examples{
-Doc <- GetAllCell(system.file("extdata",
-                              "cellosaurus.xml",
-                              package = "TidyComb"))
-
+all.cell <- GetAllCell()
 }

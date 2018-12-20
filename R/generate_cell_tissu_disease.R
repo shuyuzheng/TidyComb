@@ -37,7 +37,7 @@ GenerateCell <- function(name){
     dis <- GetCellInfo(cell, "disease")
     dis.uni <- unique(dis)
     tis <- GetCellInfo(cell, "tissue")
-    tis.uni <- unique(tis) %>% na.omit()
+    tis.uni <- stats::na.omit(unique(tis))
     accession <- GetCellInfo(cell, "accession")
     id <- seq(exist.cell$n + 1, length.out = length(exist.cell$new))
 

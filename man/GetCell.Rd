@@ -26,9 +26,7 @@ to find entries that matches the names provided in the \code{names}
 parameter.
 }
 \examples{
-all.cells <- GetAllCell(system.file("extdata",
-                                    "cellosaurus.xml",
-                                     package = "TidyComb"))
-cell.lines <- GetCell(all.cells, c("U87", "A549"), "name")
+node <- GetAllCell()
+cell.lines <- GetCell(node, c("U87", "A549"), "name")
 
 }

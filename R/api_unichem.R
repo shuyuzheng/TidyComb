@@ -2,11 +2,6 @@
 # Functions for retrieving or updating celline information from Cellosaurus.
 # Copyrighte Shuyu Zheng
 
-UnichemVer <- function() {
-  url <- ""
-}
-
-
 
 #' Get other identifiers from InChIKey
 #'
@@ -42,7 +37,7 @@ GetIds <- function(inchikey) {
   for (id in inchikey) {
     # progress indicator
     message(round(i/n * 100), "%", "\r", appendLF = FALSE)
-    flush.console()
+    utils::flush.console()
     drugbank <- NA
     kegg <- NA
     tryCatch({

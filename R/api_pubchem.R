@@ -63,14 +63,14 @@ GetCid <- function(ids, type = NULL, quiet = TRUE){
   for (id in ids) {
 
     message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
-    flush.console()
+    utils::flush.console()
 
     tryCatch({
       res <- RCurl::dynCurlReader()
       url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound",
                     "/%s/%s", "/synonyms/XML")
       RCurl::curlPerform(
-        url = sprintf(url, type, URLencode(id)),
+        url = sprintf(url, type, utils::URLencode(id)),
         curl = curlHandle, writefunction = res$update)
       doc <- XML::xmlInternalTreeParse(res$value())
       rootNode <- XML::xmlName(XML::xmlRoot(doc))
@@ -139,7 +139,7 @@ GetPubNames <- function(cids){
     tryCatch(
       {
         message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
-        flush.console()
+        utils::flush.console()
 
         url <- sprintf(url.base, compound)
         res <- jsonlite::fromJSON(url)
@@ -191,7 +191,7 @@ GetPubchemPro <- function(cids){
                      collapse = ",")
   url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
                      compound, "/property/", property, "/CSV")
-  temp <- read.csv(url, stringsAsFactors = FALSE)
+  temp <- utils::read.csv(url, stringsAsFactors = FALSE)
   res <- rbind.data.frame(res, temp)
   }
 
@@ -216,7 +216,7 @@ GetPubPhase <- function(cids, quiet = TRUE){
   for (compound in cids) {
     tryCatch({
       message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
-      flush.console()
+      utils::flush.console()
 
       url <- paste0('https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?',
                     'infmt=json&outfmt=json&query={"select":["cid","phase"],',
@@ -266,7 +266,7 @@ GetPubPhase <- function(cids, quiet = TRUE){
 #
 #   for (compound in cids) {
 #     message(round(i/n, 2)*100, "%", "completed", "\r", appendLF = FALSE)
-#     flush.console()
+#     utils::flush.console()
 #
 #     tryCatch({
 #       url <- sprintf(url.base, compound)
@@ -385,7 +385,7 @@ GetPubPhase <- function(cids, quiet = TRUE){
 #   }
 #
 #   ## OK, load the data
-#   dat <- read.csv(tmpdest,header=TRUE,fill=TRUE,row.names=NULL)
+#   dat <- utils::read.csv(tmpdest,header=TRUE,fill=TRUE,row.names=NULL)
 #   unlink(tmpdest)
 #
 #   valid.rows <- grep("^[[:digit:]]*$", dat[,1])

@@ -8,10 +8,10 @@ Loewe2 = function (response.mat, correction = TRUE, Emin = NA, Emax = NA,
                                    fixed = c(NA, Emin, Emax, NA),
                                    nan.handle)
   drug.col.model <- single.fit$drug.col.model
-  drug.col.par <- coef(drug.col.model)
+  drug.col.par <- stats::coef(drug.col.model)
 
   drug.row.model <- single.fit$drug.row.model
-  drug.row.par <- coef(drug.row.model)
+  drug.row.par <- stats::coef(drug.row.model)
 
 
   row.conc <- as.numeric(rownames(response.mat))[-1]
@@ -35,10 +35,10 @@ Loewe2 = function (response.mat, correction = TRUE, Emin = NA, Emax = NA,
 
       options(warn = -1)
       slv <- tryCatch({
-          slv <- nleqslv(max(drug.col.par[2] + 1, drug.row.par[2] + 1),
-                         eq, method = "Newton", x1=x1, x2=x2,
-                         drug.col.par = drug.col.par,
-                         drug.row.par = drug.row.par)
+          slv <- nleqslv::nleqslv(max(drug.col.par[2] + 1, drug.row.par[2] + 1),
+                                  eq, method = "Newton", x1=x1, x2=x2,
+                                  drug.col.par = drug.col.par,
+                                  drug.row.par = drug.row.par)
 
         },
         error = function(cond){

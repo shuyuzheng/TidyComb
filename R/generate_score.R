@@ -1,7 +1,8 @@
 # Function to generate the response table with synergy scores
 
 # response input must contain the following columns
-# block_id	conc_r	conc_c	response	drug_row	drug_col	conc_r_unit	conc_c_unit	cell_line_name
+# block_id	conc_r	conc_c	response	drug_row	drug_col	conc_r_unit
+# conc_c_unit	cell_line_name
 
 # response = read.csv("C:\\Users\\Localadmin_jtang\\Dropbox\\drugcomb\\code\\response_template.csv", stringsAsFactors = F)
 # setwd("C:\\Users\\Localadmin_jtang\\Dropbox\\drugcomb\\code")
@@ -25,7 +26,7 @@ GenerateScore = function(response){
     data.tmp <- response[index,]
 
     set.seed(1) # add random noise - NB! the noise will be saved in the output
-    data.tmp$response <- data.tmp$response + rnorm(nrow(data.tmp), 0, 0.001)
+    data.tmp$response <- data.tmp$response + stats::rnorm(nrow(data.tmp), 0, 0.001)
 
     data.tmp2 <- ReshapeData2(data.tmp, data.type = "inhibition")
     response.mat <- data.tmp2$dose.response.mats[[1]]

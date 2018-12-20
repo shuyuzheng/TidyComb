@@ -7,7 +7,7 @@
 GetIds(inchikey)
 }
 \arguments{
-\item{inchikeys}{A vector of characters. It contains identifiers of the drug.}
+\item{inchikey}{A vector of characters. It contains identifiers of the drug.}
 }
 \value{
 A data frame with first column is the identifier passed to \code{ids}

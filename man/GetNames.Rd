@@ -32,9 +32,7 @@ nodes, combining this function with \code{xpathSapply} or
 }
 \examples{
 # parse the Cellosaurus xml file.
-node <- GetAllCell(system.file("extdata",
-                               "cellosaurus.xml",
-                               package = "TidyComb"))
+node <- GetAllCell()
 
 # extract "cell-line-list" nodes of "U251" and "U87" cell lines.
 cell <- GetCell(node, c("U251", "U87"), "name")

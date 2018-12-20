@@ -4,6 +4,109 @@
 
 
 
+
+
+#' Check the Cellosaurus data version.
+#'
+#' Cellosaurus publishes its dataset as an XML file which could be downloaded
+#' from ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml. This
+#' could be used to check the publish version of this file (by default) or a
+#' XML downloaded before (by passing the "file" argument).
+#'
+#' @param file A character. The xml file contains the Cellosaurus dataset.
+#'
+#' @param ... Other arguments.
+#'
+#' @export
+#'
+#' @examples
+#' # Check the online Cellosaurus database version.
+#' CellVersion()
+#'
+#' # Check the local Cellosaurus XML document version.
+#' CellVersion(system.file("extdata",
+#'                         "cellosaurus.xml",
+#'                         package = "TidyComb"))
+#'
+
+CellVersion <- function(
+          file = "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml",
+          ...){
+  #build handler
+  startElement = function(ctxt, name, attrs, ...) {
+    if (name == "release") {
+      print(attrs)
+      XML::xmlStopParser(ctxt)
+    }
+  }
+  class(startElement) = "XMLParserContextFunction"
+
+  print("Cellosaurus database version is:")
+  invisible(XML::xmlEventParse(file,
+                               handlers = list(startElement = startElement)))
+}
+
+#' Loading a Cellosaurus XML dataset
+#'
+#' Cellosaus published "cellosaurus.xml" contains 5 part of information:
+#' "header", "cell-line-list", "publication-list", "copyright". (more
+#' information in "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xsd")
+#' This function will parse the XML file and extract "cell-line-list" node which
+#' includes all information about cell lines as a XML document object.
+#'
+#' @return An XMLNode containing all cell lines' information archieved in
+#' Cellosaurus dataset.
+#'
+#' @export
+#'
+#' @examples
+#' all.cell <- GetAllCell()
+GetAllCell <- function() {
+  doc <- XML::xmlInternalTreeParse(system.file("extdata",
+                                               "cellosaurus.xml",
+                                               package = "TidyComb"))
+  all.cell <- XML::xmlRoot(doc)[[2]]
+  return(all.cell)
+}
+
+#' Find matitching cell-lines
+#'
+#' This function searches the value of <name> tags in Cellosaurus XML document
+#' to find entries that matches the names provided in the \code{names}
+#' parameter.
+#'
+#' @param node An XMLNodelist. It is the output of \code{\link{GetAllCell}}
+#' function which contains all cell lines' information in Cellosaurus dataset.
+#'
+#' @param ids A vector of characters. It is the name or Cellosaurus accession of
+#' cell lines that will be searched in Cellosaurus XML file.
+#'
+#' @param type A charatcer. It indicate the type of \code{id}. It could be
+#' "name", "accession".
+#'
+#' @return An XMLNodeSet containing matched cell lines in the dataset. If no
+#' cell line is matched, a NULL list will be return.
+#'
+#' @examples
+#' node <- GetAllCell()
+#' cell.lines <- GetCell(node, c("U87", "A549"), "name")
+#'
+GetCell <- function(node, ids, type = "name"){
+  if(type == "name"){
+
+    xpath <- paste0("//name[text()='",
+                    paste(ids, collapse = "' or text() = '"),
+                    "']/ancestor::cell-line")
+  } else if (type == "accession") {
+    xpath <- paste0("//accession[text()='",
+                    paste(ids, collapse = "' or text() = '"),
+                    "']/ancestor::cell-line")
+  } else {
+    stop("Type ", type, 'is not allowed. Available types are: "name", "accession"')
+  }
+    cells <- XML::getNodeSet(node, xpath)
+}
+
 #' Extract primary name and synonyms of one cell line.
 #'
 #' \code{GetNames} extract primary name and synonyms from only one
@@ -28,9 +131,7 @@
 #'
 #' @examples
 #' # parse the Cellosaurus xml file.
-#' node <- GetAllCell(system.file("extdata",
-#'                                "cellosaurus.xml",
-#'                                package = "TidyComb"))
+#' node <- GetAllCell()
 #'
 #' # extract "cell-line-list" nodes of "U251" and "U87" cell lines.
 #' cell <- GetCell(node, c("U251", "U87"), "name")
@@ -42,7 +143,7 @@
 #' names <- sapply(cell, GetNames)
 GetNames <- function(node) {
   name.list <- XML::xmlToDataFrame(XML::xmlChildren(node)$'name-list',
-                              stringsAsFactors = FALSE)
+                                   stringsAsFactors = FALSE)
   name <- name.list[1,]
   synonyms <- sapply(name.list,
                      function(x) {
@@ -72,7 +173,7 @@ GetNames <- function(node) {
 #' \item{disease_id}{NCI Thesaurus entry code of the associated disease.}
 #'
 #' @examples
-#' node <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
+#' node <- GetAllCell()
 #' cell <- GetCell(node, c("U251", "U87"), "name")
 #'
 #' # get first cell line associated disease and disease ID
@@ -88,8 +189,6 @@ GetDisease <- function(node){
   return(diseases)
 }
 
-
-
 #' Extract the source tissue of one cell line.
 #'
 #' This function extract source tissue according to cross-reference "CCLE Name"
@@ -103,9 +202,7 @@ GetDisease <- function(node){
 #' @return A character. The tissue name of cell line according to CClE category.
 #'
 #' @examples
-#' node <- GetAllCell(system.file("extdata",
-#'                                "cellosaurus.xml",
-#'                                package = "TidyComb"))
+#' node <- GetAllCell()
 #' cell <- GetCell(node, c("U251", "U87"), "name")
 #'
 #' # get Cellosaurus Accession for first cell line
@@ -133,7 +230,7 @@ GetTissue <- function(node){
 #' @return A character. The Cellosaurus accession ID of cell line
 #'
 #' @examples
-#' node <- GetAllCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
+#' node <- GetAllCell()
 #' cell <- GetCell(node, c("U251", "U87"), "name")
 #'
 #' # get Cellosaurus Accession for first cell line
@@ -145,100 +242,6 @@ GetAccession <- function(node){
   accession <- XML::xpathSApply(node,
                                 './accession-list/accession[@type="primary"]',
                                 XML::xmlValue)
-}
-
-#' Check the Cellosaurus data version.
-#'
-#' Cellosaurus publishes its dataset as an XML file which could be downloaded
-#' from ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml. This
-#' could be used to check the publish version of this file (by default) or a
-#' XML downloaded before (by passing the "file" argument).
-#'
-#' @param file A character. The xml file contains the Cellosaurus dataset.
-#'
-#' @param ... Other arguments.
-#'
-#' @examples
-#' # Check the online Cellosaurus database version.
-#' CellVersion()
-#'
-#' # Check the local Cellosaurus XML document version.
-#' CellVersion(system.file("extdata",
-#'                         "cellosaurus.xml",
-#'                         package = "TidyComb"))
-#'
-#' @export
-CellVersion <- function(
-          file = "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml",
-          ...){
-  #build handler
-  startElement = function(ctxt, name, attrs, ...) {
-    if (name == "release") {
-      print(attrs)
-      XML::xmlStopParser(ctxt)
-    }
-  }
-  class(startElement) = "XMLParserContextFunction"
-
-  print("Cellosaurus database version is:")
-  invisible(XML::xmlEventParse(file,
-                               handlers = list(startElement = startElement)))
-}
-
-#' Loading a Cellosaurus XML dataset
-#'
-#' Cellosaus published "cellosaurus.xml" contains 5 part of information:
-#' "header", "cell-line-list", "publication-list", "copyright". (more
-#' information in "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xsd")
-#' This function will parse the XML file and extract "cell-line-list" node which
-#' includes all information about cell lines as a XML document object.
-#'
-#' @return An XMLNode containing all cell lines' information archieved in
-#' Cellosaurus dataset.
-GetAllCell <- function() {
-  doc <- XML::xmlInternalTreeParse(system.file("extdata",
-                                               "cellosaurus.xml",
-                                               package = "TidyComb"))
-  all.cell <- XML::xmlRoot(doc)[[2]]
-  return(all.cell)
-}
-
-#' Find matitching cell-lines
-#'
-#' This function searches the value of <name> tags in Cellosaurus XML document
-#' to find entries that matches the names provided in the \code{names}
-#' parameter.
-#'
-#' @param node An XMLNodelist. It is the output of \code{\link{GetAllCell}}
-#' function which contains all cell lines' information in Cellosaurus dataset.
-#'
-#' @param ids A vector of characters. It is the name or Cellosaurus accession of
-#' cell lines that will be searched in Cellosaurus XML file.
-#'
-#' @param type A charatcer. It indicate the type of \code{id}. It could be
-#' "name", "accession".
-#'
-#' @return An XMLNodeSet containing matched cell lines in the dataset. If no
-#' cell line is matched, a NULL list will be return.
-#'
-#' @examples
-#' node <- GetAllCell()
-#' cell.lines <- GetCell(c("U87", "A549"), "name")
-#'
-GetCell <- function(node, ids, type = "name"){
-  if(type == "name"){
-
-    xpath <- paste0("//name[text()='",
-                    paste(ids, collapse = "' or text() = '"),
-                    "']/ancestor::cell-line")
-  } else if (type == "accession") {
-    xpath <- paste0("//accession[text()='",
-                    paste(ids, collapse = "' or text() = '"),
-                    "']/ancestor::cell-line")
-  } else {
-    stop("Type ", type, 'is not allowed. Available types are: "name", "accession"')
-  }
-    cells <- XML::getNodeSet(node, xpath)
 }
 
 #' Extract cell line information
@@ -265,7 +268,8 @@ GetCell <- function(node, ids, type = "name"){
 #' @return A data frame contains cell line information selected by \code{info}
 #'
 #' @examples
-#' cell.lines <- GetCell(cellosaurus, c("U87", "A549"), "name")
+#' node <- GetAllCell()
+#' cell.lines <- GetCell(node, c("U87", "A549"), "name")
 #' cell.info <- GetCellInfo(cell.lines)
 #'
 #' @export
@@ -295,7 +299,7 @@ GetCellInfo <- function(node, info = "accession") {
   n <- length(node)
   for (i in 1:n) {
     message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
-    flush.console()
+    utils::flush.console()
 
     temp <- fun(node[[i]])
     if (length(temp) == 0) {

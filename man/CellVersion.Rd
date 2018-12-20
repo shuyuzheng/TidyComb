@@ -24,6 +24,8 @@ XML downloaded before (by passing the "file" argument).
 CellVersion()
 
 # Check the local Cellosaurus XML document version.
-CellVersion(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
+CellVersion(system.file("extdata",
+                        "cellosaurus.xml",
+                        package = "TidyComb"))
 
 }

@@ -20,9 +20,7 @@ Combining it with \code{\link[base]{apply}} or \code{\link[base]{sapply}}
 can extract tissue from an XMLNodeSet object.
 }
 \examples{
-node <- GetAllCell(system.file("extdata",
-                               "cellosaurus.xml",
-                               package = "TidyComb"))
+node <- GetAllCell()
 cell <- GetCell(node, c("U251", "U87"), "name")
 
 # get Cellosaurus Accession for first cell line

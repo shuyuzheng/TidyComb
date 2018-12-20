@@ -23,4 +23,4 @@ drugcomb <- list(cell_line = cell_line,
                  disease = disease,
                  tissue = tissue,
                  study = study)
-usethis::use_data(drugcomb, overwrite = TRUE)
+usethis::use_data(drugcomb, overwrite = TRUE, internal = TRUE)

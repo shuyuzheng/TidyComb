@@ -48,7 +48,8 @@ GenerateSurface = function(response_with_scores, model){
     )
 
     # list format
-    mat2 <- stats::setNames(melt(mat1), c('conc_r', 'conc_c', 'response'))
+    mat2 <- stats::setNames(reshape2::melt(mat1),
+                            c('conc_r', 'conc_c', 'response'))
     mat2$block_id <- data2$drug.pairs$blockIDs[index]
     mat2$drug_row <- data2$drug.pairs$drug.row[index]
     mat2$drug_col <- data2$drug.pairs$drug.col[index]
