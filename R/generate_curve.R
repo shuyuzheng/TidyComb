@@ -67,7 +67,7 @@ GenerateCurve <- function(response_with_scores) {
   )
 
   mat6 <- data.frame(matrix(NA, nrow = 2, ncol = 10))
-  mat6 <- stats::setNames(mat6, c("block_id","drug_row", "drug_col",
+  mat6 <- stats::setNames(mat6, c("block_id","drug_row_id", "drug_col_id",
                                   "conc_r_unit","conc_c_unit", "b", "c", "d",
                                   "e", "model"))
 

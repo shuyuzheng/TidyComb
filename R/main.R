@@ -1,6 +1,6 @@
 # Function to take the uploaded response data
-# response = read.csv("C:\\Users\\Localadmin_jtang\\Dropbox\\drugcomb\\upload\\response_template.csv", stringsAsFactors = F)
 # pipeline(response)
+
 
 pipeline <- function(response) {
   # library(openxlsx)
@@ -50,23 +50,20 @@ pipeline <- function(response) {
   options(scipen = 999) # suppress the scientific notation
 
   if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
-             "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row_cid",
-             "drug_col_cid") %in%
+             "conc_r_unit", "conc_c_unit","cell_line_id", "drug_row_id",
+             "drug_col_id") %in%
            colnames(response)))
     stop("The input data must contain the following columns: ",
          "block_id, drug_row, drug_col, response,\n",
          "conc_r, conc_c, conc_r_unit, conc_c_unit, \n",
-         "cell_line_name, drug_row_cid, drug_col_cid.")
-
-  print(noquote('Generating cell_line, tissue, disease...'))
-  cell <- GenerateCell(stats::na.omit(unique(response$cell_line_name)))
-
-  print(noquote('Generating drug...'))
-  cids <- stats::na.omit(unique(c(input$drug_row_cid, input$drug_col_cid)))
-  drug <- GenerateDrug(cids)
+         "cell_line_id, drug_row_id, drug_col_id.")
 
   print(noquote('Generating scores...'))
   response_with_scores <- GenerateScore(response)
+  response_out <- response_with_scores[, c("block_id", "conc_r", "conc_c",
+                                           "response", "synergy_zip",
+                                           "synergy_bliss", "synergy_loewe",
+                                           "synergy_hsa")]
 
   print(noquote('Generating summary...'))
   summary <- GenerateSummary2(response_with_scores)
@@ -78,11 +75,8 @@ pipeline <- function(response) {
   curve <- GenerateCurve(response_with_scores)
 
   print(noquote('Ready.'))
-  return(list(cell_line = cell$`cell_line`,
-              tissue = cell$`tissue`,
-              disease  = cell$`disease`,
-              drug = drug$drug,
-              response_with_scores=response_with_scores,
+  return(list(response_with_scores = response_with_scores,
+              response = response_out,
               summary = summary,
               surface = surface,
               curve = curve))

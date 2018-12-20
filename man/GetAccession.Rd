@@ -19,13 +19,3 @@ XMLIntervalElementNode object extracted from Cellosaurus xml file. Combining
 this function with \code{\link[base]{apply}} or \code{\link[base]{sapply}}
 can extract disease information from an XMLNodeSet object.
 }
-\examples{
-node <- GetAllCell()
-cell <- GetCell(node, c("U251", "U87"), "name")
-
-# get Cellosaurus Accession for first cell line
-accession <- GetAccession(cell[[1]])
-
-# get Cellosaurus Accession for all cell lines
-accessions <- sapply(cell, GetAccession)
-}

@@ -12,8 +12,8 @@
 # css_col: a particular row selected according to ic50_row
 
 GenerateSummary2 <- function(response) {
-  sensscores <- unique(response[, c("block_id", "cell_line_name",
-                                    "drug_row", "drug_col")])
+  sensscores <- unique(response[, c("block_id", "cell_line_id",
+                                    "drug_row_id", "drug_col_id")])
   rownames(sensscores) <- sensscores$block_id
   m <- sensscores$block_id
   len<- length(m)
@@ -119,8 +119,8 @@ GenerateSummary2 <- function(response) {
   summarytable <- merge(sensscores, synscores, by = 0, all = TRUE)
   summarytable <- summarytable[order(as.numeric(summarytable$Row.names)), ]
   rownames(summarytable) <- NULL
-  colnames(summarytable) <- c('block_id', 'cell_line_name', 'drug_row_name',
-                              'drug_col_name', 'ic50_row', 'ic50_col',
+  colnames(summarytable) <- c('block_id', 'cell_line_id', 'drug_row_id',
+                              'drug_col_id', 'ic50_row', 'ic50_col',
                               'dss_row', 'dss_col', 'css_row', 'css_col', 'css',
                               'synergy_zip', 'synergy_hsa', 'synergy_bliss',
                               'synergy_loewe')
@@ -129,8 +129,8 @@ GenerateSummary2 <- function(response) {
                                    "dss_row", "dss_col", "css_row", "css_col",
                                    "synergy_zip", "synergy_bliss",
                                    "synergy_loewe", "synergy_hsa",
-                                   "drug_row_name", "drug_col_name",
-                                   "cell_line_name")]
+                                   "drug_row_id", "drug_col_id",
+                                   "cell_line_id")]
   summarytable$conc_r_unit <- unique(response$conc_r_unit)
   summarytable$conc_c_unit <- unique(response$conc_c_unit)
   # save(summarytable, file = "step3.RData")

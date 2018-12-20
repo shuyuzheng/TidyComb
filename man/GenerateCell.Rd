@@ -4,10 +4,11 @@
 \alias{GenerateCell}
 \title{Generate "cell_line" and "tissue" file}
 \usage{
-GenerateCell(name)
+GenerateCell(acc)
 }
 \arguments{
-\item{name}{A vector of charactors contains names of interested cell lines}
+\item{acc}{A vector of charactors contains cellosaurus accessions of
+interested cell lines.}
 }
 \value{
 A list with 3 data frame contains

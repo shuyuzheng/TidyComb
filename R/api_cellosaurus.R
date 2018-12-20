@@ -3,9 +3,6 @@
 # Copyrighte Shuyu Zheng
 
 
-
-
-
 #' Check the Cellosaurus data version.
 #'
 #' Cellosaurus publishes its dataset as an XML file which could be downloaded
@@ -102,7 +99,8 @@ GetCell <- function(node, ids, type = "name"){
                     paste(ids, collapse = "' or text() = '"),
                     "']/ancestor::cell-line")
   } else {
-    stop("Type ", type, 'is not allowed. Available types are: "name", "accession"')
+    stop("Type ", type,
+         'is not allowed. Available types are: "name", "accession"')
   }
     cells <- XML::getNodeSet(node, xpath)
 }
@@ -229,15 +227,7 @@ GetTissue <- function(node){
 #'
 #' @return A character. The Cellosaurus accession ID of cell line
 #'
-#' @examples
-#' node <- GetAllCell()
-#' cell <- GetCell(node, c("U251", "U87"), "name")
-#'
-#' # get Cellosaurus Accession for first cell line
-#' accession <- GetAccession(cell[[1]])
-#'
-#' # get Cellosaurus Accession for all cell lines
-#' accessions <- sapply(cell, GetAccession)
+
 GetAccession <- function(node){
   accession <- XML::xpathSApply(node,
                                 './accession-list/accession[@type="primary"]',
@@ -304,7 +294,7 @@ GetCellInfo <- function(node, info = "accession") {
     temp <- fun(node[[i]])
     if (length(temp) == 0) {
       temp <- rep(NA, length(colname))
-      }
+    }
     mat <- rbind(mat, temp)
     temp <- NULL
 
