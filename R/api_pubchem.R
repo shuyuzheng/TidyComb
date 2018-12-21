@@ -56,49 +56,44 @@ GetCid <- function(ids, type = NULL, quiet = TRUE){
   }
 
   curlHandle <- RCurl::getCurlHandle()
-  out <- data.frame(stringsAsFactors = FALSE)
+  out <- data.frame()
 
-  stepi <- 0
+  stepi <- 1
   n <- length(ids)
   for (id in ids) {
 
     message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
     utils::flush.console()
 
+    cid <- NA
     tryCatch({
       res <- RCurl::dynCurlReader()
       url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound",
-                    "/%s/%s", "/synonyms/XML")
+                    "/%s/%s", "/cids/JSON")
       RCurl::curlPerform(
         url = sprintf(url, type, utils::URLencode(id)),
         curl = curlHandle, writefunction = res$update)
-      doc <- XML::xmlInternalTreeParse(res$value())
-      rootNode <- XML::xmlName(XML::xmlRoot(doc))
-      if (rootNode == "InformationList") {
-        XML::xpathApply(doc, "//x:Information", namespaces = "x", function(x) {
-          cid <- XML::xpathSApply(x, "./x:CID", namespaces = "x", XML::xmlValue)
-          df <- data.frame(id = id, cid = cid,
-                           stringsAsFactors = FALSE)
-          out <<- rbind.data.frame(out, df)
-        })
+      doc <- jsonlite::fromJSON(res$value())
+      rootNode <- names(doc)
+
+      if (rootNode == "IdentifierList") {
+        cid <- doc$`IdentifierList`$`CID`
+
       } else if (rootNode == "Fault") {
-        XML::xpathApply(doc, "//x:Details", namespaces = "x", function(x){
-        fault <- XML::xpathApply(doc, "//x:Details", namespaces = "x",
-                                 XML::xmlValue)
+        fault <- doc$Fault$Details
         if (!quiet) {
           print( paste(id, fault[[1]], sep = ": ") )
         }
-        df <- data.frame(id = id, cid = NA,
-                         stringsAsFactors = FALSE)
-        out <<- rbind.data.frame(out, df)
-       })
+        cid <- NA
       }
-    },
-    error = function(e) {
+    }, error = function(e) {
       print(e)
-    },
-    finally = Sys.sleep(0.2) # See usage policy.
+    }, finally = Sys.sleep(0.2) # See usage policy.
     )
+
+    df <- data.frame(id = id, cid = cid, stringsAsFactors = FALSE)
+    out <- rbind.data.frame(out, df)
+
     stepi <- stepi + 1
   }
 
@@ -234,11 +229,13 @@ GetPubPhase <- function(cids, quiet = TRUE) {
         }
       } else if (status != 0) {
         error <- res$SDQOutputSet[[1]][[2]]
+        temp <- matrix(c(compound, 0), nrow = 1)
         if (!quiet) {
           print( strsplit(error, ". ", fixed = T)[[1]][1] )
         }
       }
     }, error = function(e){
+      temp <- matrix(c(compound, 0), nrow = 1)
       if (!quiet) print(e)
     }, finally = Sys.sleep(0.2)
     )
@@ -249,7 +246,9 @@ GetPubPhase <- function(cids, quiet = TRUE) {
 
   # clean
   gc()
+  clinical_phase <- as.data.frame(clinical_phase)
   clinical_phase$cid <- as.integer(clinical_phase$cid)
+  clinical_phase$phase <- as.integer(clinical_phase$phase)
   return(clinical_phase)
 }
 

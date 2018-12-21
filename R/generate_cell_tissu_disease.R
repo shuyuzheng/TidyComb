@@ -21,24 +21,21 @@ MatchCellAcc <- function(name){
   doc <- GetAllCell()
   cell <- GetCell(doc, ids = name, type = "name")
   acc <- GetCellInfo(cell, "accession")
-  names <- GetCellInfo(cell, "name")
-  all_name <- NA
-  for (i in 1:nrow(names)) {
-    all_name[i] <- paste(names[i, 1], names[i, 2], sep = "; ")
-  }
+  all_names <- GetCellInfo(cell, "name_in_one")
 
-  info <- data.frame(acc, all_name, stringsAsFactors = FALSE)
+  info <- data.frame(acc, all_names, stringsAsFactors = FALSE)
+
   df <- NULL
   for (i in name) {
     temp <- NULL
-    temp <- info[grep(i, info[, "all_name"]), ]
+    temp <- info[grep(i, info[, "all_names"]), ]
     if (nrow(temp) == 0) {
       temp[1, ] = c(NA, NA)
     }
     temp$input_name <- i
     df <- rbind(df, temp)
   }
-  df <- df[, c("input_name", "cellosaurus_accession", "all_name")]
+  df <- df[, c("input_name", "cellosaurus_accession", "all_names")]
   message("Please check the table and make sure that each cell line matches",
           " with correct cellosaurus accessions. \n",
           "Query on https://web.expasy.org/cellosaurus/ may be helpful.")
@@ -71,19 +68,19 @@ GenerateCell <- function(acc){
   exist.cell <- CheckCell(acc)
 
   if (length(exist.cell$new) == 0) {
-  cell_line <- data.frame(name = character(),
-                          synonyms = character(),
-                          cellosaurus_accession = character(),
-                          disease_id = character(),
-                          id = numeric(),
-                          tissue_id = numeric(),
+    cell_line <- data.frame(name = character(),
+                            synonyms = character(),
+                            cellosaurus_accession = character(),
+                            disease_id = character(),
+                            id = numeric(),
+                            tissue_id = numeric(),
+                            stringsAsFactors = FALSE)
+    disease <- data.frame(name = character(),
+                          id = character(),
                           stringsAsFactors = FALSE)
-  disease <- data.frame(name = character(),
-                        id = character(),
-                        stringsAsFactors = FALSE)
-  tissue <- data.frame(id = numeric(),
-                       name = character(),
-                       stringsAsFactors = FALSE)
+    tissue <- data.frame(id = numeric(),
+                         name = character(),
+                         stringsAsFactors = FALSE)
   } else {
     cell <- GetCell(doc, ids = as.character(exist.cell$new), type = "accession")
     names <- GetCellInfo(cell, "name")
@@ -120,7 +117,7 @@ GenerateCell <- function(acc){
     }
 
     cell_line <- data.frame(names, accession, dis[, "disease_id"],
-                                  id, tissue_id, stringsAsFactors = FALSE)
+                            id, tissue_id, stringsAsFactors = FALSE)
     colnames(cell_line) <- c("name", "synonyms", "cellosaurus_accession",
                              "disease_id", "id", "tissue_id")
   }

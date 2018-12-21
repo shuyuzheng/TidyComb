@@ -8,8 +8,8 @@ pipeline(response)
 }
 \arguments{
 \item{response}{A data frame. It must contain columns: "block_id",
-"drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
-"conc_c_unit","cell_line_id", "drug_row_id", "drug_col_id".}
+"drug_row_id", "drug_col_id", "response", "conc_r", "conc_c", "conc_r_unit",
+ "conc_c_unit","cell_line_id"}
 }
 \value{
 A list contains 6 data frames: "response_with_scores", "response",

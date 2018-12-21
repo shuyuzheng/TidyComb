@@ -28,7 +28,7 @@ GetIds <- function(inchikey) {
   # building base url
     url.base <- "https://www.ebi.ac.uk/unichem/rest/inchikey/"
 
-  df <- data.frame() # result container
+  df <- NULL
   i <- 1 # indicator
   n <- length(inchikey)
 
@@ -38,28 +38,38 @@ GetIds <- function(inchikey) {
     # progress indicator
     message(round(i/n * 100), "%", "\r", appendLF = FALSE)
     utils::flush.console()
+
     drugbank <- NA
     kegg <- NA
+    chembl <- NA
     tryCatch({
-    # requesting server via API
-    url <- paste0(url.base, id) # establishing data
-    res <- jsonlite::fromJSON(url) # parsing JSON file
+      # requesting server via API
+      url <- paste0(url.base, id) # establishing data
+      res <- jsonlite::fromJSON(url) # parsing JSON file
 
-    # extracting IDs
-    drugbank <- ifelse(2 %in% res[,1], res[which(res[,1] == 2), 2], NA)
-    kegg <- ifelse(6 %in% res[,1], res[which(res[,1] == 6), 2], NA)
+      # extracting IDs
+      if (2 %in% res[, 1]) {
+        drugbank <- res[which(res[, 1] == 2), 2]
+      }
+      if (6 %in% res[, 1]) {
+        kegg <- res[which(res[, 1] == 6), 2]
+      }
+      if (1 %in% res[, 1]) {
+        chembl <- res[which(res[, 1] == 1), 2]
+      }
 
-    },
-    error = function(e){
+    }, error = function(e) {
       print(e)
-    })
-    temp <- data.frame(inchikey = id,
-                       uni_drugbank = drugbank,
-                       uni_kegg_c = kegg,
-                       stringsAsFactors = FALSE)
-    df <- rbind.data.frame(df, temp)
+    }
+    )
+    temp <- cbind(inchikey = id,
+                  uni_drugbank = drugbank,
+                  uni_kegg_c = kegg,
+                  chembl_id = chembl)
+    df <- rbind(df, temp)
     i <- i + 1
   }
+  df <- as.data.frame(df, stringsAsFactors = FALSE)
   return(df)
 }
 

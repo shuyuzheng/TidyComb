@@ -107,7 +107,7 @@ GetCell <- function(node, ids, type = "name"){
 
 #' Extract primary name and synonyms of one cell line.
 #'
-#' \code{GetNames} extract primary name and synonyms from only one
+#' \code{GetCellNames} extract primary name and synonyms from only one
 #' \emph{cell-line-list} node in Cellosaurus xml file.
 #'
 #' This function extracts the primary name (as "name") and synonyms (as
@@ -135,11 +135,11 @@ GetCell <- function(node, ids, type = "name"){
 #' cell <- GetCell(node, c("U251", "U87"), "name")
 #'
 #' # get first cell line (U251)'s primary name and synonyms
-#' name <- GetNames(cell[[1]])
+#' name <- GetCellName(cell[[1]])
 #'
 #' # get all cell lines' name and synonyms
-#' names <- sapply(cell, GetNames)
-GetNames <- function(node) {
+#' names <- sapply(cell, GetCellName)
+GetCellName <- function(node) {
   name.list <- XML::xmlToDataFrame(XML::xmlChildren(node)$'name-list',
                                    stringsAsFactors = FALSE)
   name <- name.list[1,]
@@ -151,6 +151,12 @@ GetNames <- function(node) {
   return(names)
 }
 
+GetCellNameInOne <- function(node) {
+  name.list <- XML::xmlToDataFrame(XML::xmlChildren(node)$'name-list',
+                                   stringsAsFactors = FALSE)
+  names <- sapply(name.list, paste, collapse = "; ")
+  return(names)
+}
 #' Extract the disease information of one cell line.
 #'
 #' \code{GetDisease} extracts the cell line associated diseases and NCI
@@ -266,8 +272,11 @@ GetAccession <- function(node){
 GetCellInfo <- function(node, info = "accession") {
 
   if (info == "name") {
-    fun <- function(x) {GetNames(x)}
+    fun <- function(x) {GetCellName(x)}
     colname <- c("name", "synonyms")
+  } else if (info == "name_in_one") {
+    fun <- function(x) {GetCellNameInOne(x)}
+    colname <- c("all_names")
   } else if (info == "accession") {
     fun <- function(x) {GetAccession(x)}
     colname <- c("cellosaurus_accession")
@@ -279,7 +288,7 @@ GetCellInfo <- function(node, info = "accession") {
     colname <- c("tissue_name")
   } else {
     stop("Info ", info, 'is not allowed. Available values are: "name",',
-         '"accession", "disease", "tissue".')
+         '"accession", "disease", "tissue", and "name_in_one".')
   }
 
   temp <- NULL

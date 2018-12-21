@@ -37,11 +37,11 @@ ChemblVersion <- function(){
 #'
 #' @examples
 #' drug.info <- GetChembl("PMATZTZNYRCHOR-CGLBZJNRSA-N")
-GetChembl <- function(ids, quiet = TRUE){
+GetChembl <- function(ids, quiet = TRUE) {
   message("Getting information from ChEMBL...")
   curlHandle <- RCurl::getCurlHandle()
   out <- data.frame(stringsAsFactors = FALSE)
-  new_item <- NA
+
 
   stepi <- 1
   n <- length(ids)
@@ -51,21 +51,20 @@ GetChembl <- function(ids, quiet = TRUE){
     utils::flush.console()
 
     tryCatch({
-
-      chembl_phase <- integer()
-      chembl_id <- character()
+      new_item <- NA
+      chembl_phase <- NA
+      chembl_id <- NA
       res <- RCurl::dynCurlReader()
 
       url <- paste0("https://www.ebi.ac.uk/chembl/api/data/molecule/", id)
-      RCurl::curlPerform(
-        url = url,
-        curl = curlHandle, writefunction = res$update)
+      RCurl::curlPerform( url = url,
+                          curl = curlHandle, writefunction = res$update)
       doc <- XML::xmlInternalTreeParse(res$value())
 
       # clinical phase
       new_item <- XML::xpathApply(doc, "//max_phase", XML::xmlValue)
       new_item <- as.integer(unlist(new_item))
-      if (is.null(new_item)) {
+      if (is.na(new_item)) {
         new_item <- 0
       }
       chembl_phase <- c(chembl_phase, new_item)
@@ -78,7 +77,7 @@ GetChembl <- function(ids, quiet = TRUE){
         new_item <- NA
       }
       chembl_id <- c(chembl_id, new_item)
-      },
+    },
     error = function(e) {
       chembl_id <<- NA
       chembl_phase <<- 0
@@ -99,4 +98,55 @@ GetChembl <- function(ids, quiet = TRUE){
   gc()
 
   return(out)
+}
+
+GetChemblPhase <- function(ids, quiet = TRUE) {
+  message("Getting clinical phase from ChEMBL...")
+  chembl_id <- NULL
+  chembl_phase <- NULL
+  curlHandle <- RCurl::getCurlHandle()
+
+  stepi <- 1
+  n <- length(ids)
+  for (id in ids) {
+
+    message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
+    utils::flush.console()
+
+    tryCatch({
+      new_item <- 0
+      res <- RCurl::dynCurlReader()
+
+      url <- paste0("https://www.ebi.ac.uk/chembl/api/data/molecule/", id)
+      RCurl::curlPerform( url = url,
+                          curl = curlHandle, writefunction = res$update)
+      doc <- XML::xmlInternalTreeParse(res$value())
+
+      # clinical phase
+      new_item <- XML::xpathApply(doc, "//max_phase", XML::xmlValue)
+      new_item <- as.integer(unlist(new_item))
+      if (is.na(new_item)) {
+        new_item <- 0
+      }
+
+    }, error = function(e) {
+      if (!quiet) {
+        new_item <<- 0
+        print(e)
+      }
+    }
+    )
+    chembl_phase <- c(chembl_phase, new_item)
+
+    chembl_id <- c(chembl_id, id)
+    stepi <- stepi + 1
+  }
+
+  df <- data.frame(chembl_id, chembl_phase, stringsAsFactors = F)
+
+  # Cleanup
+  rm(curlHandle)
+  gc()
+
+  return(df)
 }

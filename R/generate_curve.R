@@ -2,8 +2,9 @@
 #
 
 # response_with_scores must contain the following columns
-# c("block_id","conc_r","conc_c", "response", "drug_row", "drug_col", "conc_r_unit",
-#      "conc_c_unit", "cell_line_name", "row", "col", "synergy_zip", "synergy_hsa", "synergy_bliss", "synergy_loewe")
+# "block_id","conc_r","conc_c", "response", "drug_row_id", "drug_col_id",
+# "conc_r_unit", "conc_c_unit", "cell_line__id", "row", "col", "synergy_zip",
+# "synergy_hsa", "synergy_bliss", "synergy_loewe")
 
 GenerateCurve <- function(response_with_scores) {
   m <- unique(response_with_scores$block_id)

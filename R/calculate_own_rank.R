@@ -1,3 +1,15 @@
+#' Rank the vectors
+#'
+#' @param x a vector need to be ranked
+#'
+#' @return a vector contains the rank of original vector
+#' @export
+own_rank <- function(x) {
+  x_unique <- unique(x)
+  x_ranks <- rank(x_unique)
+  x_ranks[match(x, x_unique)]
+}
+
 # own_log, natural base
 # calculate log(1+10^(b*(c-x))) to be used in scoreCurve function
 own_log <-  function(b, c, x) {
@@ -21,10 +33,3 @@ own_log2 <- function(x) {
   }
   return(res)
 }
-
-own_rank <- function(x) {
-  x_unique <- unique(x)
-  x_ranks <- rank(x_unique)
-  x_ranks[match(x,x_unique)]
-}
-
