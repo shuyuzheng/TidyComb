@@ -4,7 +4,7 @@
 \alias{GetCid}
 \title{Match CID according to other identifiers}
 \usage{
-GetCid(ids, type = NULL, quiet = TRUE)
+GetCid(ids, type, quiet = TRUE)
 }
 \arguments{
 \item{ids}{A vector of characters contains the identifiers of drugs you are
@@ -29,7 +29,7 @@ during retrieving data.}
 \value{
 A data frame contains two columns:
 \itemize{
-  \item \code{id} The identifiers inputted by user.
+  \item \code{input_id} The identifiers input by user.
   \item \code{cid} The matched CID.
 }
 }

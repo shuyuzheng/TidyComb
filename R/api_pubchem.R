@@ -39,7 +39,7 @@
 #'
 #' @return A data frame contains two columns:
 #' \itemize{
-#'   \item \code{id} The identifiers inputted by user.
+#'   \item \code{input_id} The identifiers input by user.
 #'   \item \code{cid} The matched CID.
 #' }
 #'
@@ -47,7 +47,7 @@
 #'
 #' @examples
 #' GetCid("aspirin", "name", quiet = TRUE)
-GetCid <- function(ids, type = NULL, quiet = TRUE){
+GetCid <- function(ids, type , quiet = TRUE) {
   message("Getting CIDs from PubChem...")
   types <- c("name", "smiles", "inchi", "sdf", "inchikey", "formula")
 
@@ -55,52 +55,44 @@ GetCid <- function(ids, type = NULL, quiet = TRUE){
     stop("Invalid idtype specified, valiable idtypes are: ", types)
   }
 
-  curlHandle <- RCurl::getCurlHandle()
-  out <- data.frame()
-
+  cid <- integer()
+  input_id <- character()
+  url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/",
+                       type, "/%s", "/cids/json")
   stepi <- 1
   n <- length(ids)
   for (id in ids) {
 
-    message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
-    utils::flush.console()
-
-    cid <- NA
+    temp <- NA
     tryCatch({
-      res <- RCurl::dynCurlReader()
-      url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound",
-                    "/%s/%s", "/cids/JSON")
-      RCurl::curlPerform(
-        url = sprintf(url, type, utils::URLencode(id)),
-        curl = curlHandle, writefunction = res$update)
-      doc <- jsonlite::fromJSON(res$value())
+
+      url <- sprintf(url.base, utils::URLencode(id))
+
+      doc <- jsonlite::fromJSON(url)
       rootNode <- names(doc)
-
       if (rootNode == "IdentifierList") {
-        cid <- doc$`IdentifierList`$`CID`
-
+        temp <- doc$`IdentifierList`$`CID`
       } else if (rootNode == "Fault") {
         fault <- doc$Fault$Details
         if (!quiet) {
           print( paste(id, fault[[1]], sep = ": ") )
         }
-        cid <- NA
+        temp <- NA
       }
     }, error = function(e) {
       print(e)
     }, finally = Sys.sleep(0.2) # See usage policy.
     )
+    cid <- c(cid, temp)
+    input_id <- c(input_id, rep_len(id, length(temp)))
 
-    df <- data.frame(id = id, cid = cid, stringsAsFactors = FALSE)
-    out <- rbind.data.frame(out, df)
+    message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
+    utils::flush.console()
 
     stepi <- stepi + 1
   }
-
-    # Cleanup
-  rm(curlHandle)
-  gc()
-  return(out)
+  df <- data.frame(input_id = input_id, cid = cid, stringsAsFactors = FALSE)
+  return(df)
 }
 
 #' Get drug synonyms from PubChem
