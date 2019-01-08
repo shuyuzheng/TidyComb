@@ -1,4 +1,4 @@
-get.pubmed <- function(pmid, tool = "R", email = NULL ) {
+get.pubmed <- function(pmids, tool = "R", email = NULL ) {
   # Input:
   #    1. pmid: PubMed ID of publications
   #    2. email: user's e-mail address
@@ -19,21 +19,28 @@ get.pubmed <- function(pmid, tool = "R", email = NULL ) {
   #    2. email: should be the e-mail address of the maintainer of the tool,
   # and should be a valid e-mail address.
   if (is.null(email)) {
-      stop("As the PMC API ask for user's contact information, please provide
-      your email address as a parameter when calling this function.")
+    stop("As the PMC API ask for user's contact information, please provide
+         your email address as a parameter when calling this function.")
   }
 
-  url  <- paste0("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/",
-                "esummary.fcgi?", "db=pubmed", "&id=", pmid, "&tool=R",
-                "&email=", email, "&retmode=json", sep = "")
-  res <- jsonlite::fromJSON(url)
-  result <- unlist(res[[2]], recursive = TRUE, use.names = TRUE)
-  info <- as.data.frame(t(result[str_c(pmid, ".", c("pubdate", "authors.name1"
-                  , "title", "fulljournalname", "elocationid"))]))
-  colnames(info) <- c("year", "name", "title", "journal", "doi")
-  info$year <- sub("([A-Za-z]+).*", "\\1", info$year)
-  info$name <- sub("([A-Za-z]+).*", "\\1", info$name)
-  info$doi <- sub("doi: ", "", info$doi, fixed = TRUE)
-  return(info)
+  df <- NULL
+  for (id in pmids){
+    url  <- paste0("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/",
+                   "esummary.fcgi?", "db=pubmed", "&id=", id, "&tool=R",
+                   "&email=", email, "&retmode=json")
+    res <- jsonlite::fromJSON(url)
+    result <- unlist(res[[2]], recursive = TRUE, use.names = TRUE)
+    info <- as.data.frame(t(result[paste0(id, ".", c("pubdate", "authors.name1",
+                                                     "title", "fulljournalname",
+                                                     "elocationid"))]))
+    colnames(info) <- c("year", "name", "title", "journal", "doi")
+    info$year <- as.integer(substr(info$year, 1, 4))
+    info$name <- sub("([A-Za-z]+).*", "\\1", info$name)
+    info$doi <- sub("^.*doi: ", "", info$doi)
+    info$pubmed_id <- as.integer(id)
+    df <- rbind.data.frame(df, info)
+  }
+
+  return(df)
 }
 
