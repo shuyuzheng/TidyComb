@@ -18,7 +18,7 @@ A data frame contains two variables:
 }
 }
 \description{
-\code{GetCellNames} extract primary name and synonyms from only one
+\code{GetCellName} extract primary name and synonyms from only one
 \emph{cell-line-list} node in Cellosaurus xml file.
 }
 \details{

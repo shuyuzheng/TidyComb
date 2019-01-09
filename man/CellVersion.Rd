@@ -2,25 +2,34 @@
 % Please edit documentation in R/api_cellosaurus.R
 \name{CellVersion}
 \alias{CellVersion}
-\title{Check the Cellosaurus data version.}
+\title{Check Cellosaurus database version.}
 \usage{
 
   CellVersion(file = "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml",
   ...)
 }
 \arguments{
-\item{file}{A character. The xml file contains the Cellosaurus dataset.}
+\item{file}{File path to an xml file contains the Cellosaurus dataset.}
 
-\item{...}{Other arguments.}
+\item{...}{}
+}
+\value{
+A named Character vector. It contains: version, date of update,
+number of archived cell lines and number of archived publications.
 }
 \description{
+\code{CellVersion} is used to check the version of a Cellosaurus xml file.
+}
+\details{
 Cellosaurus publishes its dataset as an XML file which could be downloaded
-from ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml. This
-could be used to check the publish version of this file (by default) or a
-XML downloaded before (by passing the "file" argument).
+from \url{ftp://ftp.expasy.org/databases/cellosaurus/}. \code{CellVersion} is
+used to check the dataset version of a "cellosaurus.xml" file. By default it
+will check the online dataset version. If you'd like to check the version of
+a local Cellosaurus xml file please pass the path of file to argument
+\code{file}.
 }
 \examples{
-# Check the online Cellosaurus database version.
+# Check the online Cellosaurus dataset version.
 CellVersion()
 
 # Check the local Cellosaurus XML document version.

@@ -4,19 +4,34 @@
 \alias{GetAllCell}
 \title{Loading a Cellosaurus XML dataset}
 \usage{
-GetAllCell()
+GetAllCell(file)
+}
+\arguments{
+\item{file}{File path to a Cellosaurus xml file.}
 }
 \value{
 An XMLNode containing all cell lines' information archieved in
 Cellosaurus dataset.
 }
 \description{
-Cellosaus published "cellosaurus.xml" contains 5 part of information:
+\code{GetAllCell} will parse the Cellosaurus XML file and extract all content
+in "cell-line-list" node as a \code{XML document} object.
+}
+\details{
+Cellosaurus.xml file contains 5 child nodes in its root node:
 "header", "cell-line-list", "publication-list", "copyright". (more
 information in "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xsd")
-This function will parse the XML file and extract "cell-line-list" node which
-includes all information about cell lines as a XML document object.
+All the cell line informations we need for preparing data are in
+"cell-line-list" so this function will parse the dataset file and remove all
+rudundant informations.
+
+Warning: Although it is possible to parsing the online database directly by
+passing url \url{ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml}
+to function \code{GetAllCell}, it is easy to cause crach of R as the huge
+reuirement of memory. We recommend to download the dataset to a local file
+and then parse this local file by using this function.
 }
 \examples{
-all.cell <- GetAllCell()
+all.cell <- GetAllCell(system.file("extdata", "cellosaurus.xml",
+                                   package = "TidyComb"))
 }

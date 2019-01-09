@@ -15,13 +15,14 @@
 #'   \item \strong{all_name} All names for the mached cell lines, including
 #'   primary name and synonyms.
 #' }
+#'
 #' @export
 #'
 MatchCellAcc <- function(name){
   doc <- GetAllCell()
   cell <- GetCell(doc, ids = name, type = "name")
   acc <- GetCellInfo(cell, "accession")
-  all_names <- GetCellInfo(cell, "name_in_one")
+  all_names <- GetCellInfo(cell, info = "name_in_one")
 
   info <- data.frame(acc, all_names, stringsAsFactors = FALSE)
 

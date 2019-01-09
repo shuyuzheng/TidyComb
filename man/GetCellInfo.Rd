@@ -14,11 +14,13 @@ file by either \code{\link{GetAllCell}} or \code{\link{GetCell}}}
 extract. Available values are:
 \itemize{
   \item \strong{name} primary name and synonyms of cell lines.
+  \item \strong{name_in_one} Output all names (Primary and synonyms) of cell
+  line into one character.
   \item \strong{accession} Cellosaurus Accession ID for cell lines.
   \item \strong{disease} diseases that are associated with the cell lines and
    corresponding NCI Thesaurus entry code.
-  \item \strong{tissue} Tissues that the cell line generated from. Following the CCLE
-   category.
+  \item \strong{tissue} Tissues that the cell line generated from. Following
+  the CCLE category.
 }}
 }
 \value{
