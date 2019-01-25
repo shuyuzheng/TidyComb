@@ -20,11 +20,11 @@ local Cellosaurus XML file. If the local file is not up-to-date, it will
 automatically update the local file.
 }
 \details{
-It is \strong{not} recommended to directly parse the online Cellosaurus
-dataset. Because it will cost a large amount of memory which might leads to
-a crash of R. It is better to download the dataset and then parse the local
-Cellosaurus xml file. In this case, it is necessary to update your local file
-before parsing it.
+For parsing Cellosaurus XML file, we do \strong{not} recommend to directly
+parse the online Cellosaurus dataset. It requires a huge amount of memory and
+will lead to a crash of R. We recommend to download the dataset and then
+parse the local XML file. In this case, it is necessary to update your local
+file before processing it.
 
 \code{UpdateCell} using the \code{\link{CellVersion}} function to check the
 current online version of Cellosaurus dataset and the version of a local

@@ -24,6 +24,6 @@ This function extracts all names(primary name and synonyms) of an
 node extracted from Cellosaurus xml file. Then paste them into one character.
 
 If you'd like to extract information from multiple \emph{cell-line-list}
-nodes, combining this function with \code{xpathSapply} or
-\code{\link[base]{sapply}} is recommanded.
+nodes, combining this function with \code{xpathSapply} or \code{sapply} is
+recommanded.
 }

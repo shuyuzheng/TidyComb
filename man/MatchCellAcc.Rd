@@ -4,10 +4,13 @@
 \alias{MatchCellAcc}
 \title{Match cell line name with cellosaurus accession}
 \usage{
-MatchCellAcc(name)
+MatchCellAcc(name, file)
 }
 \arguments{
 \item{name}{A vector of charactors contains names of interested cell lines}
+
+\item{file}{The path to Cellosaurus XML file which was posted on
+\url{https://web.expasy.org/cellosaurus/}}
 }
 \value{
 A data frame contains:

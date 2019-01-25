@@ -29,12 +29,13 @@ A data frame contains cell line information selected by \code{info}
 \description{
 This function will extract the primary name, synonyms, Cellosausurs Accession
 ID, disease, disease_id) of the cell lines and Wrap them into one data frame.
-If you prefer some not all of these data, \code{\link{GetNames}},
-\code{\link{GetDisease}}, or \code{\link{GetAccession}} are recommended.
+If you prefer some not all of these data, \code{\link{GetCellName}},
+\code{\link{GetCellNameInOne}}, \code{\link{GetDisease}}, or
+\code{\link{GetAccession}} are recommended.
 }
 \examples{
-node <- GetAllCell()
+node <- GetAllCell(system.file("extdata", "cellosaurus.xml",
+                               package = "TidyComb"))
 cell.lines <- GetCell(node, c("U87", "A549"), "name")
 cell.info <- GetCellInfo(cell.lines)
-
 }

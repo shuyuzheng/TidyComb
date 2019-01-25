@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_cellosaurus.R
 \name{GetCell}
 \alias{GetCell}
-\title{Find matitching cell-lines}
+\title{Find matching cell-lines}
 \usage{
 GetCell(node, ids, type = "name")
 }
@@ -26,7 +26,8 @@ to find entries that matches the names provided in the \code{names}
 parameter.
 }
 \examples{
-node <- GetAllCell()
+node <- GetAllCell(file = system.file("extdata", "cellosaurus.xml",
+                                      package = "TidyComb"))
 cell.lines <- GetCell(node, c("U87", "A549"), "name")
 
 }

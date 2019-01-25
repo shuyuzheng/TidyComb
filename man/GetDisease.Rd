@@ -24,16 +24,6 @@ file.
 This function extract the cell line associated disease and disease ID (NCI
 Thesaurus entry code) which the cell line associated with from an
 XMLIntervalElementNode object extracted from Cellosaurus xml file. Combining
-this function with \code{\link[base]{apply}} or \code{\link[base]{sapply}}
-can extract disease information from an XMLNodeSet object.
-}
-\examples{
-node <- GetAllCell()
-cell <- GetCell(node, c("U251", "U87"), "name")
-
-# get first cell line associated disease and disease ID
-disease <- GetDisease(cell[[1]])
-
-# get all cell lines associated diseases and disease IDs
-diseases <- sapply(cell, GetDisease)
+this function with \code{apply} or \code{sapply} can extract disease
+information from an XMLNodeSet object.
 }

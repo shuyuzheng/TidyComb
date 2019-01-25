@@ -16,16 +16,6 @@ A character. The tissue name of cell line according to CClE category.
 \description{
 This function extract source tissue according to cross-reference "CCLE Name"
 from an XMLIntervalElementNode object extracted from Cellosaurus xml file.
-Combining it with \code{\link[base]{apply}} or \code{\link[base]{sapply}}
-can extract tissue from an XMLNodeSet object.
-}
-\examples{
-node <- GetAllCell()
-cell <- GetCell(node, c("U251", "U87"), "name")
-
-# get Cellosaurus Accession for first cell line
-accession <- GetAccession(cell[[1]])
-
-# get Cellosaurus Accession for all cell lines
-accessions <- sapply(cell, GetAccession)
+Combining it with \code{apply} or \code{sapply} can extract tissue from an
+XMLNodeSet object.
 }

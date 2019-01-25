@@ -7,6 +7,9 @@
 #'
 #' @param name A vector of charactors contains names of interested cell lines
 #'
+#' @param file The path to Cellosaurus XML file which was posted on
+#' \url{https://web.expasy.org/cellosaurus/}
+#'
 #' @return A data frame contains:
 #' \itemize{
 #'   \item \strong{input_name} The input cell lines names
@@ -18,8 +21,8 @@
 #'
 #' @export
 #'
-MatchCellAcc <- function(name){
-  doc <- GetAllCell()
+MatchCellAcc <- function(name, file){
+  doc <- GetAllCell(file)
   cell <- GetCell(doc, ids = name, type = "name")
   acc <- GetCellInfo(cell, "accession")
   all_names <- GetCellInfo(cell, info = "name_in_one")
@@ -50,6 +53,9 @@ MatchCellAcc <- function(name){
 #' @param acc A vector of charactors contains cellosaurus accessions of
 #'  interested cell lines.
 #'
+#' @param file The path to Cellosaurus XML file which was posted on
+#' \url{https://web.expasy.org/cellosaurus/}
+#'
 #' @return  A list with 3 data frame contains
 #' \itemize{
 #'   \item \strong{cell_line} The cell_line table prepared for uploading.
@@ -58,13 +64,13 @@ MatchCellAcc <- function(name){
 #' }
 #' @export
 #'
-GenerateCell <- function(acc){
+GenerateCell <- function(acc, file){
   message("Generating cell_line, disease, tissue...")
   if (!all(grepl("CVCL_.+", acc))) {
     stop("Illegal cellosaurus accession! Please check your input list. \n\r",
          "Cellosaurus accessions should in form 'CVCL_xxxx'.")
   }
-  doc <- GetAllCell()
+  doc <- GetAllCell(file)
   # Checking whether cell lines have been in DrugComb
   exist.cell <- CheckCell(acc)
 

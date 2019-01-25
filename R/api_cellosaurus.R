@@ -15,10 +15,11 @@
 #'
 #' @param file File path to an XML file contains the Cellosaurus dataset.
 #'
-#' @param ...
+#' @param ... Other arguments required by \code{\link[XML]{xmlEventParse}}
 #'
 #' @return A named Character vector. It contains: version, date of update,
 #' number of archived cell lines and number of archived publications.
+#'
 #' @export
 #'
 #' @examples
@@ -73,6 +74,7 @@ CellVersion <- function(
 #' @return A message about the version checking results. If the local file is
 #' \strong{not} up-to-date, the local file will be updated with online
 #' Cellosaurus data.
+#'
 #' @export
 #'
 #' @examples
@@ -85,7 +87,7 @@ UpdateCell <- function(file) {
             version.online, "\n",
             " Local file is under version ", version.local, "\n",
             "Updating local files for you, please wait for a monment...")
-    download.file(url, file)
+    utils::download.file(url, file)
     message("Local Cellosaurus file hase been up to date now!")
   } else if (version.local == version.online) {
     message("Local file is already the latest version ",
@@ -148,8 +150,11 @@ GetAllCell <- function(file) {
 #' @return An XMLNodeSet containing matched cell lines in the dataset. If no
 #' cell line is matched, a NULL list will be return.
 #'
+#' @export
+#'
 #' @examples
-#' node <- GetAllCell()
+#' node <- GetAllCell(file = system.file("extdata", "cellosaurus.xml",
+#'                                       package = "TidyComb"))
 #' cell.lines <- GetCell(node, c("U87", "A549"), "name")
 #'
 GetCell <- function(node, ids, type = "name"){
@@ -180,7 +185,7 @@ GetCell <- function(node, ids, type = "name"){
 #'
 #' If you'd like to extract information from multiple \emph{cell-line-list}
 #' nodes, combining this function with \code{xpathSapply} or
-#' \code{\link[base]{sapply}} is recommanded.
+#' \code{sapply} is recommanded.
 #'
 #' @param node An \code{XMLInternalElementNode} with only one
 #' \emph{cell-line-list} node extracted from \emph{Cellosaurus xml file}.
@@ -190,19 +195,7 @@ GetCell <- function(node, ids, type = "name"){
 #'   \item \code{name} the primary name of cell line.
 #'   \item \code{synonyms} synonyms of the cell line separated by semicolons.
 #' }
-#'
-#' @examples
-#' # parse the Cellosaurus xml file.
-#' node <- GetAllCell()
-#'
-#' # extract "cell-line-list" nodes of "U251" and "U87" cell lines.
-#' cell <- GetCell(node, c("U251", "U87"), "name")
-#'
-#' # get first cell line (U251)'s primary name and synonyms
-#' name <- GetCellName(cell[[1]])
-#'
-#' # get all cell lines' name and synonyms
-#' names <- sapply(cell, GetCellName)
+
 GetCellName <- function(node) {
   name.list <- XML::xmlToDataFrame(XML::xmlChildren(node)$'name-list',
                                    stringsAsFactors = FALSE)
@@ -226,14 +219,13 @@ GetCellName <- function(node) {
 #' node extracted from Cellosaurus xml file. Then paste them into one character.
 #'
 #' If you'd like to extract information from multiple \emph{cell-line-list}
-#' nodes, combining this function with \code{xpathSapply} or
-#' \code{\link[base]{sapply}} is recommanded.
+#' nodes, combining this function with \code{xpathSapply} or \code{sapply} is
+#' recommanded.
 #'
 #' @param node An \code{XMLInternalElementNode} with only one
 #' \emph{cell-line-list} node extracted from \emph{Cellosaurus xml file}.
 #'
 #' @return A character contains all names (Primary and synonyms) of cell line.
-#'
 
 GetCellNameInOne <- function(node) {
   name.list <- XML::xmlToDataFrame(XML::xmlChildren(node)$'name-list',
@@ -251,8 +243,8 @@ GetCellNameInOne <- function(node) {
 #' This function extract the cell line associated disease and disease ID (NCI
 #' Thesaurus entry code) which the cell line associated with from an
 #' XMLIntervalElementNode object extracted from Cellosaurus xml file. Combining
-#' this function with \code{\link[base]{apply}} or \code{\link[base]{sapply}}
-#' can extract disease information from an XMLNodeSet object.
+#' this function with \code{apply} or \code{sapply} can extract disease
+#' information from an XMLNodeSet object.
 #'
 #' @param node An XMLInternalElementNode with only one cell line's information
 #' which was extracted from Cellosaurus xml file.
@@ -260,16 +252,6 @@ GetCellNameInOne <- function(node) {
 #' @return A data frame contains two variables:
 #' \item{disease}{name of the cell line associated disease.}
 #' \item{disease_id}{NCI Thesaurus entry code of the associated disease.}
-#'
-#' @examples
-#' node <- GetAllCell()
-#' cell <- GetCell(node, c("U251", "U87"), "name")
-#'
-#' # get first cell line associated disease and disease ID
-#' disease <- GetDisease(cell[[1]])
-#'
-#' # get all cell lines associated diseases and disease IDs
-#' diseases <- sapply(cell, GetDisease)
 GetDisease <- function(node){
   disease.list <- XML::xmlChildren(node)$'disease-list'
   disease <- XML::xmlValue(disease.list)
@@ -282,23 +264,13 @@ GetDisease <- function(node){
 #'
 #' This function extract source tissue according to cross-reference "CCLE Name"
 #' from an XMLIntervalElementNode object extracted from Cellosaurus xml file.
-#' Combining it with \code{\link[base]{apply}} or \code{\link[base]{sapply}}
-#' can extract tissue from an XMLNodeSet object.
+#' Combining it with \code{apply} or \code{sapply} can extract tissue from an
+#' XMLNodeSet object.
 #'
 #' @param node An XMLInternalElementNode with only one cell line's information
 #' which was extracted from Cellosaurus xml file.
 #'
 #' @return A character. The tissue name of cell line according to CClE category.
-#'
-#' @examples
-#' node <- GetAllCell()
-#' cell <- GetCell(node, c("U251", "U87"), "name")
-#'
-#' # get Cellosaurus Accession for first cell line
-#' accession <- GetAccession(cell[[1]])
-#'
-#' # get Cellosaurus Accession for all cell lines
-#' accessions <- sapply(cell, GetAccession)
 GetTissue <- function(node){
   ref.list <- XML::xmlChildren(node)$`xref-list`
   ref <- sapply(XML::xmlChildren(ref.list), XML::xmlAttrs)
@@ -310,15 +282,13 @@ GetTissue <- function(node){
 #'
 #' This function extract Cellosaurus accession ID of one cell line from an
 #' XMLIntervalElementNode object extracted from Cellosaurus xml file. Combining
-#' this function with \code{\link[base]{apply}} or \code{\link[base]{sapply}}
-#' can extract disease information from an XMLNodeSet object.
+#' this function with \code{apply} or \code{sapply} can extract disease
+#' information from an XMLNodeSet object.
 #'
 #' @param node An XMLInternalElementNode with only one cell line's information
 #' which was extracted from Cellosaurus xml file.
 #'
 #' @return A character. The Cellosaurus accession ID of cell line
-#'
-
 GetAccession <- function(node){
   accession <- XML::xpathSApply(node,
                                 './accession-list/accession[@type="primary"]',
@@ -329,8 +299,9 @@ GetAccession <- function(node){
 #'
 #' This function will extract the primary name, synonyms, Cellosausurs Accession
 #' ID, disease, disease_id) of the cell lines and Wrap them into one data frame.
-#' If you prefer some not all of these data, \code{\link{GetNames}},
-#' \code{\link{GetDisease}}, or \code{\link{GetAccession}} are recommended.
+#' If you prefer some not all of these data, \code{\link{GetCellName}},
+#' \code{\link{GetCellNameInOne}}, \code{\link{GetDisease}}, or
+#' \code{\link{GetAccession}} are recommended.
 #'
 #' @param node An "XMLInternalElementNode" extracted from the Cellosaurus XML
 #' file by either \code{\link{GetAllCell}} or \code{\link{GetCell}}
@@ -350,12 +321,13 @@ GetAccession <- function(node){
 #'
 #' @return A data frame contains cell line information selected by \code{info}
 #'
+#' @export
+#'
 #' @examples
-#' node <- GetAllCell()
+#' node <- GetAllCell(system.file("extdata", "cellosaurus.xml",
+#'                                package = "TidyComb"))
 #' cell.lines <- GetCell(node, c("U87", "A549"), "name")
 #' cell.info <- GetCellInfo(cell.lines)
-#'
-#' @export
 GetCellInfo <- function(node, info = "accession") {
 
   if (info == "name") {

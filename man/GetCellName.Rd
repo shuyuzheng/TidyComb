@@ -28,18 +28,5 @@ one \emph{cell-line-list} node extracted from Cellosaurus xml file.
 
 If you'd like to extract information from multiple \emph{cell-line-list}
 nodes, combining this function with \code{xpathSapply} or
-\code{\link[base]{sapply}} is recommanded.
-}
-\examples{
-# parse the Cellosaurus xml file.
-node <- GetAllCell()
-
-# extract "cell-line-list" nodes of "U251" and "U87" cell lines.
-cell <- GetCell(node, c("U251", "U87"), "name")
-
-# get first cell line (U251)'s primary name and synonyms
-name <- GetCellName(cell[[1]])
-
-# get all cell lines' name and synonyms
-names <- sapply(cell, GetCellName)
+\code{sapply} is recommanded.
 }

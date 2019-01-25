@@ -4,11 +4,14 @@
 \alias{GenerateCell}
 \title{Generate "cell_line" and "tissue" file}
 \usage{
-GenerateCell(acc)
+GenerateCell(acc, file)
 }
 \arguments{
 \item{acc}{A vector of charactors contains cellosaurus accessions of
 interested cell lines.}
+
+\item{file}{The path to Cellosaurus XML file which was posted on
+\url{https://web.expasy.org/cellosaurus/}}
 }
 \value{
 A list with 3 data frame contains

@@ -30,7 +30,9 @@ head(template)
 ## 1.1 Matched cellosaurus accession.
 ```{r Match_cell_accession, message=FALSE}
 cells <- unique(na.omit(template$cell_line_name))
-cell.match <- MatchCellAcc(cells)
+cell.match <- MatchCellAcc(cells, file = system.file("extdata", 
+                                                     "cellosaurus.xml",
+                                                     package = "TidyComb"))
 print(cell.match)
 ```
 
@@ -45,7 +47,9 @@ cell.match.clean <- cell.match[-2, c("input_name", "cellosaurus_accession")]
 ## 1.2 Generate files according to cellosaurus accessions.
 
 ```{r Generate_cell_line}
-cell <- GenerateCell(cell.match.clean$cellosaurus_accession)
+cell <- GenerateCell(cell.match.clean$cellosaurus_accession, 
+                     file = system.file("extdata", "cellosaurus.xml",
+                                        package = "TidyComb"))
 names(cell)
 
 ```
@@ -109,9 +113,9 @@ template$drug_row_id <- drug_index$id[match(template$drug_row_cid,
 template$drug_col_id <- drug_index$id[match(template$drug_col_cid,
                                             drug_index$cid)]
 head(template)
-template <- template[, c("block_id", "drug_row_id", "drug_col_id", "response",
+template <- template[, c("block_id", "drug_row", "drug_col", "response",
                          "conc_r", "conc_c", "conc_r_unit", "conc_c_unit",
-                         "cell_line_id")]
+                         "cell_line_name")]
 ```
 
 # 3. calculate synergy scores and generate other files for uploading

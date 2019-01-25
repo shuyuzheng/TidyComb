@@ -2,8 +2,8 @@
 #
 
 # response_with_scores must contain the following columns
-# "block_id","conc_r","conc_c", "response", "drug_row_id", "drug_col_id",
-# "conc_r_unit", "conc_c_unit", "cell_line__id", "row", "col", "synergy_zip",
+# "block_id","conc_r","conc_c", "response", "drug_row", "drug_col",
+# "conc_r_unit", "conc_c_unit", "cell_line_name", "row", "col", "synergy_zip",
 # "synergy_hsa", "synergy_bliss", "synergy_loewe")
 
 GenerateCurve <- function(response_with_scores) {
@@ -68,7 +68,7 @@ GenerateCurve <- function(response_with_scores) {
   )
 
   mat6 <- data.frame(matrix(NA, nrow = 2, ncol = 10))
-  mat6 <- stats::setNames(mat6, c("block_id","drug_row_id", "drug_col_id",
+  mat6 <- stats::setNames(mat6, c("block_id","drug_row", "drug_col",
                                   "conc_r_unit","conc_c_unit", "b", "c", "d",
                                   "e", "model"))
 

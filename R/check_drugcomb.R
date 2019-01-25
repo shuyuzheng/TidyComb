@@ -10,7 +10,7 @@
 #
 CheckCell <- function(test) {
   message("Checking Cell lines...")
-  exist <- TidyComb:::drugcomb$cell_line
+  exist <- drugcomb$cell_line
   n <- nrow(exist)
   old <- stats::na.omit(exist[match(test, exist$cellosaurus_accession), ])
   new <- test[!test %in% exist$cellosaurus_accession]
@@ -26,7 +26,7 @@ CheckCell <- function(test) {
 
 CheckTissue <- function(test) {
   message("Checking tissues...")
-  exist <- TidyComb:::drugcomb$tissue
+  exist <- drugcomb$tissue
   n <- nrow(exist)
   old <- stats::na.omit(exist[match(test, exist$name), ])
   new <- test[!test %in% exist$name]
@@ -42,7 +42,7 @@ CheckTissue <- function(test) {
 
 CheckDisease <- function(test) {
   message("Checking  diseases...")
-  exist <- TidyComb:::drugcomb$disease
+  exist <- drugcomb$disease
   n <- nrow(exist)
   old <- stats::na.omit(exist[match(test, exist$id), ])
   new <- test[!test %in% exist$id]
@@ -58,7 +58,7 @@ CheckDisease <- function(test) {
 
 CheckDrug <- function(cids) {
   message("Checking drugs...")
-  exist <- TidyComb:::drugcomb$drug
+  exist <- drugcomb$drug
   n <- nrow(exist)
   old <- stats::na.omit(exist[match(cids, exist$cid), ])
   new <- cids[!cids %in% exist$cid]

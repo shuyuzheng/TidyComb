@@ -4,13 +4,10 @@
 # block_id	conc_r	conc_c	response	drug_row	drug_col	conc_r_unit
 # conc_c_unit	cell_line_name
 
-# response = read.csv("C:\\Users\\Localadmin_jtang\\Dropbox\\drugcomb\\code\\response_template.csv", stringsAsFactors = F)
-# setwd("C:\\Users\\Localadmin_jtang\\Dropbox\\drugcomb\\code")
-
-GenerateScore = function(response){
+GenerateScore <- function(response){
   # add row and column numbers
-  response <- plyr::ddply(response, c("cell_line_id", "drug_row_id" ,
-                                      "drug_col_id", "block_id"),
+  response <- plyr::ddply(response, c("cell_line_name", "drug_row" ,
+                                      "drug_col", "block_id"),
                           transform,
                           row = own_rank(conc_r),
                           col = own_rank(conc_c))
@@ -26,7 +23,8 @@ GenerateScore = function(response){
     data.tmp <- response[index,]
 
     set.seed(1) # add random noise - NB! the noise will be saved in the output
-    data.tmp$response <- data.tmp$response + stats::rnorm(nrow(data.tmp), 0, 0.001)
+    data.tmp$response <- data.tmp$response + stats::rnorm(nrow(data.tmp),
+                                                          0, 0.001)
 
     data.tmp2 <- ReshapeData2(data.tmp, data.type = "inhibition")
     response.mat <- data.tmp2$dose.response.mats[[1]]
@@ -54,7 +52,7 @@ GenerateScore = function(response){
 
     data.tmp2$dose.response.mats[[1]] <- response.mat
 
-    # missing_index = which(is.na(response.mat), arr.ind = T)
+    # missing_index <- which(is.na(response.mat), arr.ind = T)
     # if(length(missing_index) !=0 ){
     #   for(j in 1:nrow(missing_index)){
     #     r <- missing_index[j, 1]
@@ -75,9 +73,9 @@ GenerateScore = function(response){
     bliss.tmp <- CalculateSynergy2(data.tmp2, method = "BLISS",
                                    correction = TRUE, nan.handle = "L4",
                                    Emin = NA, Emax = NA)
-    zip.tmp = CalculateSynergy2(data.tmp2, method = "ZIP", correction = TRUE,
+    zip.tmp <- CalculateSynergy2(data.tmp2, method = "ZIP", correction = TRUE,
                                 nan.handle = "L4", Emin = NA, Emax = NA)
-    loewe.tmp = CalculateSynergy2(data.tmp2, method = "LOEWE",
+    loewe.tmp <- CalculateSynergy2(data.tmp2, method = "LOEWE",
                                   correction = TRUE, nan.handle = "L4",
                                   Emin = NA, Emax = NA)
 

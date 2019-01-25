@@ -1,9 +1,9 @@
 ReshapeData2 <- function(data, data.type = "viability") {
-  if (!all(c("block_id", "drug_row_id", "drug_col_id", "row", "col", "response",
+  if (!all(c("block_id", "drug_row", "drug_col", "row", "col", "response",
              "conc_r", "conc_c", "conc_r_unit", "conc_c_unit") %in%
            colnames(data))) {
     stop("The input data must contain the following columns: ",
-         "block_id, drug_row_id, drug_col_id, row, col, response,", "\n ",
+         "block_id, drug_row, drug_col, row, col, response,", "\n ",
          "conc_r, conc_c, conc_r_unit, conc_c_unit")
   }
   id.drug.comb <- unique(data$block_id)
@@ -42,8 +42,8 @@ ReshapeData2 <- function(data, data.type = "viability") {
     }
     conc.runit <- unique(tmp.mat$conc_r_unit)
     conc.cunit <- unique(tmp.mat$conc_c_unit)
-    drug.row <- unique(tmp.mat$drug_row_id)
-    drug.col <- unique(tmp.mat$drug_col_id)
+    drug.row <- unique(tmp.mat$drug_row)
+    drug.col <- unique(tmp.mat$drug_col)
     drug.pairs$drug.row[i] <- drug.row
     drug.pairs$drug.col[i] <- drug.col
     drug.pairs$concRUnit[i] <- conc.runit

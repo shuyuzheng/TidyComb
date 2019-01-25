@@ -1,23 +1,56 @@
-get.pubmed <- function(pmids, tool = "R", email = NULL ) {
-  # Input:
-  #    1. pmid: PubMed ID of publications
-  #    2. email: user's e-mail address
-  #    3. tool: the name of application, default is "R"
-  # Output: data.frame with matched publication date, first author, title,
-  #    journal, and doi of the publication.
-  #
-  # API Documentation: https://www.ncbi.nlm.nih.gov/pmc/tools/developers/
-  #
-  # Note about API usage:
-  # The use of our APIs is entirely free, and doesn't require an API key, but
-  # we ask that you please:
-  # * Do not make concurrent requests, even at off-peak times;
-  # * Include two parameters that help to identify your service or application
-  # to our servers:
-  #    1. tool: should be the name of the application, as a string value with
-  # no internal spaces.
-  #    2. email: should be the e-mail address of the maintainer of the tool,
-  # and should be a valid e-mail address.
+
+#'Get publication information from Pubmed
+#'
+#' \code{GetPubmed} extract information (pulication date, first name of first
+#' author, title of the publication, full name of journal, doi) of publications
+#' from Pubmed database.
+#'
+#' \code{GetPubmed} extract publications information via API provided by PMC
+#' database.
+#'
+#' The argument \code{tool} and \code{email} are required for access
+#' \href{https://www.ncbi.nlm.nih.gov/pmc/tools/developers/}{API}.
+#' Following is the "Note about API usage":
+#'
+#' The use of our APIs is entirely free, and doesn't require an API key, but
+#' we ask that you please:
+#' \itemize{
+#'   \item{Do not make concurrent requests, even at off-peak times;}
+#'   \item{Include two parameters that help to identify your service or
+#' application to our servers:
+#'     \enumerate{
+#'       \item tool should be the name of the application, as a string value
+#'       with no internal spaces.
+#'       \item email should be the e-mail address of the maintainer of the tool,
+#'       and should be a valid e-mail address.
+#'     }
+#'   }
+#' }
+#'
+#' @param pmids A vector of character/numeric containing PubMed ID of
+#' publications
+#'
+#' @param tool The name of application, default is "TidyComb"
+#'
+#' @param email User's e-mail address
+#'
+#' @return A data frame containing 6 variables:
+#' \itemize{
+#'   \item \strong{pubmed_id} The PubMed ID of the publication passed to
+#'   \code{pmid} argument.
+#'   \item \strong{year} The year of the publication date.
+#'   \item \strong{name} The first name of the first author.
+#'   \item \strong{title} The title of the publication.
+#'   \item \strong{journal} The full name of journal where the publication was
+#'   reposted.
+#'   \item \strong{doi} The Digital Object Identifier (DOI) of the publication.
+#' }
+#'
+#' @export
+#'
+#' @examples
+#' study <- GetPubmed(c(26551875, 15627163))
+GetPubmed <- function(pmids, tool = "TidyComb", email = NULL ) {
   if (is.null(email)) {
     stop("As the PMC API ask for user's contact information, please provide
          your email address as a parameter when calling this function.")

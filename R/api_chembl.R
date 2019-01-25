@@ -2,10 +2,17 @@
 # Functions for retrieving or updating celline information from Cellosaurus.
 # Copyrighte Shuyu Zheng
 
-#' Check version of Chembl database
+#' Check version of ChEMBL database
+#'
+#' By calling function \code{ChemblVersion} without any argument, you can check
+#' the current version ChEMBL database.
+#'
+#' \code{ChemblVersion} is a fuction wrapping the "Status" function provided by
+#' \href{https://www.ebi.ac.uk/chembl/ws}{ChEMBL Web Services}.
 #'
 #' @return A vector of named characters contains the update information of
-#' Chembl.
+#' ChEMBL.
+#'
 #' @export
 #'
 #' @examples
@@ -16,21 +23,24 @@ ChemblVersion <- function(){
   res <- unlist(res)
 }
 
-#' Get Chembl ID and max clinical phase
+#' Get information from ChEMBL
 #'
-#' This function retrieves the Chembl ID and max clinical trial phase of drugs
-#' by provided InChiKeys.
-#' API: \href{https://www.ebi.ac.uk/chembl/ws}{ChEMBL Web Services}.
+#' \code{GetChembl} retrieves ChEMBL ID and max clinical trial phase of drugs
+#' accordint to standard InChIKey.
 #'
-#' @param ids A vector of characters contains the InChIKey of drugs. Note: the
-#' leading and tailing whitespaces are not allowed.
+#' \code{GetChembl} queries ChEMBL database via
+#' \href{https://www.ebi.ac.uk/chembl/ws}{ChEMBL Web Services}. The input drug
+#' identifier is standard InChIKey.
+#'
+#' @param ids A vector of characters contains the InChIKey of drugs.
+#' \emph{Note:} the leading and tailing whitespaces are not allowed.
 #'
 #' @param quiet A logical value. If it is \code{TRUE}, the error messages will
 #' not show during runing the function.
 #'
 #' @return A data frame contains 3 columns:
-#'  \item{inchikey}{Identifiers inputted in the function.}
-#'  \item{chembl_id}{Chembl ID of the matched drugs.}
+#'  \item{inchikey}{Inputted standard InChIKey of drugs.}
+#'  \item{chembl_id}{ChEMBL ID of the matched drugs.}
 #'  \item{chembl_phase}{Max clinical trial phase of the matched drugs.}
 #'
 #' @export
@@ -99,6 +109,31 @@ GetChembl <- function(ids, quiet = TRUE) {
 
   return(out)
 }
+
+#' Get max clinical trial phase from ChEMBL ID
+#'
+#' \code{GetChemblPhase} retrieves max clinical trial phase of drugs accordint
+#' to ChEMBL ID.
+#'
+#' \code{GetChemblPhase} queries ChEMBL database via
+#' \href{https://www.ebi.ac.uk/chembl/ws}{ChEMBL Web Services}. The input drug
+#' identifier is ChEMBL ID and the out put information is "max clinical trial
+#' phase".
+#'
+#' @param ids A vector of characters contains the ChEMBL IDs of drugs.
+#' \emph{Note:} the leading and tailing whitespaces are not allowed.
+#'
+#' @param quiet A logical value. If it is \code{TRUE}, the error messages will
+#' not show during runing the function.
+#'
+#' @return A data frame contains 2 columns:
+#'  \item{chembl_id}{Inputted ChEMBL ID of drugs.}
+#'  \item{chembl_phase}{Max clinical trial phase of the matched drugs.}
+#'
+#' @export
+#'
+#' @examples
+#' drug.info <- GetChemblPhase("CHEMBL25")
 
 GetChemblPhase <- function(ids, quiet = TRUE) {
   message("Getting clinical phase from ChEMBL...")

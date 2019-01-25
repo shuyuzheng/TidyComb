@@ -4,14 +4,14 @@
 
 #' Match CID according to other identifiers
 #'
-#' \code{GetCid} matches CIDs of drugs according to user-provided identifiers.
+#' \code{GetCid} matches CID of drugs according to user-provided identifiers.
 #'
-#' This function using the PubChem API
+#' \code{GetCid} queries PubChem database via
 #' (\href{https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html}{PUG REST}
-#' to seach mached drugs. Available
+#' to search matched CIDs of drugs according to other identifiers. Available
 #' identifiers are: name, SID, SMILES, InChI, SDF, InChIKey, molecula formula.
 #'
-#' \strong{API USAGE POLICY:}
+#' Following is the \strong{"API USAGE POLICY"}:
 #' Please note that PUG REST is not designed for very large volumes (millions)
 #' of requests. We ask that any script or application not make more than 5
 #' requests per second, in order to avoid overloading the PubChem servers. If
@@ -19,10 +19,10 @@
 #' for help on optimizing your task, as there are likely more efficient ways to
 #' approach such bulk queries.
 #'
-#' @param ids A vector of characters contains the identifiers of drugs you are
-#' interested in.
+#' @param ids A vector of characters contains the identifiers of drugs for
+#' searching.
 #'
-#' @param type A character indicates the type of identifiers passed by \code{id}
+#' @param type A character indicates the type of identifiers passed to \code{id}
 #'   argument. Available types are:
 #'   \itemize{
 #'   \item \strong{smiles} Identifiers of drugs in the simplified molecular-input
@@ -34,8 +34,9 @@
 #'   synonyms, NCGC IDs, Chembl IDs, CAS or any other kind of identifiers.
 #'   \item \strong{sdf} The SDF
 #'   }
-#' @param quiet A logical value. Describe wether or not show error message
-#' during retrieving data.
+#'
+#' @param quiet A logical value. If it is \code{TRUE}, the error message
+#' during retrieving data will not show in console.
 #'
 #' @return A data frame contains two columns:
 #' \itemize{
@@ -80,7 +81,9 @@ GetCid <- function(ids, type , quiet = TRUE) {
         temp <- NA
       }
     }, error = function(e) {
-      print(e)
+      if (!quiet) {
+        print(e)
+      }
     }, finally = Sys.sleep(0.2) # See usage policy.
     )
     cid <- c(cid, temp)
@@ -97,7 +100,12 @@ GetCid <- function(ids, type , quiet = TRUE) {
 
 #' Get drug synonyms from PubChem
 #'
-#' @param cids A vector of characters or integers. contains CID of interested drugs
+#' \code{GetPubNames} queries PubChem database with drug CIDs via
+#' (\href{https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html}{PUG REST} to
+#' searching for synonyms of drug.
+#'
+#' @param cids A vector of characters or integers containing CID of drugs for
+#' searching.
 #'
 #' @return A Data frame contains:
 #' \itemize{
@@ -106,6 +114,7 @@ GetCid <- function(ids, type , quiet = TRUE) {
 #'   PubChem.
 #'   \item \strong{synonyms} Synonyms retrieved from PubChem
 #' }
+#'
 #' @export
 #'
 #' @examples
@@ -148,7 +157,8 @@ GetPubNames <- function(cids){
 #'
 #' \code{GetPubchemPro} function retrieves the properties (InChIKey, Canonical
 #' SMILES, and molecula formula) of drugs from PubChem database via
-#' \href{https://pubchemdocs.ncbi.nlm.nih.gov/pug-rest$_Toc494865567}{PUG REST}.
+#' \href{https://pubchemdocs.ncbi.nlm.nih.gov/pug-rest$_Toc494865567}{PUG REST},
+#' accordint to CIDs.
 #'
 #' @param cids A vector of integer or character indicates the CIDs of drugs.
 #'
@@ -188,6 +198,24 @@ GetPubchemPro <- function(cids) {
       return(res)
 }
 
+#' Get max clinical trial phase from Pubchem
+#'
+#' \code{GetPubPhase} function retrieves the max clinical trial phase of drugs
+#' from PubChem database via
+#' \href{https://pubchemdocs.ncbi.nlm.nih.gov/pug-rest$_Toc494865567}{PUG REST},
+#' accordint to CIDs.
+#'
+#' @param cids A vector of integer or character indicates the CIDs of drugs.
+#'
+#' @return A data frame contains 4 columns:
+#' \itemize{
+#'   \item \strong{CID} CID of drugs which is inputted to \code{cids} argument.
+#'   \item \strong{phase} Max clinical trial phase of matched drugs.
+#' }
+#' @export
+#'
+#' @examples
+#' clinical.phase <- GetPubPhase(c(1,2,3,4))
 GetPubPhase <- function(cids, quiet = TRUE) {
   message("Getting clinical phases from PubChem...")
   # build container
@@ -228,7 +256,9 @@ GetPubPhase <- function(cids, quiet = TRUE) {
       }
     }, error = function(e){
       temp <- matrix(c(compound, 0), nrow = 1)
-      if (!quiet) print(e)
+      if (!quiet) {
+        print(e)
+      }
     }, finally = Sys.sleep(0.2)
     )
 
