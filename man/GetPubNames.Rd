@@ -7,7 +7,8 @@
 GetPubNames(cids)
 }
 \arguments{
-\item{cids}{A vector of characters or integers. contains CID of interested drugs}
+\item{cids}{A vector of characters or integers containing CID of drugs for
+searching.}
 }
 \value{
 A Data frame contains:
@@ -19,7 +20,9 @@ A Data frame contains:
 }
 }
 \description{
-Get drug synonyms from PubChem
+\code{GetPubNames} queries PubChem database with drug CIDs via
+(\href{https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html}{PUG REST} to
+searching for synonyms of drug.
 }
 \examples{
 GetPubNames("2244")

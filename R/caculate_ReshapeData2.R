@@ -1,11 +1,38 @@
-ReshapeData2 <- function(data, data.type = "viability") {
-  if (!all(c("block_id", "drug_row", "drug_col", "row", "col", "response",
-             "conc_r", "conc_c", "conc_r_unit", "conc_c_unit") %in%
-           colnames(data))) {
-    stop("The input data must contain the following columns: ",
-         "block_id, drug_row, drug_col, row, col, response,", "\n ",
-         "conc_r, conc_c, conc_r_unit, conc_c_unit")
-  }
+#' Reshape data into response matrix
+#'
+#' Function \code{ReshapeBlock} transforms response data in form of molten data
+#' frame into "response matrix" format.
+#'
+#' \code{ReshapeBlock} extract response data of one combination block and tidy
+#' them into a matrix whose columns and rows refer to consentrations of two
+#' drugs and the cells were filled with \em{response value} referring to
+#' inhibition rate of combination.
+#'
+#' User also need to declear the type of "response value" in input data which is
+#' defaultly set as \code{inhibition}. If the \code{type} is \code{viability},
+#' \code{ReshapeBlock} will automatically transform them into \em{inhibition
+#' value} by substracting them from 100.
+#'
+#' @param block A data frame which contains the drug combination response data
+#' and it must contain the following columns: block_id, response, conc_r,
+#' conc_c, conc_r_unit, conc_c_unit, cell_line_name, drug_row, drug_col.
+#'
+#' @return A list contains "response matrix" for each pair of drugs.
+#'
+#' @export
+#'
+ReshapeBlock <- function(block) {
+
+  response.mat <- reshape2::acast(block, conc_r ~ conc_c,
+                                  value.var = "response",
+                                  function(x) mean(x, na.rm = TRUE))
+
+
+  return(response.mat)
+}
+
+ReshapeData2 <- function(data, type = "inhibition") {
+
   id.drug.comb <- unique(data$block_id)
   dose.response.mats <- list()
   drug.pairs <- data.frame(drug.row = character(length(id.drug.comb)),
@@ -15,9 +42,8 @@ ReshapeData2 <- function(data, data.type = "viability") {
                            blockIDs = numeric(length(id.drug.comb)),
                            stringsAsFactors = FALSE)
   for (i in 1:length(id.drug.comb)) {
-    # cat('\r', i)
     tmp.mat <- data[which(data$block_id == id.drug.comb[i]),]
-    if (data.type == "viability") {
+    if (type == "viability") {
       tmp.mat$Inhibition <- 100 - tmp.mat$response
     } else {
       tmp.mat$Inhibition <- tmp.mat$response

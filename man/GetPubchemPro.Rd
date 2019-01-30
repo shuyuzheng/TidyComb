@@ -21,7 +21,8 @@ A data frame contains 4 columns:
 \description{
 \code{GetPubchemPro} function retrieves the properties (InChIKey, Canonical
 SMILES, and molecula formula) of drugs from PubChem database via
-\href{https://pubchemdocs.ncbi.nlm.nih.gov/pug-rest$_Toc494865567}{PUG REST}.
+\href{https://pubchemdocs.ncbi.nlm.nih.gov/pug-rest$_Toc494865567}{PUG REST},
+accordint to CIDs.
 }
 \examples{
 property <- GetPubchemPro(c(1,2,3,4))

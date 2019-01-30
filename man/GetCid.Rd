@@ -7,10 +7,10 @@
 GetCid(ids, type, quiet = TRUE)
 }
 \arguments{
-\item{ids}{A vector of characters contains the identifiers of drugs you are
-interested in.}
+\item{ids}{A vector of characters contains the identifiers of drugs for
+searching.}
 
-\item{type}{A character indicates the type of identifiers passed by \code{id}
+\item{type}{A character indicates the type of identifiers passed to \code{id}
 argument. Available types are:
 \itemize{
 \item \strong{smiles} Identifiers of drugs in the simplified molecular-input
@@ -23,8 +23,8 @@ synonyms, NCGC IDs, Chembl IDs, CAS or any other kind of identifiers.
 \item \strong{sdf} The SDF
 }}
 
-\item{quiet}{A logical value. Describe wether or not show error message
-during retrieving data.}
+\item{quiet}{A logical value. If it is \code{TRUE}, the error message
+during retrieving data will not show in console.}
 }
 \value{
 A data frame contains two columns:
@@ -34,15 +34,15 @@ A data frame contains two columns:
 }
 }
 \description{
-\code{GetCid} matches CIDs of drugs according to user-provided identifiers.
+\code{GetCid} matches CID of drugs according to user-provided identifiers.
 }
 \details{
-This function using the PubChem API
+\code{GetCid} queries PubChem database via
 (\href{https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html}{PUG REST}
-to seach mached drugs. Available
+to search matched CIDs of drugs according to other identifiers. Available
 identifiers are: name, SID, SMILES, InChI, SDF, InChIKey, molecula formula.
 
-\strong{API USAGE POLICY:}
+Following is the \strong{"API USAGE POLICY"}:
 Please note that PUG REST is not designed for very large volumes (millions)
 of requests. We ask that any script or application not make more than 5
 requests per second, in order to avoid overloading the PubChem servers. If

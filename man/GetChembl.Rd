@@ -2,27 +2,31 @@
 % Please edit documentation in R/api_chembl.R
 \name{GetChembl}
 \alias{GetChembl}
-\title{Get Chembl ID and max clinical phase}
+\title{Get information from ChEMBL}
 \usage{
 GetChembl(ids, quiet = TRUE)
 }
 \arguments{
-\item{ids}{A vector of characters contains the InChIKey of drugs. Note: the
-leading and tailing whitespaces are not allowed.}
+\item{ids}{A vector of characters contains the InChIKey of drugs.
+\emph{Note:} the leading and tailing whitespaces are not allowed.}
 
 \item{quiet}{A logical value. If it is \code{TRUE}, the error messages will
 not show during runing the function.}
 }
 \value{
 A data frame contains 3 columns:
- \item{inchikey}{Identifiers inputted in the function.}
- \item{chembl_id}{Chembl ID of the matched drugs.}
+ \item{inchikey}{Inputted standard InChIKey of drugs.}
+ \item{chembl_id}{ChEMBL ID of the matched drugs.}
  \item{chembl_phase}{Max clinical trial phase of the matched drugs.}
 }
 \description{
-This function retrieves the Chembl ID and max clinical trial phase of drugs
-by provided InChiKeys.
-API: \href{https://www.ebi.ac.uk/chembl/ws}{ChEMBL Web Services}.
+\code{GetChembl} retrieves ChEMBL ID and max clinical trial phase of drugs
+accordint to standard InChIKey.
+}
+\details{
+\code{GetChembl} queries ChEMBL database via
+\href{https://www.ebi.ac.uk/chembl/ws}{ChEMBL Web Services}. The input drug
+identifier is standard InChIKey.
 }
 \examples{
 drug.info <- GetChembl("PMATZTZNYRCHOR-CGLBZJNRSA-N")

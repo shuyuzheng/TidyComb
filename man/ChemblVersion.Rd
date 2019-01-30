@@ -2,16 +2,21 @@
 % Please edit documentation in R/api_chembl.R
 \name{ChemblVersion}
 \alias{ChemblVersion}
-\title{Check version of Chembl database}
+\title{Check version of ChEMBL database}
 \usage{
 ChemblVersion()
 }
 \value{
 A vector of named characters contains the update information of
-Chembl.
+ChEMBL.
 }
 \description{
-Check version of Chembl database
+By calling function \code{ChemblVersion} without any argument, you can check
+the current version ChEMBL database.
+}
+\details{
+\code{ChemblVersion} is a fuction wrapping the "Status" function provided by
+\href{https://www.ebi.ac.uk/chembl/ws}{ChEMBL Web Services}.
 }
 \examples{
 print(ChemblVersion())

@@ -1,0 +1,62 @@
+
+#' calculate synergy scores in response table
+#'
+#' \code{GenerateScore()} takes input \code{template} table, calculates synergy
+#' scores and generates the \em{response_with_score} table which is used for
+#' downstream functions \code{\link{GenerateCurve()}},
+#' \code{\link{GenerateSummary2()}}, and \code{\link{Generatesurface3()}}.
+#'
+#' There are four different synergy scores calculated by function
+#' \code{GenerateScore}:
+#' \itemize{
+#'   \item \strong{Bliss}: Expected effect of two drugs acting indenpendently.
+#'   \href{https://doi.org/10.1111/j.1744-7348.1939.tb06990.x}{(Bliss, 1939)}.
+#'   \item \strong{Highest Single Agent(HSA)}: The maximal sigle drug effect.
+#'   \href{http://pharmrev.aspetjournals.org/content/41/2/93.long}{(Berenbaum,
+#'   1989)}.
+#'   \item \strong{Loewe}: Expected effect of a drug combined with itself.
+#'   \href{https://www.ncbi.nlm.nih.gov/pubmed/13081480}{(Loewe, 1953)}.
+#'   \item \strong{Zero Interaction Potency(ZIP)}: Expected effect of two drugs
+#'   that do not potentiate each other.
+#'   \href{https://doi.org/10.1016/j.csbj.2015.09.001}{(Yadav.et.al., 2015)}
+#' }
+#'
+#' @param response a data frame which must contains variables:
+#' \itemize{
+#'   \item \strong{block_id}: Numerical group ID, only positive. Identical value
+#'   refers to screening results of one pair of compounds tested with all doses
+#'   in one cancer cell line.
+#'   \item \strong{conc_r}: Numerical value, only positive. Row compound
+#'   concentration.
+#'   \item \strong{conc_c}: Numerical value, only positive. Column compound
+#'   concentration.
+#'   \item \strong{response}: numerical value, positive or negative. Cell
+#'   growth inhibition rate. It refers to the response of cancer cell lines to
+#'   one drug combination.
+#'   \item \strong{drug_row}: Names or identifiers of compounds which were added
+#'   along rows.
+#'   \item \strong{drug_col}: Names or identifiers of compounds which were added
+#'   along columns.
+#'   \item \strong{conc_r_unit}: Molar concentration unit of row compound with a
+#'   relevant SI prefix.
+#'   \item \strong{conc_c_unit}: Molar concentration unit of column compound
+#'   with a relevant SI prefix.
+#'   \item \strong{cell_line_name}: Name of cancer cell line in which compound
+#'   combinations are tested.
+#' }
+#'
+#' @param type A character which indicates what type of response the
+#' \em{response value} in input data refers to. Available options are
+#' "viability" and "inhibition".
+#'
+#' @return A data frame. Response table with synergy scores.
+#'
+#' @export
+#'
+#' @examples
+#' response_with_score <- GenerateScore(system.file("extdata",
+#'                                                  "template.csv",
+#'                                                  package = "TidyComb"))
+
+
+

@@ -1,14 +1,14 @@
 # NA values are not allowed
 CalculateSynergy2 <- function (data, method = "ZIP", correction = TRUE,
                                Emin = NA, Emax = NA, nan.handle = c("L4")) {
-  if (!is.list(data)) {
-    stop("Input data is not a list format!")
-  }
+  # if (!is.list(data)) {
+  #   stop("Input data is not a list format!")
+  # }
   if (!method %in% c("ZIP", "HSA", "BLISS", "LOEWE")) {
     stop("The method parameter can only be one of the following:",
          " ZIP, HSA, Bliss and Loewe.")
   }
-  dose.response.mats <- data$dose.response.mats
+  dose.response.mats <- data#$dose.response.mats
   num.pairs <- length(dose.response.mats)
   scores <- list()
   nan.handle <- match.arg(nan.handle)
