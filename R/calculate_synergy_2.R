@@ -1,5 +1,5 @@
 # NA values are not allowed
-CalculateSynergy2 <- function (data, method = "ZIP", correction = TRUE,
+CalculateSynergy2 <- function (response.mat, method = "ZIP", correction = TRUE,
                                Emin = NA, Emax = NA, nan.handle = c("L4")) {
   # if (!is.list(data)) {
   #   stop("Input data is not a list format!")
@@ -8,13 +8,13 @@ CalculateSynergy2 <- function (data, method = "ZIP", correction = TRUE,
     stop("The method parameter can only be one of the following:",
          " ZIP, HSA, Bliss and Loewe.")
   }
-  dose.response.mats <- data#$dose.response.mats
-  num.pairs <- length(dose.response.mats)
-  scores <- list()
-  nan.handle <- match.arg(nan.handle)
-  for (i in 1:num.pairs) {
-    response.mat <- dose.response.mats[[i]]
-    scores[[i]] <- switch(method,
+  # dose.response.mats <- data#$dose.response.mats
+  # num.pairs <- length(dose.response.mats)
+  # scores <- list()
+  # nan.handle <- match.arg(nan.handle)
+  # for (i in 1:num.pairs) {
+  #   response.mat <- dose.response.mats[[i]]
+    scores <- switch(method,
                           ZIP = ZIP2(response.mat, correction, Emin = Emin,
                                      Emax = Emax, nan.handle),
                           HSA = HSA2(response.mat, correction, Emin = Emin,
@@ -23,8 +23,10 @@ CalculateSynergy2 <- function (data, method = "ZIP", correction = TRUE,
                                          Emax = Emax, nan.handle),
                           LOEWE = Loewe2(response.mat, correction, Emin = Emin,
                                         Emax = Emax, nan.handle))
-  }
-  data$scores <- scores
-  data$method <- method
-  return(data)
+  # }
+  out <- list()
+  out$data <- data
+  out$scores <- scores
+  out$method <- method
+  return(out)
 }

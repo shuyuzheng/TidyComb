@@ -86,9 +86,13 @@ GenerateScore <- function(response, type = "inhibition"){
     data.tmp$response <- data.tmp$response + stats::rnorm(nrow(data.tmp),
                                                           0, 0.001)
 
+    # response.mat <- ReshapeData2(data.tmp, data.type = "inhibition")
+    # response.mat <- data.tmp2$dose.response.mats[[1]]
+
     response.mat <- reshape2::acast(data.tmp, conc_r ~ conc_c,
-                                 value.var = "response",
-                                 function(x) mean(x, na.rm = TRUE))
+                                    value.var = "response",
+                                    function(x) mean(x, na.rm = TRUE))
+    # replicates are averaged
 
     # missing value imputation - NB! the imputation only stay within the
     # function
@@ -130,25 +134,39 @@ GenerateScore <- function(response, type = "inhibition"){
     # CalculateSynergy2 does not allow NA values
     hsa.tmp <- CalculateSynergy2(response.mat, method = "HSA", correction = TRUE,
                                  nan.handle = "L4", Emin = NA, Emax = NA)
-    bliss.tmp <- CalculateSynergy2(data.tmp2, method = "BLISS",
+    bliss.tmp <- CalculateSynergy2(response.mat, method = "BLISS",
                                    correction = TRUE, nan.handle = "L4",
                                    Emin = NA, Emax = NA)
-    zip.tmp <- CalculateSynergy2(data.tmp2, method = "ZIP", correction = TRUE,
+    zip.tmp <- CalculateSynergy2(response.mat, method = "ZIP", correction = TRUE,
                                  nan.handle = "L4", Emin = NA, Emax = NA)
-    loewe.tmp <- CalculateSynergy2(data.tmp2, method = "LOEWE",
+
+    loewe.tmp <- CalculateSynergy2(response.mat, method = "LOEWE",
                                    correction = TRUE, nan.handle = "L4",
                                    Emin = NA, Emax = NA)
 
-    data.tmp$synergy_zip <- apply(data.tmp[,c("row","col")], 1,
-                                  function(x) zip.tmp$scores[[1]][x[1],x[2]])
-    data.tmp$synergy_hsa <- apply(data.tmp[,c("row","col")], 1,
-                                  function(x) hsa.tmp$scores[[1]][x[1],x[2]])
-    data.tmp$synergy_bliss <- apply(data.tmp[,c("row","col")], 1,
-                                    function(x) bliss.tmp$scores[[1]][x[1],x[2]])
-    data.tmp$synergy_loewe <- apply(data.tmp[,c("row","col")], 1,
-                                    function(x) loewe.tmp$scores[[1]][x[1],x[2]])
+    # data.tmp$synergy_zip <- apply(data.tmp[,c("row","col")], 1,
+    #                               function(x) zip.tmp$scores[[1]][x[1],x[2]])
+    # data.tmp$synergy_hsa <- apply(data.tmp[,c("row","col")], 1,
+    #                               function(x) hsa.tmp$scores[[1]][x[1],x[2]])
+    # data.tmp$synergy_bliss <- apply(data.tmp[,c("row","col")], 1,
+    #                                 function(x) bliss.tmp$scores[[1]][x[1],x[2]])
+    # data.tmp$synergy_loewe <- apply(data.tmp[,c("row","col")], 1,
+    #                                 function(x) loewe.tmp$scores[[1]][x[1],x[2]])
+    zip.tmp <- reshape2::melt(zip.tmp$scores)
+    names(zip.tmp) <- c("conc_r", "conc_c", "synergy_zip")
+    bliss.tmp <- reshape2::melt(bliss.tmp$scores)
+    names(bliss.tmp) <- c("conc_r", "conc_c", "synergy_bliss")
+    loewe.tmp <- reshape2::melt(loewe.tmp$scores)
+    names(loewe.tmp) <- c("conc_r", "conc_c", "synergy_loewe")
+    hsa.tmp <- reshape2::melt(hsa.tmp$scores)
+    names(hsa.tmp) <- c("conc_r", "conc_c", "synergy_hsa")
 
-    scores[[i]] <- data.tmp
+    data.tmp <- full_join(data.tmp, zip.tmp, by = c("conc_r", "conc_c"))
+    data.tmp <- full_join(data.tmp, hsa.tmp, by = c("conc_r", "conc_c"))
+    data.tmp <- full_join(data.tmp, bliss.tmp, by = c("conc_r", "conc_c"))
+    data.tmp <- full_join(data.tmp, loewe.tmp, by = c("conc_r", "conc_c"))
+
+    scores[[i]] <-  data.tmp
   }
   # options(show.error.messages = TRUE)
   response_with_scores <- do.call(rbind, scores)

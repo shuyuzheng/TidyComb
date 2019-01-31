@@ -45,9 +45,7 @@
 #'   combinations are tested.
 #' }
 #'
-#' @param type A character which indicates what type of response the
-#' \em{response value} in input data refers to. Available options are
-#' "viability" and "inhibition".
+
 #'
 #' @return A data frame. Response table with synergy scores.
 #'
