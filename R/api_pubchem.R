@@ -1,6 +1,6 @@
 # TidyComb
-# Functions for retrieving or updating celline information from Cellosaurus.
-# Copyrighte Shuyu Zheng
+# Functions for retrieving or updating drug information from PubChem database.
+# Copyright Shuyu Zheng
 
 #' Match CID according to other identifiers
 #'

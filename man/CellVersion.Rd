@@ -14,7 +14,7 @@
 \item{...}{Other arguments required by \code{\link[XML]{xmlEventParse}}}
 }
 \value{
-A named Character vector. It contains: version, date of update,
+A named character vector. It contains: version, date of update,
 number of archived cell lines and number of archived publications.
 }
 \description{

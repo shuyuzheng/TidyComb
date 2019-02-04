@@ -1,3 +1,7 @@
+# TidyComb
+# Functions for retrieving or updating publication information from PubMed.
+# Copyright Shuyu Zheng
+
 
 #'Get publication information from Pubmed
 #'

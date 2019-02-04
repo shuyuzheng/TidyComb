@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_cell_tissu_disease.R
 \name{GenerateCell}
 \alias{GenerateCell}
-\title{Generate "cell_line" and "tissue" file}
+\title{Generate "cell_line" "disease" and "tissue" tables}
 \usage{
 GenerateCell(acc, file)
 }
@@ -22,5 +22,5 @@ A list with 3 data frame contains
 }
 }
 \description{
-Generate "cell_line" and "tissue" file
+Generate "cell_line" "disease" and "tissue" tables
 }

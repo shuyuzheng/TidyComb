@@ -1,3 +1,6 @@
+# TidyComb
+# Function for generate "drug" table which will be uploaded to DrugComb
+# Copyright: Shuyu Zheng
 
 #' Generate drug table and drug id index table
 #'
@@ -17,8 +20,6 @@
 GenerateDrug <- function(cids) {
   # 1. Check whether drug have been archived in DrugComb database.
   check <- CheckDrug(cids = cids)
-
-
 
   # 2. Get infomation from databases
   # PubChem
@@ -42,7 +43,6 @@ GenerateDrug <- function(cids) {
   } else {
     drug$clinical_phase <- drug$phase
   }
-
 
   # DrugBank
   drugbank <- utils::read.csv(system.file("extdata", "drugbank.csv",

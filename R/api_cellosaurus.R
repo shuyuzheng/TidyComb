@@ -1,6 +1,6 @@
 # TidyComb
 # Functions for retrieving or updating celline information from Cellosaurus.
-# Copyrighte Shuyu Zheng
+# Copyright: Shuyu Zheng
 
 
 #' Check Cellosaurus XML file version.
@@ -17,7 +17,7 @@
 #'
 #' @param ... Other arguments required by \code{\link[XML]{xmlEventParse}}
 #'
-#' @return A named Character vector. It contains: version, date of update,
+#' @return A named character vector. It contains: version, date of update,
 #' number of archived cell lines and number of archived publications.
 #'
 #' @export

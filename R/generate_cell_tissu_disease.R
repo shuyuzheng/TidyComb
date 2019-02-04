@@ -1,6 +1,7 @@
 # TidyComb
-# Functions for retrieving or updating celline information from Cellosaurus.
-# Copyrighte Shuyu Zheng
+# Functions for generating "cell_line", "tissue", and "disease" tables for
+# DrugComb databse.
+# Copyright: Shuyu Zheng
 
 
 #' Match cell line name with cellosaurus accession
@@ -48,7 +49,7 @@ MatchCellAcc <- function(name, file){
 
 
 
-#' Generate "cell_line" and "tissue" file
+#' Generate "cell_line" "disease" and "tissue" tables
 #'
 #' @param acc A vector of charactors contains cellosaurus accessions of
 #'  interested cell lines.
@@ -62,6 +63,7 @@ MatchCellAcc <- function(name, file){
 #'   \item \strong{tissue} The tissue table prepared for uploading.
 #'   \item \strong{disease} The disease table prepared for uploading.
 #' }
+#'
 #' @export
 #'
 GenerateCell <- function(acc, file){
