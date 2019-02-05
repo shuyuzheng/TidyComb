@@ -207,6 +207,9 @@ GetPubchemPro <- function(cids) {
 #'
 #' @param cids A vector of integer or character indicates the CIDs of drugs.
 #'
+#' @param quiet A logical value. If it is \code{TRUE}, the error message will
+#' shut down during retrieving process.
+#'
 #' @return A data frame contains 4 columns:
 #' \itemize{
 #'   \item \strong{CID} CID of drugs which is inputted to \code{cids} argument.

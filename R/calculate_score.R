@@ -3,10 +3,25 @@
 # Copyright Shuyu Zheng
 #
 
+
+ExtractSingleDrug <- function(response.mat, dim = "row") {
+  if (dim == "row") {
+    single.drug <- data.frame(response = response.mat[, "0"],
+                              dose = as.numeric(rownames(response.mat)))
+  } else if (dim == "col") {
+    single.drug <- data.frame(response = response.mat["0", ],
+                              dose = as.numeric(colnames(response.mat)))
+  } else {
+    stop("Values for 'dim' should be eighther 'row' or 'col'!")
+  }
+  rownames(single.drug) <- NULL
+  return(single.drug)
+}
+
 #' Fitting single drug dose-response model
 #'
 #' Function \code{FittingSingleDrug} fits dose-response model by using
-#' \code{\link[drc]drm} function.
+#' \code{\link[drc]{drm}} function.
 #'
 #' Pre-fitting process:
 #' 1. Change the 0 value in concentration into 10^-10 to avoide raising error
@@ -37,69 +52,43 @@
 #'
 FittingSingleDrug <- function (response, ...) {
 
-  if (!all(c("conc", "response") %in% colnames(response))) {
-    stop('The input must contain columns: "conc", "respone".')
+  if (!all(c("dose", "response") %in% colnames(response))) {
+    stop('The input must contain columns: "dose", "respone".')
   }
 
   # nonzero concentrations to take the log
-  response[which(response[, "conc"] == 0), "conc"] <- 10^-10
+  response$dose[which(response$dose == 0)] <- 10^-10
 
   # ???
-  if(nrow(response)!= 1 & stats::var(response[, "response"]) == 0) {
-    response[nrow(response), "response"] <- response[nrow(response), "response"]
+  if(nrow(response)!= 1 & stats::var(response$response) == 0) {
+    response$response[nrow(response)] <- response$response[nrow(response)]
                                             + 10^-10
   }
 
   drug.model <- tryCatch({
-    drc::drm(response ~ conc, data = response,
+    drc::drm(response ~ dose, data = response,
              fct = drc::LL.4(fixed = c(NA, NA, NA, NA)),
              na.action = stats::na.omit,
              control = drc::drmc(errorm = FALSE, noMessage = TRUE))
   }, warning = function(w) {
-    drc::drm(response ~ log(conc), data = response,
+    drc::drm(response ~ log(dose), data = response,
              fct = drc::L.4(fixed = c(NA, NA, NA, NA)),
              na.action = stats::na.omit,
              control = drc::drmc(errorm = FALSE, noMessage = TRUE))
   }, error = function(e) {
-    drc::drm(response ~ log(conc), data = response,
+    drc::drm(response ~ log(dose), data = response,
              fct = drc::L.4(fixed = c(NA, NA, NA, NA)),
              na.action = stats::na.omit,
              control = drc::drmc(errorm = FALSE, noMessage = TRUE))
   })
   drug.fitted <- suppressWarnings(stats::fitted(drug.model))
 
-  res <- list(fitted() = drug.fitted,
+  res <- list(fitted = drug.fitted,
               model = drug.model)
   return(res)
 }
 
-ExtractSingleDrug <- function(response.mat, dim = "row") {
-  if (dim == "row") {
-    single.drug <- cbind(rownames(response.mat), response.mat[, "0"])
-    colnames(single.drug) <- c("conc", "response")
-  } else if (dim = "col") {
-    single.drug <- cbind(colnames(response.mat), response.mat["0", ])
-  } else {
-    stop("Values for 'dim' should be eighther 'row' or 'col'!")
-  }
-}
 
-#' Correct baseline of fitted drug dose-response curve
-#'
-#' @param response A data frame. It contains the response data for one pair of
-#' drugs. It must contain colums
-#'
-#' @param ...
-#'
-#' @return
-#' @export
-#'
-#' @examples
-BaselineCorrectionSD <- function (response.mat, drug.row.fitted,
-                                  drug.col.fitted, ...) {
-
-  return(corrected.mat)
-}
 
 CalculateZIP <- function(response.mat, correction = TRUE,
                          Emin = NA, Emax = NA) {
@@ -115,8 +104,8 @@ CalculateZIP <- function(response.mat, correction = TRUE,
     response.mat <- response.mat - ((100 - response.mat)/100 * baseline)
   }
 
-  drug.col.response <- single.fitted$drug.col.fitted # first row
-  drug.row.response <- single.fitted$drug.row.fitted # first column
+  drug.col.response <- drug.col.fitted$fitted # first row
+  drug.row.response <- drug.row.fitted$fitted # first column
 
   updated.single.mat <- mat.or.vec(nrow(response.mat), ncol(response.mat))
   colnames(updated.single.mat) <- colnames(response.mat)
