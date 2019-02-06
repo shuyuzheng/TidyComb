@@ -4,7 +4,7 @@
 \alias{AddNoise}
 \title{Add noise to response value}
 \usage{
-AddNoise(response.mat, method = "random")
+AddNoise(response.mat, method)
 }
 \arguments{
 \item{response.mat}{A matrix. It contains the response data for one block of

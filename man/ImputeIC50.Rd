@@ -7,7 +7,8 @@
 ImputeIC50(response.mat, ic_r, ic_c)
 }
 \arguments{
-\item{response.mat}{}
+\item{response.mat}{A matrix. It contains response value of a block of drug
+combination.}
 }
 \value{
 a data frame contains all response value at the IC50 concentration

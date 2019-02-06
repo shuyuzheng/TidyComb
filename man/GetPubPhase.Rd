@@ -8,6 +8,9 @@ GetPubPhase(cids, quiet = TRUE)
 }
 \arguments{
 \item{cids}{A vector of integer or character indicates the CIDs of drugs.}
+
+\item{quiet}{A logical value. If it is \code{TRUE}, the error message will
+shut down during retrieving process.}
 }
 \value{
 A data frame contains 4 columns:
