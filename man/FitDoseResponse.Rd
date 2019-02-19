@@ -4,17 +4,21 @@
 \alias{FitDoseResponse}
 \title{Fitting single drug dose-response model}
 \usage{
-FitDoseResponse(response, ...)
+FitDoseResponse(data, Emin = NA, Emax = NA)
 }
 \arguments{
-\item{response}{A matrix. It contains two columns:
+\item{data}{A data frame. It contains two columns:
 \itemize{
   \item \strong{conc} The concentration of drugs added in experiment.
   \item \strong{response} The response of cell lines to drug with different
   concentrations.
 }}
 
-\item{...}{}
+\item{Emin}{A numeric or \code{NA}. It specifies the minimum value in the
+fitted dose-response curve. Default setting is \code{NA}.}
+
+\item{Emax}{A numeric or \code{NA}. It specifies the maximum value in the
+fitted dose-response curve. Default setting is \code{NA}.}
 }
 \value{
 An object of class 'drc'. It contains imformation of fitted model.

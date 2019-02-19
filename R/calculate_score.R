@@ -40,13 +40,17 @@ ExtractSingleDrug <- function(response.mat, dim = "row") {
 #'   concentrations.
 #' }
 #'
-#' @param ...
+#' @param Emin A numeric or \code{NA}. It specifies the minimum value in the
+#' fitted dose-response curve. Default setting is \code{NA}.
+#'
+#' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
+#' fitted dose-response curve. Default setting is \code{NA}.
 #'
 #' @return An object of class 'drc'. It contains imformation of fitted model.
 #'
 #' @export
 #'
-FitDoseResponse <- function (data, ...) {
+FitDoseResponse <- function (data, Emin = NA, Emax = NA) {
 
   if (!all(c("dose", "response") %in% colnames(data))) {
     stop('The input must contain columns: "dose", "respone".')
@@ -56,24 +60,23 @@ FitDoseResponse <- function (data, ...) {
   data$dose[which(data$dose == 0)] <- 10^-10
 
   # ???
-  if(nrow(data)!= 1 & stats::var(data$response) == 0) {
-    data$response[nrow(data)] <- data$response[nrow(data)]
-                                            + 10^-10
+  if(nrow(data) != 1 & stats::var(data$response) == 0) {
+    data$response[nrow(data)] <- data$response[nrow(data)] + 10 ^ -10
   }
 
   drug.model <- tryCatch({
     drc::drm(response ~ dose, data = data,
-             fct = drc::LL.4(fixed = c(NA, NA, NA, NA)),
+             fct = drc::LL.4(fixed = c(NA, Emin, Emax, NA)),
              na.action = stats::na.omit,
              control = drc::drmc(errorm = FALSE, noMessage = TRUE))
   }, warning = function(w) {
     drc::drm(response ~ log(dose), data = data,
-             fct = drc::L.4(fixed = c(NA, NA, NA, NA)),
+             fct = drc::L.4(fixed = c(NA, Emin, Emax, NA)),
              na.action = stats::na.omit,
              control = drc::drmc(errorm = FALSE, noMessage = TRUE))
   }, error = function(e) {
     drc::drm(response ~ log(dose), data = data,
-             fct = drc::L.4(fixed = c(NA, NA, NA, NA)),
+             fct = drc::L.4(fixed = c(NA, Emin, Emax, NA)),
              na.action = stats::na.omit,
              control = drc::drmc(errorm = FALSE, noMessage = TRUE))
   })
@@ -86,11 +89,11 @@ CalculateZIP <- function(response.mat, correction = TRUE,
                          Emin = NA, Emax = NA) {
   drug.row <- ExtractSingleDrug(response.mat, dim = "row")
   drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
-                                                fixed = c(NA, Emin, Emax, NA))))
+                                                    Emin = Emin, Emax = Emax)))
 
   drug.col <- ExtractSingleDrug(response.mat, dim = "col")
   drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
-                                                fixed = c(NA, Emin, Emax, NA))))
+                                                    Emin = Emin, Emax = Emax)))
 
   if (correction) {
     baseline <- (min(as.numeric(drug.row.fit)) +
@@ -99,19 +102,24 @@ CalculateZIP <- function(response.mat, correction = TRUE,
   }
 
 
+  drug.row <- ExtractSingleDrug(response.mat, dim = "row")
+  drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
+                                                     Emin = Emin, Emax = Emax)))
+
+  drug.col <- ExtractSingleDrug(response.mat, dim = "col")
+  drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
+                                                     Emin = Emin, Emax = Emax)))
+
+
   # updated.single.mat[1, -1] <- drug.col.fit[-1]
   # updated.single.mat[-1, 1] <- drug.row.fit[-1]
   n.row <- nrow(response.mat)
   n.col <- ncol(response.mat)
 
   # print('row')
-  tem <- data.frame(dose = as.numeric(rownames(response.mat))[-1])
+  tmp <- data.frame(dose = as.numeric(rownames(response.mat))[-1])
   updated.col.mat <- matrix(nrow = n.row - 1, ncol = n.col - 1)
 
-
-
-
-  if (nrow())
   for (i in 2:n.col) {
     # nonzero concentrations to take the log
     tmp$response <- response.mat[-1, i]
@@ -124,85 +132,58 @@ CalculateZIP <- function(response.mat, correction = TRUE,
 
     if(nrow(tmp) == 1) {
       # # no fitting
-      fitted.inhibition <- tmp$inhibition
+      fitted.response <- tmp$response - 10 ^ -10
     } else {
       tmp.min <- drug.col.fit[i]
-      tmp.model <- FitDoseResponse(data = tmp, fixed = c(NA, tmp.min, 100, NA))
-      fitted.inhibition <- suppressWarnings(stats::fitted(tmp.model))
+      tmp.model <- FitDoseResponse(data = tmp, Emin = tmp.min, Emax = 100)
+      fitted.response <- suppressWarnings(stats::fitted(tmp.model))
     }
 
     # if (fitted.inhibition[length(fitted.inhibition)] < 0)
     #  fitted.inhibition[length(fitted.inhibition)] <- tmp.min
-    updated.col.mat[, i] <- fitted.inhibition
+    updated.col.mat[, i - 1] <- fitted.response
   }
 
   # print('col')
-  updated.row.mat <- updated.single.mat
-  for (i in 2:nrow(response.mat)) {
-    # print(i)
-    tmp <- as.data.frame(mat.or.vec(ncol(response.mat) - 1, 0))
-    tmp$dose <- as.numeric(colnames(response.mat))[-1]
+  tmp <- data.frame(dose = as.numeric(colnames(response.mat))[-1])
+  updated.row.mat <- matrix(nrow = n.row - 1, ncol = n.col - 1)
+
+  for (i in 2:n.row) {
     # nonzero concentrations to take the log
-    tmp$dose[which(tmp$dose==0)] =  10^-10
+    tmp$response <- response.mat[i, -1]
 
-    tmp$inhibition <- response.mat[i, c(2:ncol(response.mat))]
-    tmp.min <- updated.single.mat[i, 1]
-
-    if (stats::var(tmp$inhibition, na.rm = TRUE) == 0 |
-        length(tmp$inhibition) == 1) {
-      tmp$inhibition[1] <- tmp$inhibition[1] - 10^-10
-    }
-
-    if(nrow(tmp)==1) {
-      fitted.inhibition <- tmp$inhibition
+    if(nrow(tmp) == 1) {
+      # # no fitting
+      fitted.response <- tmp$response - 10 ^ -10
     } else {
-      tmp.model = tryCatch(
-        {
-          tmp.model <- drc::drm(inhibition ~ dose, data = tmp,
-                               fct = drc::LL.4(fixed = c(NA, tmp.min, 100, NA)),
-                               na.action = stats::na.omit,
-                               control = drc::drmc(errorm = FALSE,
-                                                   noMessage = TRUE))
-        },
-        warning = function(w) {
-          tmp.model <- drc::drm(inhibition ~ log(dose), data = tmp,
-                                fct = drc::L.4(fixed = c(NA, tmp.min, 100, NA)),
-                                na.action = stats::na.omit,
-                                control = drc::drmc(errorm = FALSE,
-                                                    noMessage = TRUE))
-
-        },
-        error = function(w) {
-          tmp.model<-drc::drm(inhibition ~ log(dose), data = tmp,
-                              fct = drc::L.4(fixed = c(NA, tmp.min, 100, NA)),
-                              na.action = stats::na.omit,
-                              control = drc::drmc(errorm = FALSE,
-                                                  noMessage = TRUE))
-        }
-
-      )
-      fitted.inhibition <- suppressWarnings(stats::fitted(tmp.model))
+      tmp.min <- drug.row.fit[i]
+      tmp.model <- FitDoseResponse(data = tmp, Emin = tmp.min, Emax = 100)
+      fitted.response <- suppressWarnings(stats::fitted(tmp.model))
     }
 
-    # if (tmp$fitted.inhibition[ncol(response.mat) - 1] < 0)
-    #  tmp$fitted.inhibition[ncol(response.mat) - 1] <- tmp.min
-    tmp$fitted.inhibition <- fitted.inhibition
-    updated.row.mat[i, c(2:ncol(response.mat))] <- tmp$fitted.inhibition
+    # if (fitted.inhibition[length(fitted.inhibition)] < 0)
+    #  fitted.inhibition[length(fitted.inhibition)] <- tmp.min
+    updated.row.mat[i - 1 , ] <- fitted.response
   }
 
-  fitted.mat <- (updated.col.mat + updated.row.mat)/2
-  zip.mat <- updated.single.mat
-  for (i in 2:nrow(updated.single.mat)) {
-    for (j in 2:ncol((updated.single.mat))) {
-      zip.mat[i, j] <- updated.single.mat[i, 1] + updated.single.mat[1, j] -
-                       updated.single.mat[i, 1] * updated.single.mat[1, j]/100
+  fitted.mat <- (updated.col.mat + updated.row.mat) / 2
+
+  zip.mat <- matrix(nrow = n.row -1, ncol = n.col - 1)
+  for (i in 1:(n.row - 1)) {
+    for (j in 1:(n.col - 1)) {
+      zip.mat[i, j] <- drug.row.fit[i + 1] + drug.col.fit[j + 1] -
+        drug.row.fit[i + 1] * drug.col.fit[j + 1] / 100
     }
   }
 
-  # fitted.mat[1, 1] <- 0
-  # zip.mat[1, 1] <- 0
-  # fitted.mat <- apply(fitted.mat, c(1, 2), function(x) ifelse(x > 100, 100, x))
+  delta.mat <- fitted.mat - zip.mat
 
-  delta.mat <- (fitted.mat - zip.mat)
+  # add 0 to first column and first row
+  delta.mat <- rbind(rep(0, times = n.row -1), delta.mat)
+  delta.mat <- cbind(rep(0, times = n.col), delta.mat)
+
+  # add colname and rowname for delta.mat
+  colnames(delta.mat) <- colnames(response.mat)
+  rownames(delta.mat) <- rownames(response.mat)
   return(delta.mat)
 }
