@@ -1,11 +1,13 @@
 context("calculate_score")
 library("TidyComb")
 library("dplyr")
+load("zip.rda")
+load("response_with_noise.rda")
 response <- read.csv("response_test.csv", stringsAsFactors = FALSE)
 response.mat <- reshape2::acast(response, conc_r ~ conc_c,
                                 value.var = "response")
-response.mat.noise <- AddNoise(response.mat, method = "random")
-zip <- reshape2::acast(response, conc_r ~ conc_c, value.var = "synergy_zip")
+# zip <- reshape2::acast(response, conc_r ~ conc_c, value.var = "synergy_zip")
+
 
 # ExtractSingleDrug
 drug.row <- ExtractSingleDrug(response.mat = response.mat, "row")
@@ -19,9 +21,9 @@ test_that("ExtractSingleDrug should return a matrix with two columns 'conc' and
 test_that("ExtractSingleDrug extract correct information of drug on correct
           dim", {
   expect_equal(drug.row, response %>% filter(conc_c == 0) %>%
-                           select(response, dose = conc_r) %>% arrange(dose))
+                 dplyr::select(response, dose = conc_r) %>% arrange(dose))
   expect_equal(drug.col, response %>% filter(conc_r == 0) %>%
-                           select(response, dose = conc_c) %>% arrange(dose))
+                 dplyr::select(response, dose = conc_c) %>% arrange(dose))
 })
 
 test_that("Value passed to ExtractSingleDrug dim should be either 'row' or
@@ -36,5 +38,5 @@ test_that("FitDoseResponse should return a 'drc' object.", {
   expect_equal(class(fit), "drc")
 })
 test_that("CalculateZIP should reture correct ZIP synergy score", {
-  expect_equal(CalculateZIP(response.mat = response.mat), zip)
+  expect_equal(CalculateZIP(response.mat = response.mat.noise), zip)
 })
