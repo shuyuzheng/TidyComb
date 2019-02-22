@@ -13,7 +13,7 @@ row, respectively. The values in matrix indicate the inhibition rate to cell
 growth.}
 
 \item{dim}{A character. It should be either "col" or "row" to indicate which
-drug's dose-response value would you like to extract.}
+drug's dose-response value will be extracted.}
 }
 \value{
 A data frame. It contains two variables:

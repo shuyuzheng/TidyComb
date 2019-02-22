@@ -269,32 +269,113 @@ CalculateZIP <- function(response.mat, # correction = TRUE,
 
 #' Calculate Bliss synergy score
 #'
+#' \code{CalculateBliss} calculates the synergy score matrix for a block of
+#' drug combination by using a druginteraction reference model introduced by
+#' C. I. Bliss in 1939.
 #'
+#' This model is a reference model for evaluating the interaction between two
+#' drugs. The basic assumption of this model is "The expected effect of two
+#' drugs acting independently". More details about this model could be found in
+#' original publication:
+#' \href{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-7348.1939.tb06990.x}{(Bliss, 1939)}.
 #'
-#' @param response.mat
-#' @param correction
-#' @param Emin
-#' @param Emax
+#' @param response.mat A drug cobination dose-response matrix. It's column name
+#' and row name are representing the concerntrations of drug added to column and
+#' row, respectively. The values in matrix indicate the inhibition rate to cell
+#' growth.
 #'
-#' @return
+#' @param correction A logical value. It indicates whether \emph{baseline
+#' correction} needed before calculation. Default value is \code{TRUE}, which
+#' means the correction will be done.
+#'
+#' @param Emin A numeric or \code{NA}. It specifies the minimum value in the
+#' fitted dose-response curve. Default setting is \code{NA}.
+#'
+#' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
+#' fitted dose-response curve. Default setting is \code{NA}.
+#'
+#' @return A matrix with synergy score calculated via reference model introduced
+#' by C. I. Bliss.
+#'
 #' @export
-#'
-#' @examples
 CalculateBliss <- function (response.mat, # correction = TRUE,
                             Emin = NA, Emax = NA) {
   # if (correction) {
   #   response.mat <- CorrectBaseLine(response.mat)
   # }
   #
-  drug1.response <- response.mat[, 1]
-  drug2.response <- response.mat[1, ]
-  ref.mat <- response.mat
+  drug.row <- response.mat[, 1]
+  drug.col <- response.mat[1, ]
+  reference.mat <- response.mat
   for (i in 2:nrow(response.mat)) {
     for (j in 2:ncol(response.mat)) {
-      ref.mat[i, j] <- drug1.response[i] + drug2.response[j] -
-        drug1.response[i] * drug2.response[j]/100
+      reference.mat[i, j] <- drug.row[i] + drug.cow[j] -
+        drug.row[i] * drug.col[j]/100
     }
   }
-  syn.mat <- response.mat - ref.mat
-  return(syn.mat)
+  synergy.mat <- response.mat - reference.mat
+  return(synergy.mat)
 }
+
+#' Calculate HSA synergy score
+#'
+#' \code{CalculateHSA} calculates the synergy score matrix for a block of
+#' drug combination by using Highest Single Agent (HSA) reference model.
+#'
+#' This model is a reference model for evaluating the interaction between two
+#' drugs. The basic assumption of this model is "The reference effect of drug
+#' combination is the maximal single drug effect". More details about this model
+#' could be found in original publication:
+#' \href{https://www.ncbi.nlm.nih.gov/pubmed/2692037}{(Berenbaum, 1989)}.
+#'
+#' @param response.mat A drug cobination dose-response matrix. It's column name
+#' and row name are representing the concerntrations of drug added to column and
+#' row, respectively. The values in matrix indicate the inhibition rate to cell
+#' growth.
+#'
+#' @param correction A logical value. It indicates whether \emph{baseline
+#' correction} needed before calculation. Default value is \code{TRUE}, which
+#' means the correction will be done.
+#'
+#' @param Emin A numeric or \code{NA}. It specifies the minimum value in the
+#' fitted dose-response curve. Default setting is \code{NA}.
+#'
+#' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
+#' fitted dose-response curve. Default setting is \code{NA}.
+#'
+#' @return A matrix with synergy score calculated via Highest Single Agent (HSA)
+#' reference model.
+#'
+#' @export
+
+#' Calculate Loewe synergy score
+#'
+#' \code{CalculateLoewe} calculates the synergy score matrix for a block of
+#' drug combination by using a druginteraction reference model introduced by
+#' Loewe in 1953.
+#'
+#' This model is a reference model for evaluating the interaction between two
+#' drugs. The basic assumption of this model is "The referece effect of drug
+#' combination is the expected effect of a drug combined with itself". More
+#' details about this model could be found in original publication:
+#' \href{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-7348.1939.tb06990.x}{(Bliss, 1939)}.
+#'
+#' @param response.mat A drug cobination dose-response matrix. It's column name
+#' and row name are representing the concerntrations of drug added to column and
+#' row, respectively. The values in matrix indicate the inhibition rate to cell
+#' growth.
+#'
+#' @param correction A logical value. It indicates whether \emph{baseline
+#' correction} needed before calculation. Default value is \code{TRUE}, which
+#' means the correction will be done.
+#'
+#' @param Emin A numeric or \code{NA}. It specifies the minimum value in the
+#' fitted dose-response curve. Default setting is \code{NA}.
+#'
+#' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
+#' fitted dose-response curve. Default setting is \code{NA}.
+#'
+#' @return A matrix with synergy score calculated via reference model introduced
+#' by C. I. Bliss.
+#'
+#' @expor
