@@ -1,13 +1,7 @@
 context("calculate_score")
 library("TidyComb")
 library("dplyr")
-load("zip.rda")
-load("response_with_noise.rda")
-response <- read.csv("response_test.csv", stringsAsFactors = FALSE)
-response.mat <- reshape2::acast(response, conc_r ~ conc_c,
-                                value.var = "response")
-# zip <- reshape2::acast(response, conc_r ~ conc_c, value.var = "synergy_zip")
-
+load("synergy.rda")
 
 # ExtractSingleDrug
 drug.row <- ExtractSingleDrug(response.mat = response.mat, "row")
@@ -37,6 +31,22 @@ fit <- FitDoseResponse(drug.row)
 test_that("FitDoseResponse should return a 'drc' object.", {
   expect_equal(class(fit), "drc")
 })
+
+# BaselineCorrect
+correct.response <- CorrectBaseLine(response.mat.noise)
+# Synergy scores
 test_that("CalculateZIP should reture correct ZIP synergy score", {
-  expect_equal(CalculateZIP(response.mat = response.mat.noise), zip)
+  expect_equal(CalculateZIP(response.mat = correct.response), zip)
+})
+
+test_that("CalculateHSA should reture correct HSA synergy score", {
+  expect_equal(CalculateHSA(response.mat = correct.response), hsa)
+})
+
+test_that("CalculateBliss should reture correct Bliss synergy score", {
+  expect_equal(CalculateBliss(response.mat = correct.response), bliss)
+})
+
+test_that("CalculateLoewe should reture correct Loewe synergy score", {
+  expect_equal(CalculateLoewe(response.mat = correct.response), loewe)
 })

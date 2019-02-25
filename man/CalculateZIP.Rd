@@ -4,7 +4,7 @@
 \alias{CalculateZIP}
 \title{Calculate ZIP synergy score}
 \usage{
-CalculateZIP(response.mat, Emin = NA, Emax = NA)
+CalculateZIP(response.mat, ...)
 }
 \arguments{
 \item{response.mat}{A drug cobination dose-response matrix. It's column name
@@ -12,15 +12,15 @@ and row name are representing the concerntrations of drug added to column and
 row, respectively. The values in matrix indicate the inhibition rate to cell
 growth.}
 
+\item{correction}{A logical value. It indicates whether \emph{baseline
+correction} needed before calculation. Default value is \code{TRUE}, which
+means the correction will be done.}
+
 \item{Emin}{A numeric or \code{NA}. It specifies the minimum value in the
 fitted dose-response curve. Default setting is \code{NA}.}
 
 \item{Emax}{A numeric or \code{NA}. It specifies the maximum value in the
 fitted dose-response curve. Default setting is \code{NA}.}
-
-\item{correction}{A logical value. It indicates whether \emph{baseline
-correction} needed before calculation. Default value is \code{TRUE}, which
-means the correction will be done.}
 }
 \value{
 A matrix with  \eqn{\Delta} score calculated via Zero Interaction

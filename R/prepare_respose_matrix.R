@@ -1,7 +1,13 @@
 # TidyComb
-# Functions for preparig drug response matrix for drug-response model fitting,
-# and synergy scores, CSS, and DSS calculation.
+# Functions for processing drug response matrix.
 # Copyrighte Shuyu Zheng
+#
+# Functions in this page:
+#
+# ImputeNear: Impute missing value with nearest values
+# AddNoise: Add noise to response value
+# ImputeIC50: Impute missing value at IC50 concentration of drug
+# ExtractSingleDrug: Extract single drug response from matrix
 
 #' Impute missing value with nearest values
 #'
@@ -174,4 +180,39 @@ ImputeIC50 <- function(response.mat, ic_r, ic_c) {
   }
   tempres <- list(tempcf_c = tempcf_c, tempcf_r = tempcf_r)
   return(tempres)
+}
+
+#' Extract single drug response from matrix
+#'
+#' \code{ExtractSingleDrug} extracts the dose-response values of single drug (
+#' drug added in column or row) from a drug combination dose-response matrix.
+#'
+#' @param response.mat A drug cobination dose-response matrix. It's column name
+#' and row name are representing the concerntrations of drug added to column and
+#' row, respectively. The values in matrix indicate the inhibition rate to cell
+#' growth.
+#'
+#' @param dim A character. It should be either "col" or "row" to indicate which
+#' drug's dose-response value will be extracted.
+#'
+#' @return A data frame. It contains two variables:
+#' \itemize{
+#' \item \strong{dose} The concertration of drug.
+#' \item \strong{response} The cell's response (inhibation rate) to
+#' corresponding drug concertration.
+#' }
+#'
+#' @export
+ExtractSingleDrug <- function(response.mat, dim = "row") {
+  if (dim == "row") {
+    single.drug <- data.frame(response = response.mat[, "0"],
+                              dose = as.numeric(rownames(response.mat)))
+  } else if (dim == "col") {
+    single.drug <- data.frame(response = response.mat["0", ],
+                              dose = as.numeric(colnames(response.mat)))
+  } else {
+    stop("Values for 'dim' should be eighther 'row' or 'col'!")
+  }
+  rownames(single.drug) <- NULL
+  return(single.drug)
 }

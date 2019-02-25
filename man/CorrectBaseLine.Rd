@@ -4,7 +4,7 @@
 \alias{CorrectBaseLine}
 \title{Base line correction}
 \usage{
-CorrectBaseLine(response.mat)
+CorrectBaseLine(response.mat, ...)
 }
 \arguments{
 \item{response.mat}{A drug cobination dose-response matrix. It's column name

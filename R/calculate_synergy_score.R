@@ -2,42 +2,13 @@
 # Functions for calculating drug synergy scores.
 # Copyright Shuyu Zheng
 #
-
-
-#' Extract single drug
-#'
-#' \code{ExtractSingleDrug} extracts the dose-response values of single drug (
-#' drug added in column or row) from a drug combination dose-response matrix.
-#'
-#' @param response.mat A drug cobination dose-response matrix. It's column name
-#' and row name are representing the concerntrations of drug added to column and
-#' row, respectively. The values in matrix indicate the inhibition rate to cell
-#' growth.
-#'
-#' @param dim A character. It should be either "col" or "row" to indicate which
-#' drug's dose-response value will be extracted.
-#'
-#' @return A data frame. It contains two variables:
-#' \itemize{
-#' \item \strong{dose} The concertration of drug.
-#' \item \strong{response} The cell's response (inhibation rate) to
-#' corresponding drug concertration.
-#' }
-#'
-#' @export
-ExtractSingleDrug <- function(response.mat, dim = "row") {
-  if (dim == "row") {
-    single.drug <- data.frame(response = response.mat[, "0"],
-                              dose = as.numeric(rownames(response.mat)))
-  } else if (dim == "col") {
-    single.drug <- data.frame(response = response.mat["0", ],
-                              dose = as.numeric(colnames(response.mat)))
-  } else {
-    stop("Values for 'dim' should be eighther 'row' or 'col'!")
-  }
-  rownames(single.drug) <- NULL
-  return(single.drug)
-}
+# Functions in this page:
+#
+# FitDoseResponse: Fitting single drug dose-response model
+# CorrectBaseLine: Do base line correction to matrix
+# CalculateZIP/Bliss/HSA/Loewe: Calculat synergy scores
+# eq.LL4/L4.LL4/L4: Four functions to calculate loewe score in CalculateLoewe.
+# fun: Function used in CalculateLoewe
 
 #' Fitting single drug dose-response model
 #'
@@ -115,14 +86,14 @@ FitDoseResponse <- function (data, Emin = NA, Emax = NA) {
 #'
 #' @return A matrix which base line have been adjusted.
 #' @export
-CorrectBaseLine <- function(response.mat){
+CorrectBaseLine <- function(response.mat, ...){
   drug.row <- ExtractSingleDrug(response.mat, dim = "row")
   drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
-                                                  Emin = Emin, Emax = Emax)))
+                                                                 ...)))
 
   drug.col <- ExtractSingleDrug(response.mat, dim = "col")
   drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
-                                                  Emin = Emin, Emax = Emax)))
+                                                                 ...)))
 
   baseline <- (min(as.numeric(drug.row.fit)) +
                  min(as.numeric(drug.col.fit))) / 2
@@ -162,32 +133,18 @@ CorrectBaseLine <- function(response.mat){
 #' Potency (ZIP) method
 #'
 #' @export
-CalculateZIP <- function(response.mat, # correction = TRUE,
-                         Emin = NA, Emax = NA) {
+CalculateZIP <- function(response.mat, ...) {
   # if (correction) {
   #   response.mat <- CorrectBaseLine(response.mat)
   # }
 
   drug.row <- ExtractSingleDrug(response.mat, dim = "row")
   drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
-                                                    Emin = Emin, Emax = Emax)))
+                                                                 ...)))
 
   drug.col <- ExtractSingleDrug(response.mat, dim = "col")
   drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
-                                                    Emin = Emin, Emax = Emax)))
-
-  if (correction) {
-    baseline <- (min(as.numeric(drug.row.fit)) +
-                   min(as.numeric(drug.col.fit))) / 2
-    response.mat <- response.mat - ((100 - response.mat) / 100 * baseline)
-    drug.row <- ExtractSingleDrug(response.mat, dim = "row")
-    drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
-                                                    Emin = Emin, Emax = Emax)))
-
-    drug.col <- ExtractSingleDrug(response.mat, dim = "col")
-    drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
-                                                    Emin = Emin, Emax = Emax)))
-  }
+                                                                 ...)))
 
   n.row <- nrow(response.mat)
   n.col <- ncol(response.mat)
@@ -284,37 +241,25 @@ CalculateZIP <- function(response.mat, # correction = TRUE,
 #' row, respectively. The values in matrix indicate the inhibition rate to cell
 #' growth.
 #'
-#' @param correction A logical value. It indicates whether \emph{baseline
-#' correction} needed before calculation. Default value is \code{TRUE}, which
-#' means the correction will be done.
-#'
-#' @param Emin A numeric or \code{NA}. It specifies the minimum value in the
-#' fitted dose-response curve. Default setting is \code{NA}.
-#'
-#' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
-#' fitted dose-response curve. Default setting is \code{NA}.
-#'
 #' @return A matrix with synergy score calculated via reference model introduced
 #' by C. I. Bliss.
 #'
 #' @export
-CalculateBliss <- function (response.mat, # correction = TRUE,
-                            Emin = NA, Emax = NA) {
-  # if (correction) {
-  #   response.mat <- CorrectBaseLine(response.mat)
-  # }
-  #
+CalculateBliss <- function (response.mat) {
   drug.row <- response.mat[, 1]
   drug.col <- response.mat[1, ]
   reference.mat <- response.mat
   for (i in 2:nrow(response.mat)) {
     for (j in 2:ncol(response.mat)) {
-      reference.mat[i, j] <- drug.row[i] + drug.cow[j] -
+      reference.mat[i, j] <- drug.row[i] + drug.col[j] -
         drug.row[i] * drug.col[j]/100
     }
   }
   synergy.mat <- response.mat - reference.mat
   return(synergy.mat)
+
+  # clean up
+  gc()
 }
 
 #' Calculate HSA synergy score
@@ -333,20 +278,80 @@ CalculateBliss <- function (response.mat, # correction = TRUE,
 #' row, respectively. The values in matrix indicate the inhibition rate to cell
 #' growth.
 #'
-#' @param correction A logical value. It indicates whether \emph{baseline
-#' correction} needed before calculation. Default value is \code{TRUE}, which
-#' means the correction will be done.
-#'
-#' @param Emin A numeric or \code{NA}. It specifies the minimum value in the
-#' fitted dose-response curve. Default setting is \code{NA}.
-#'
-#' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
-#' fitted dose-response curve. Default setting is \code{NA}.
-#'
 #' @return A matrix with synergy score calculated via Highest Single Agent (HSA)
 #' reference model.
 #'
 #' @export
+CalculateHSA <- function(response.mat) {
+  drug.row <- response.mat[, 1]
+  drug.col <- response.mat[1, ]
+  reference.mat <- response.mat
+  for (i in 2:nrow(response.mat)) {
+    for (j in 2:ncol(response.mat)) {
+      reference.mat[i, j] <- max(drug.row[i], drug.col[j])
+    }
+  }
+  synergy.mat <- response.mat - reference.mat
+  return(synergy.mat)
+
+  #clean up
+  gc()
+}
+
+# Four functions to calculate loewe
+eq.LL4.LL4 <- function(x, x1, x2, drug.col.par, drug.row.par) {
+  x1 / (drug.col.par[4] * (((x - drug.col.par[3]) /
+                            (drug.col.par[2] - x)) ^ (1/drug.col.par[1]))) +
+    x2 / (drug.row.par[4] * (((x - drug.row.par[3]) /
+                              (drug.row.par[2] - x)) ^ (1/drug.row.par[1]))) - 1
+}# Eq.8 in the ZIP paper
+
+eq.L4.L4 <- function(x, x1, x2, drug.col.par, drug.row.par) {
+  x1 / exp((drug.col.par[4] + log((drug.col.par[3] - x) /
+                                    (x - drug.col.par[2])) / drug.col.par[1])) +
+    x2 / exp((drug.row.par[4] + log((drug.row.par[3] - x) /
+                                  (x - drug.row.par[2])) / drug.row.par[1])) -1
+}# x1, x2 to be log scaled
+
+eq.LL4.L4 <- function(x, x1, x2, drug.col.par, drug.row.par) {
+  x1 / (drug.col.par[4] * (((x - drug.col.par[3]) /
+                              (drug.col.par[2] - x)) ^ (1 / drug.col.par[1]))) +
+    x2 / exp((drug.row.par[4] + log((drug.row.par[3] - x) /
+                                  (x - drug.row.par[2])) / drug.row.par[1])) -1
+}# x2 to be log-scaled
+
+eq.L4.LL4 <- function(x, x1, x2, drug.col.par, drug.row.par) {
+  x1 / exp((drug.col.par[4] + log((drug.col.par[3] - x) /
+                                    (x - drug.col.par[2])) / drug.col.par[1])) +
+    x2 / (drug.row.par[4] * (((x - drug.row.par[3]) /
+                            (drug.row.par[2] - x)) ^ (1 / drug.row.par[1]))) - 1
+}# x1 to be log-scaled
+
+# function used to calculate loewe if termination code from 'nleqslv' function
+# is -10, 1, or 2, which mean:
+# * -10 User supplied Jacobian is most likely incorrect.
+# * 1 Function criterion is near zero. Convergence of function values has been
+# achieved.
+# * 2 x-values within tolerance. This means that the relative distance between two
+# consecutive x-values is smaller than xtol but that the function value
+# criterion is still larger than ftol. Function values may not be near zero;
+# therefore the user must check if function values are acceptably small.
+#
+fun <- function(col_conc, row_conc, drug.par, model) {
+  # LL.4, conc must be raw
+  if(model == "LL.4") {
+    conc = col_conc + row_conc
+    (drug.par[3] + drug.par[2] *
+        (conc / drug.par[4]) ^ drug.par[1]) /
+      (1 + (conc / drug.par[4]) ^ drug.par[1])
+  } else if (model == "L.4"){# L.4, conc must be logscaled, ie. log(conc)
+    conc = log(col_conc+row_conc)
+    (drug.par[2] + (drug.par[3] - drug.par[2]) /
+        (1 + exp(drug.par[1] * (conc - drug.par[4]))))
+  } else {
+    stop("Model type is incorrect. Available values are 'LL.4' or 'L.4' ")
+  }
+}
 
 #' Calculate Loewe synergy score
 #'
@@ -365,17 +370,76 @@ CalculateBliss <- function (response.mat, # correction = TRUE,
 #' row, respectively. The values in matrix indicate the inhibition rate to cell
 #' growth.
 #'
-#' @param correction A logical value. It indicates whether \emph{baseline
-#' correction} needed before calculation. Default value is \code{TRUE}, which
-#' means the correction will be done.
-#'
-#' @param Emin A numeric or \code{NA}. It specifies the minimum value in the
-#' fitted dose-response curve. Default setting is \code{NA}.
-#'
-#' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
-#' fitted dose-response curve. Default setting is \code{NA}.
+#' @param quiet A logical value. If it is \code{TRUE} then the warning message
+#' will not show during calculation.
 #'
 #' @return A matrix with synergy score calculated via reference model introduced
 #' by C. I. Bliss.
 #'
 #' @expor
+CalculateLoewe <- function (response.mat, quiet = TRUE, ...) {
+  if (quiet) {
+    options(warn = -1)
+  }
+  drug.row <- ExtractSingleDrug(response.mat, dim = "row")
+  drug.row.model <- FitDoseResponse(drug.row)#, ...)
+  drug.row.par <- stats::coef(drug.row.model)
+  drug.row.fct <- drug.row.model$call$fct[[1]][[3]]
+
+  drug.col <- ExtractSingleDrug(response.mat, dim = "col")
+  drug.col.model <- FitDoseResponse(drug.col)#, ...)
+  drug.col.par <- stats::coef(drug.col.model)
+  drug.col.fct <- drug.col.model$call$fct[[1]][[3]]
+
+  drug.row$dose[drug.row$dose == 0] = 10^-10 # avoid log(0)
+  drug.col$dose[drug.col$dose == 0] = 10^-10 # avoid log(0)
+
+  loewe.mat <- response.mat
+  eq <- switch (paste(drug.col.fct, drug.row.fct),
+                "LL.4 LL.4" = eq.LL4.LL4,
+                "L.4 L.4"   = eq.L4.L4,
+                "LL.4 L.4"  = eq.LL4.L4,
+                "L.4 LL.4"  = eq.L4.LL4)
+
+  x <- max(drug.col.par[2], drug.row.par[2]) + 1
+
+  for (i in 1:(nrow(drug.col) - 1)) {
+    for (j in 1:(nrow(drug.row) - 1)) {
+      x1 <- drug.col$dose[i + 1]
+      x2 <- drug.row$dose[j + 1]
+
+      options(warn = -1)
+      slv <- tryCatch({
+        slv <- nleqslv::nleqslv(x, eq, method = "Newton", x1=x1, x2=x2,
+                                drug.col.par = drug.col.par,
+                                drug.row.par = drug.row.par)
+        },
+        error = function(){
+          slv <- list(termcd = 999)
+        }
+      )
+
+      if (slv$termcd < 3) {
+        y.loewe <- slv$x
+      } else {
+        y.loewe1 <- fun(x1, x2, drug.col.par, drug.col.fct) # x1 col, x2 row
+        y.loewe2 <- fun(x1, x2, drug.row.par, drug.row.fct) # x1 col, x2 row
+        y.loewe <- max(y.loewe1, y.loewe2)
+      }
+
+      if (y.loewe > 100) {
+        y.loewe <- 100
+      }
+
+      loewe.mat[j + 1, i + 1] <- y.loewe
+    }
+  }
+
+  synergy.mat <- response.mat - loewe.mat
+
+  return(synergy.mat)
+
+  options(warn = 0)
+  # clean up
+  gc()
+}

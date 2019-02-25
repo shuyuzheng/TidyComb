@@ -2,6 +2,7 @@
 
 export(AddNoise)
 export(CalculateBliss)
+export(CalculateHSA)
 export(CalculateZIP)
 export(CellVersion)
 export(CheckCell)
