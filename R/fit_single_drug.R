@@ -70,6 +70,7 @@ FitDoseResponse <- function (data, Emin = NA, Emax = NA) {
   return(drug.model)
 }
 
-GenerateCurve <- function(model){
-
+FindModelType <- function(model) {
+  type <- model$call$fct[[1]][[3]]
+  return(type)
 }
