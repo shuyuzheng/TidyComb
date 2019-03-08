@@ -75,23 +75,17 @@ FindModelType <- function(model) {
   return(type)
 }
 
-ExtractCoefs <- function(model, type, max.conc){
-  coef <- stats::coef(model)
-
-  names(coef) <- gsub(":(Intercept)", "", names(coef), fixed = T)
-
+CalculateIC50 <- function(coef, type, max.conc){
   if (type == "LL.4") {
-    ic50 <- coef[["e"]]
+    ic50 <- coef[["e:(Intercept)"]]
   } else if (type == "L.4") {
-    ic50 <- exp(coef[["e"]])
+    ic50 <- exp(coef[["e:(Intercept)"]])
   }
 
   if (ic50 > max.conc) {
     ic50 = max.conc
   }
 
-  coef <- c(coef, ic50 = ic50)
-
-  return (coef)
+  return (ic50)
 
 }

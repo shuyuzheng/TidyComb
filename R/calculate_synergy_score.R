@@ -68,18 +68,19 @@ CorrectBaseLine <- function(response.mat, ...){
 #' Potency (ZIP) method
 #'
 #' @export
-CalculateZIP <- function(response.mat, ...) {
-  # if (correction) {
-  #   response.mat <- CorrectBaseLine(response.mat)
-  # }
+CalculateZIP <- function(response.mat, drug.row.model = NULL,
+                         drug.col.model = NULL, ...) {
+  if (is.null(drug.row.model)) {
+      drug.row <- ExtractSingleDrug(response.mat, dim = "row")
+      drug.row.model <- FitDoseResponse(drug.row)
+  }
+  drug.row.fit <- suppressWarnings(stats::fitted(drug.row.model))
 
-  drug.row <- ExtractSingleDrug(response.mat, dim = "row")
-  drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
-                                                                 ...)))
-
-  drug.col <- ExtractSingleDrug(response.mat, dim = "col")
-  drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
-                                                                 ...)))
+  if (is.null(drug.col.model)) {
+    drug.col <- ExtractSingleDrug(response.mat, dim = "col")
+    drug.col.model <- FitDoseResponse(drug.col)
+  }
+  drug.col.fit <- suppressWarnings(stats::fitted(drug.col.model))
 
   n.row <- nrow(response.mat)
   n.col <- ncol(response.mat)
@@ -91,13 +92,6 @@ CalculateZIP <- function(response.mat, ...) {
   for (i in 2:n.col) {
     # nonzero concentrations to take the log
     tmp$response <- response.mat[-1, i]
-
-    # ????: | or &, + or -
-    # if (stats::var(tmp$response, na.rm = TRUE) == 0 |
-    #                length(tmp$response) == 1) {
-    #   tmp$response[1] <- tmp$response[1] - 10^-10
-    # }
-
     if(nrow(tmp) == 1) {
       # # no fitting
       fitted.response <- tmp$response - 10 ^ -10
@@ -119,7 +113,6 @@ CalculateZIP <- function(response.mat, ...) {
   for (i in 2:n.row) {
     # nonzero concentrations to take the log
     tmp$response <- response.mat[i, -1]
-
     if(nrow(tmp) == 1) {
       # # no fitting
       fitted.response <- tmp$response - 10 ^ -10
@@ -153,7 +146,11 @@ CalculateZIP <- function(response.mat, ...) {
   # add colname and rowname for delta.mat
   colnames(delta.mat) <- colnames(response.mat)
   rownames(delta.mat) <- rownames(response.mat)
-  return(delta.mat)
+
+  # melt matrix as data frame
+  res <- reshape2::melt(delta.mat)
+  colnames(res) <- c("conc_c", "conc_r", "synergy_zip")
+  return(res)
 
   # clean up
   gc()
@@ -191,7 +188,11 @@ CalculateBliss <- function (response.mat) {
     }
   }
   synergy.mat <- response.mat - reference.mat
-  return(synergy.mat)
+
+  # melt matrix as data frame
+  res <- reshape2::melt(synergy.mat)
+  colnames(res) <- c("conc_c", "conc_r", "synergy_bliss")
+  return(res)
 
   # clean up
   gc()
@@ -227,7 +228,11 @@ CalculateHSA <- function(response.mat) {
     }
   }
   synergy.mat <- response.mat - reference.mat
-  return(synergy.mat)
+
+  # melt matrix as data frame
+  res <- reshape2::melt(synergy.mat)
+  colnames(res) <- c("conc_c", "conc_r", "synergy_hsa")
+  return(res)
 
   #clean up
   gc()
@@ -312,25 +317,35 @@ fun <- function(col_conc, row_conc, drug.par, model) {
 #' by C. I. Bliss.
 #'
 #' @expor
-CalculateLoewe <- function (response.mat, quiet = TRUE, ...) {
+CalculateLoewe <- function (response.mat, quiet = TRUE, drug.col.type = NULL,
+                            drug.row.type = NULL, drug.col.par = NULL,
+                            drug.row.par = NULL, ...) {
   if (quiet) {
     options(warn = -1)
   }
-  drug.row <- ExtractSingleDrug(response.mat, dim = "row")
-  drug.row.model <- FitDoseResponse(drug.row)#, ...)
-  drug.row.par <- drug.row.model$coefficients
-  drug.row.fct <- drug.row.model$call$fct[[1]][[3]]
 
+  drug.row <- ExtractSingleDrug(response.mat, dim = "row")
   drug.col <- ExtractSingleDrug(response.mat, dim = "col")
-  drug.col.model <- FitDoseResponse(drug.col)#, ...)
-  drug.col.par <- drug.col.model$coefficients
-  drug.col.fct <- drug.col.model$call$fct[[1]][[3]]
+
+  con <- sapply(list(drug.col.type, drug.col.par, drug.row.type, drug.row.par),
+                is.null)
+
+  if (!all(!con)) {
+
+    drug.row.model <- FitDoseResponse(drug.row)
+    drug.row.par <- stats::coef(drug.row.model)
+    drug.row.type <- FindModelType(drug.row.model)
+
+    drug.col.model <- FitDoseResponse(drug.col)
+    drug.col.par <- stats::coef(drug.col.model)
+    drug.col.type <- FindModelType(drug.col.model)
+  }
 
   drug.row$dose[drug.row$dose == 0] = 10^-10 # avoid log(0)
   drug.col$dose[drug.col$dose == 0] = 10^-10 # avoid log(0)
 
   loewe.mat <- response.mat
-  eq <- switch (paste(drug.col.fct, drug.row.fct),
+  eq <- switch (paste(drug.col.type, drug.row.type),
                 "LL.4 LL.4" = eq.LL4.LL4,
                 "L.4 L.4"   = eq.L4.L4,
                 "LL.4 L.4"  = eq.LL4.L4,
@@ -357,8 +372,8 @@ CalculateLoewe <- function (response.mat, quiet = TRUE, ...) {
       if (slv$termcd < 3) {
         y.loewe <- slv$x
       } else {
-        y.loewe1 <- fun(x1, x2, drug.col.par, drug.col.fct) # x1 col, x2 row
-        y.loewe2 <- fun(x1, x2, drug.row.par, drug.row.fct) # x1 col, x2 row
+        y.loewe1 <- fun(x1, x2, drug.col.par, drug.col.type) # x1 col, x2 row
+        y.loewe2 <- fun(x1, x2, drug.row.par, drug.row.type) # x1 col, x2 row
         y.loewe <- max(y.loewe1, y.loewe2)
       }
 
@@ -372,7 +387,10 @@ CalculateLoewe <- function (response.mat, quiet = TRUE, ...) {
 
   synergy.mat <- response.mat - loewe.mat
 
-  return(synergy.mat)
+  # melt matrix as data frame
+  res <- reshape2::melt(synergy.mat)
+  colnames(res) <- c("conc_c", "conc_r", "synergy_loewe")
+  return(res)
 
   options(warn = 0)
   # clean up

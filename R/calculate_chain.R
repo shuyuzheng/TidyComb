@@ -29,9 +29,8 @@
 #'     }
 #'   \item Whole response matrix process
 #'     \enumerate{
-#'       \item Fit dose-response model through whole matrix
-#'       \item Calculate CSS
 #'       \item Calculate Synergy Scores
+#'       \item Calculate CSS
 #'     }
 #'   \item Summarize and generate surface
 #' }
@@ -41,7 +40,7 @@
 #'
 #' @return
 #' @export
-CalculateMat <- function(response.mat, correction = TRUE, ...){
+CalculateMat <- function(response.mat, correction = TRUE, ...) {
   # 1. Pre-processing
   # 1.1 Impute for missing value in original matrix
   response.mat <- ImputeNear(response.mat, times = 2)
@@ -59,20 +58,48 @@ CalculateMat <- function(response.mat, correction = TRUE, ...){
   # drug_col
   drug.col <- ExtractSingleDrug(response.mat, dim = "col")
   col.model <- FitDoseResponse(drug.col)
-  col.method <- FindModelType(col.model)
+  col.type <- FindModelType(col.type)
 
   # drug_row
   drug.row <- ExtractSingleDrug(response.mat, dim = "row")
   row.model <- FitDoseResponse(drug.row)
-  row.method <- FindModelType(row.model)
+  row.type <- FindModelType(row.type)
 
   # 2.2 Extract coeficients and IC50
   # drug_col
-  col.coe <- ExtractCoefs(col.model, col.method, max(drug.col$dose))
+  col.coe <- stats::coef(col.model)
   # drug_rowr
-  row.coe <- ExtractCoefs(row.model, row.method, max(drug.row$dose))
+  row.coe <- stats::coef(row.model)
 
-  # 2.3 Calculate DSS
+  # 2.3 Calculate DSS (using single drug response but without that at 0
+  # concentration)
+  col.dss <- CalculateSens(drug.col)
+  row.dss <- CalculateSens(drug.row)
 
+  # 3. whole matrix process
+  # 3.1 Calculate synergyscores
+  zip <- CalculateZIP(response.mat, drug.row.model = row.model,
+                      drug.col.model = col.model)
+  loewe <- CalculateLoewe(response.mat, drug.row.type = row.type,
+                          drug.row.par = row.coe, drug.col.type = col.type,
+                          drug.col.par = col.coe)
+  hsa <- CalculateHSA(response.mat)
+  bliss <- CalculateBliss(response.mat)
 
+  synergy <- Reduce(function(x, y) merge(x = x, y = y,
+                                         by = c("conc_c", "conc_r")),
+                    list(zip, loewe, hsa, bliss))
+  # 3.2 Calculate CSS
+  col.ic50 <- CalculateIC50(col.coe, col.type, max(drug.col$dose))
+  row.ic50 <- CalculateIC50(row.coe, row.type, max(drug.row$dose))
+
+  res <- ImputeIC50(response.mat, col.ic50 = col.ic50, row.ic50 = row.ic50)
+  # a particular row selected according to ic50_row
+  col.css <- CalculateSens(res$tempcf_c)
+  # a particular column selected according to ic50_col
+  row.css <- CalculateSens(res$tempcf_r)
+
+  css <- mean(col.css, row.css)
+
+  S <- css - mean(col.dss, row.dss)
 }

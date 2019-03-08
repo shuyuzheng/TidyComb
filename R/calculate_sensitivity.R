@@ -5,23 +5,7 @@
 # Functions on this page:
 #
 
-
-# IC50
-CalculateIC50 <- function(e, type, max.conc) {
-  if (type == "LL.4") {
-    ic50 <- e
-  } else if (type == "L.4") {
-    ic50 <- exp(e)
-  }
-
-  if (ic50 > max.conc) {
-    ic50 = max(df$conc)
-  }
-
-  return (ic50)
-}
-
-ComputeSensitivity <- function(df) {
+CalculateSens <- function(df) {
   #options(show.error.messages = FALSE)
   df <- df[-which(df$dose == 0),]
   if (nrow(df) == 1) {
@@ -59,25 +43,9 @@ ComputeSensitivity <- function(df) {
   }
   #options(show.error.messages = TRUE)
   return (score)
-}
 
-PredictResponse <- function(df, dose) {
-  if (stats::var(df$response, na.rm = TRUE) == 0) {
-    pred <- df$response[1]
-  } else {
-    model <- FitDoseResponse(data)
-
-    if (model$call$fct[[1]][[3]] == "LL.4") {
-      pred <- stats::predict(model, data.frame(dose = dose))
-    } else {
-      pred <- stats::predict(model, data.frame(dose = log(dose)))# NB! use log
-    }
-
-    if (pred > 100) {
-      pred <- 100 + stats::runif(1, -0.01, 0)
-    }
-  }
-  return(pred)
+  #Clean up
+  gc()
 }
 
 # CSS - scoreCurve
@@ -171,7 +139,7 @@ own_log2 = function(x)
 #' \code{\link{computeSensitivity}} for scoring.
 #'
 #' @export
-ImputeIC50 <- function(response.mat, ic_r, ic_c) {
+ImputeIC50 <- function(response.mat, col.ic50, row.ic50) {
 
   colconc <- as.numeric(colnames(response.mat))
   rowconc <- as.numeric(rownames(response.mat))
@@ -204,4 +172,7 @@ ImputeIC50 <- function(response.mat, ic_r, ic_c) {
 
   tempres <- list(tempcf_c, tempcf_r)
   return(tempres)
+
+  # Clean up
+  gc()
 }
