@@ -72,6 +72,7 @@ CalculateMat <- function(response.mat, correction = TRUE, ...){
   # drug_rowr
   row.coe <- ExtractCoefs(row.model, row.method, max(drug.row$dose))
 
+  # 2.3 Calculate DSS
 
 
 }
