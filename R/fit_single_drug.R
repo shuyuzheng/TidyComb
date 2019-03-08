@@ -47,7 +47,7 @@ FitDoseResponse <- function (data, Emin = NA, Emax = NA) {
   data$dose[which(data$dose == 0)] <- 10^-10
 
   # ???
-  if(nrow(data) != 1 & stats::var(data$response) == 0) {
+  if (nrow(data) != 1 & stats::var(data$response) == 0) {
     data$response[nrow(data)] <- data$response[nrow(data)] + 10 ^ -10
   }
 
@@ -73,4 +73,25 @@ FitDoseResponse <- function (data, Emin = NA, Emax = NA) {
 FindModelType <- function(model) {
   type <- model$call$fct[[1]][[3]]
   return(type)
+}
+
+ExtractCoefs <- function(model, type, max.conc){
+  coef <- stats::coef(model)
+
+  names(coef) <- gsub(":(Intercept)", "", names(coef), fixed = T)
+
+  if (type == "LL.4") {
+    ic50 <- coef[["e"]]
+  } else if (type == "L.4") {
+    ic50 <- exp(coef[["e"]])
+  }
+
+  if (ic50 > max.conc) {
+    ic50 = max.conc
+  }
+
+  coef <- c(coef, ic50 = ic50)
+
+  return (coef)
+
 }
