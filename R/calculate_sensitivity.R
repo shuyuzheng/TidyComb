@@ -23,8 +23,8 @@ CalculateSens <- function(df) {
                                 c = fitcoefs[2] / 100,
                                 b = fitcoefs[1],
                                 m = log10(fitcoefs[4]),
-                                c1 = log10(df$conc[2]),
-                                c2 = log10(df$conc[nrow(df)]),
+                                c1 = log10(df$dose[2]),
+                                c2 = log10(df$dose[nrow(df)]),
                                 t = 0), 3)
     }, error = function(e) {
       # Skip zero conc, log, drc::L.4()
@@ -35,8 +35,8 @@ CalculateSens <- function(df) {
                                    c = fitcoefs[2] / 100,
                                    b = fitcoefs[1],
                                    e = fitcoefs[4],
-                                   c1 = log10(df$conc[2]),
-                                   c2 = log10(df$conc[nrow(df)]),
+                                   c1 = log10(df$dose[2]),
+                                   c2 = log10(df$dose[nrow(df)]),
                                    t = 0), 3)
     }
     )
@@ -151,7 +151,7 @@ ImputeIC50 <- function(response.mat, col.ic50, row.ic50) {
   } else {
     response <- apply(response.mat, 2, function(x){
           df <- data.frame(dose = rowconc, response = x)
-          pred <- PredictResponse(df, ic_r)
+          pred <- PredictResponse(df, row.ic50)
           return(pred)
         }
       )
@@ -163,14 +163,14 @@ ImputeIC50 <- function(response.mat, col.ic50, row.ic50) {
   } else {
     response <- apply(response.mat, 1, function(x){
         df <- data.frame(dose = colconc, response = x)
-        pred <- PredictResponse(df, rc_c)
+        pred <- PredictResponse(df, col.ic50)
         return(pred)
       }
     )
     tempcf_r <- data.frame(dose = rowconc, response = response)
   }
 
-  tempres <- list(tempcf_c, tempcf_r)
+  tempres <- list(tempcf_c = tempcf_c, tempcf_r = tempcf_r)
   return(tempres)
 
   # Clean up

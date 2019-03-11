@@ -9,7 +9,7 @@ PredictResponse <- function(df, dose) {
   if (stats::var(df$response, na.rm = TRUE) == 0) {
     pred <- df$response[1]
   } else {
-    model <- FitDoseResponse(data)
+    model <- FitDoseResponse(df)
 
     if (model$call$fct[[1]][[3]] == "LL.4") {
       pred <- stats::predict(model, data.frame(dose = dose))

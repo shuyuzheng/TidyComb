@@ -58,12 +58,12 @@ CalculateMat <- function(response.mat, correction = TRUE, ...) {
   # drug_col
   drug.col <- ExtractSingleDrug(response.mat, dim = "col")
   col.model <- FitDoseResponse(drug.col)
-  col.type <- FindModelType(col.type)
+  col.type <- FindModelType(col.model)
 
   # drug_row
   drug.row <- ExtractSingleDrug(response.mat, dim = "row")
   row.model <- FitDoseResponse(drug.row)
-  row.type <- FindModelType(row.type)
+  row.type <- FindModelType(row.model)
 
   # 2.2 Extract coeficients and IC50
   # drug_col
@@ -86,20 +86,32 @@ CalculateMat <- function(response.mat, correction = TRUE, ...) {
   hsa <- CalculateHSA(response.mat)
   bliss <- CalculateBliss(response.mat)
 
-  synergy <- Reduce(function(x, y) merge(x = x, y = y,
-                                         by = c("conc_c", "conc_r")),
-                    list(zip, loewe, hsa, bliss))
-  # 3.2 Calculate CSS
+  synergy <- lapply(list(response.mat, zip, loewe, hsa, bliss), reshape2::melt)
+  synergy <- Reduce(function(x, y) {
+    merge(x = x, y = y, by = c("Var1", "Var2"))}, synergy)
+
+  colnames(synergy) <- c("conc_c", "conc_r", "response", "synergy_zip",
+                         "synergy_loewe", "synergy_hsa", "synergy_bliss")
+  # 3.2 calculate surface
+
+  # 3.3 Calculate CSS
   col.ic50 <- CalculateIC50(col.coe, col.type, max(drug.col$dose))
   row.ic50 <- CalculateIC50(row.coe, row.type, max(drug.row$dose))
 
-  res <- ImputeIC50(response.mat, col.ic50 = col.ic50, row.ic50 = row.ic50)
+  imputed.ic50 <- ImputeIC50(response.mat, col.ic50 = col.ic50,
+                             row.ic50 = row.ic50)
   # a particular row selected according to ic50_row
-  col.css <- CalculateSens(res$tempcf_c)
+  col.css <- CalculateSens(imputed.ic50$tempcf_c)
   # a particular column selected according to ic50_col
-  row.css <- CalculateSens(res$tempcf_r)
+  row.css <- CalculateSens(imputed.ic50$tempcf_r)
 
   css <- mean(col.css, row.css)
 
-  S <- css - mean(col.dss, row.dss)
+  S <- css - max(col.dss, row.dss)
+
+  sum <- apply(synergy[, c(-1, -2, -3)], 2, mean)
+  sum <- data.frame(t(sum), dss_r = row.dss, dss_c = col.dss, css_r = row.css,
+              css_c = col.css, css = css, S = S)
+  res <- list(synergy = synergy, sum = sum)
+  return(res)
 }

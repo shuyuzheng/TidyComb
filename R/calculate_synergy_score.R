@@ -64,8 +64,20 @@ CorrectBaseLine <- function(response.mat, ...){
 #' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
 #' fitted dose-response curve. Default setting is \code{NA}.
 #'
-#' @return A matrix with  \eqn{\Delta} score calculated via Zero Interaction
-#' Potency (ZIP) method
+#' @drug.col.model (optional) a character. It indicates the model used for
+#' fitting dose-response curve for drug added to columns.
+#'
+#' @drug.row.model (optional) a character. It indicates the model type used for
+#' fitting dose-response curve for drug added to rows.
+#'
+#' @drug.col.par (optional) a named vector. It contains the coeficients of
+#' fitted dose-response model for drug added to columns.
+#'
+#' @drug.row.par (optional) a named vector. It contains the coeficients of
+#' fitted dose-response model for drug added to rows.
+#'
+#' @return A matrix of \eqn{\Delta} score calculated via Zero Interaction
+#' Potency (ZIP) method.
 #'
 #' @export
 CalculateZIP <- function(response.mat, drug.row.model = NULL,
@@ -147,10 +159,7 @@ CalculateZIP <- function(response.mat, drug.row.model = NULL,
   colnames(delta.mat) <- colnames(response.mat)
   rownames(delta.mat) <- rownames(response.mat)
 
-  # melt matrix as data frame
-  res <- reshape2::melt(delta.mat)
-  colnames(res) <- c("conc_c", "conc_r", "synergy_zip")
-  return(res)
+  return(delta.mat)
 
   # clean up
   gc()
@@ -173,8 +182,10 @@ CalculateZIP <- function(response.mat, drug.row.model = NULL,
 #' row, respectively. The values in matrix indicate the inhibition rate to cell
 #' growth.
 #'
-#' @return A matrix with synergy score calculated via reference model introduced
+#' @return A matrix for synergy score calculated via reference model introduced
 #' by C. I. Bliss.
+#'
+#' @return A matrix with
 #'
 #' @export
 CalculateBliss <- function (response.mat) {
@@ -189,10 +200,7 @@ CalculateBliss <- function (response.mat) {
   }
   synergy.mat <- response.mat - reference.mat
 
-  # melt matrix as data frame
-  res <- reshape2::melt(synergy.mat)
-  colnames(res) <- c("conc_c", "conc_r", "synergy_bliss")
-  return(res)
+  return(synergy.mat)
 
   # clean up
   gc()
@@ -214,8 +222,7 @@ CalculateBliss <- function (response.mat) {
 #' row, respectively. The values in matrix indicate the inhibition rate to cell
 #' growth.
 #'
-#' @return A matrix with synergy score calculated via Highest Single Agent (HSA)
-#' reference model.
+#' @return A matrix for synergy score calculated via Highest Single Agent (HSA).
 #'
 #' @export
 CalculateHSA <- function(response.mat) {
@@ -229,10 +236,7 @@ CalculateHSA <- function(response.mat) {
   }
   synergy.mat <- response.mat - reference.mat
 
-  # melt matrix as data frame
-  res <- reshape2::melt(synergy.mat)
-  colnames(res) <- c("conc_c", "conc_r", "synergy_hsa")
-  return(res)
+  return(synergy.mat)
 
   #clean up
   gc()
@@ -313,10 +317,22 @@ fun <- function(col_conc, row_conc, drug.par, model) {
 #' @param quiet A logical value. If it is \code{TRUE} then the warning message
 #' will not show during calculation.
 #'
-#' @return A matrix with synergy score calculated via reference model introduced
-#' by C. I. Bliss.
+#' @drug.col.type (optional) a character. It indicates the model type used for
+#' fitting dose-response curve for drug added to columns.
 #'
-#' @expor
+#' @drug.row.type (optional) a character. It indicates the model type used for
+#' fitting dose-response curve for drug added to rows.
+#'
+#' @drug.col.par (optional) a named vector. It contains the coeficients of
+#' fitted dose-response model for drug added to columns.
+#'
+#' @drug.row.par (optional) a named vector. It contains the coeficients of
+#' fitted dose-response model for drug added to rows.
+#'
+#' @return A matrix for Synergy score calculated via reference model introduced
+#' by Loewe, S.
+#'
+#' @export
 CalculateLoewe <- function (response.mat, quiet = TRUE, drug.col.type = NULL,
                             drug.row.type = NULL, drug.col.par = NULL,
                             drug.row.par = NULL, ...) {
@@ -387,10 +403,8 @@ CalculateLoewe <- function (response.mat, quiet = TRUE, drug.col.type = NULL,
 
   synergy.mat <- response.mat - loewe.mat
 
-  # melt matrix as data frame
-  res <- reshape2::melt(synergy.mat)
-  colnames(res) <- c("conc_c", "conc_r", "synergy_loewe")
-  return(res)
+  # Output results
+  return(synergy.mat)
 
   options(warn = 0)
   # clean up
