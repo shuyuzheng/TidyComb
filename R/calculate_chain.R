@@ -30,6 +30,7 @@
 #'   \item Whole response matrix process
 #'     \enumerate{
 #'       \item Calculate Synergy Scores
+#'       \item Calculate Surface
 #'       \item Calculate CSS
 #'     }
 #'   \item Summarize and generate surface
@@ -41,6 +42,9 @@
 #' @return
 #' @export
 CalculateMat <- function(response.mat, correction = TRUE, ...) {
+
+  options(scipen = 999)
+
   # 1. Pre-processing
   # 1.1 Impute for missing value in original matrix
   response.mat <- ImputeNear(response.mat, times = 2)
@@ -58,18 +62,23 @@ CalculateMat <- function(response.mat, correction = TRUE, ...) {
   # drug_col
   drug.col <- ExtractSingleDrug(response.mat, dim = "col")
   col.model <- FitDoseResponse(drug.col)
-  col.type <- FindModelType(col.model)
+  col.type <- as.character(FindModelType(col.model))
 
   # drug_row
   drug.row <- ExtractSingleDrug(response.mat, dim = "row")
   row.model <- FitDoseResponse(drug.row)
-  row.type <- FindModelType(row.model)
+  row.type <- as.character(FindModelType(row.model))
 
-  # 2.2 Extract coeficients and IC50
+  # 2.2 Extract coeficients
   # drug_col
   col.coe <- stats::coef(col.model)
   # drug_rowr
   row.coe <- stats::coef(row.model)
+
+  curves <- as.data.frame(rbind(col.coe, row.coe))
+  colnames(curves) <- sub(":(Intercept)", "", colnames(curves), fixed = TRUE)
+    curves$model <- c(col.type, row.type)
+  curves$dim <- c("col", "row")
 
   # 2.3 Calculate DSS (using single drug response but without that at 0
   # concentration)
@@ -90,9 +99,23 @@ CalculateMat <- function(response.mat, correction = TRUE, ...) {
   synergy <- Reduce(function(x, y) {
     merge(x = x, y = y, by = c("Var1", "Var2"))}, synergy)
 
-  colnames(synergy) <- c("conc_c", "conc_r", "response", "synergy_zip",
+  colnames(synergy) <- c("conc_r", "conc_c", "response", "synergy_zip",
                          "synergy_loewe", "synergy_hsa", "synergy_bliss")
+
   # 3.2 calculate surface
+  smooth.res <- smoothing(response.mat)
+  smooth.zip <- smoothing(zip)
+  smooth.hsa <- smoothing(hsa)
+  smooth.bliss <- smoothing(bliss)
+  smooth.loewe <- smoothing(loewe)
+
+  surface <- lapply(list(smooth.res, smooth.zip, smooth.loewe, smooth.hsa,
+                         smooth.bliss), reshape2::melt)
+  surface <- Reduce(function(x, y) {
+    merge(x = x, y = y, by = c("Var1", "Var2"))}, surface)
+
+  colnames(surface) <- c("conc_r", "conc_c", "response", "synergy_zip",
+                         "synergy_loewe", "synergy_hsa", "synergy_bliss")
 
   # 3.3 Calculate CSS
   col.ic50 <- CalculateIC50(col.coe, col.type, max(drug.col$dose))
@@ -110,8 +133,88 @@ CalculateMat <- function(response.mat, correction = TRUE, ...) {
   S <- css - max(col.dss, row.dss)
 
   sum <- apply(synergy[, c(-1, -2, -3)], 2, mean)
-  sum <- data.frame(t(sum), dss_r = row.dss, dss_c = col.dss, css_r = row.css,
-              css_c = col.css, css = css, S = S)
-  res <- list(synergy = synergy, sum = sum)
+  sum <- data.frame(t(sum), ic50_row = row.ic50 , ic50_col = col.ic50,
+                    dss_row = row.dss, dss_col = col.dss, css_row = row.css,
+                    css_col = col.css, css = css, S = S)
+
+  res <- list(synergy = synergy, surface = surface,
+              summary = sum, curve = curves)
   return(res)
+
+  # clean up
+  gc()
+}
+
+CalculateTemplate <- function(template, ...) {
+  if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
+             "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",
+             "drug_col") %in%
+           colnames(template)))
+    stop("The input data must contain the following columns: ",
+         "block_id, drug_row, drug_col, response,\n",
+         "conc_r, conc_c, conc_r_unit, conc_c_unit, \n",
+         "cell_line_name, drug_row, drug_col.")
+
+  blocks <- unique(template$block_id)
+
+  # generate container
+  synergy <- data.frame(block_id = integer(), conc_r = numeric(),
+                        conc_c = numeric(), response = numeric(),
+                        synergy_zip = numeric(), synergy_bliss = numeric(),
+                        synergy_loewe = numeric(), synergy_hsa = numeric())
+  surface <- synergy
+  curve <- data.frame(block_id = integer(), b = numeric(),
+                      c = numeric(), d = numeric(), e = numeric(),
+                      model = numeric(), drug.row = numeric(),
+                      drug.col = numeric())
+  summary <- NULL
+
+  for (block in blocks) {
+    # 1. Generate response matrix for each block
+    response <- template %>%
+      dplyr::filter(block_id = block)
+
+    respons.mat <- response %>%
+      dplyr::select(conc_r, conc_c, response) %>%
+      reshape2::acast(conc_r ~ conc_c)
+
+    # 2. Do calculation on matrix
+    tmp <- CalculateMat(response.mat = response.mat)
+    tmp <- lapply(tmp, function(x){
+      x$block_id = rep(block, nrow(x))
+      return(x)
+      })
+
+    # 3. Add information to summary table
+    info <- response %>%
+      dplyr::select(drug_row, drug_col, cell_line_name,
+                    conc_r_unit, conc_c_unit) %>%
+      unique()
+
+    tmp$summary <- cbind.data.frame(info, tmp$summary)
+
+    # 4. fill drug names to curve table
+
+    tmp$curve <- tmp$curve %>%
+      mutate(drug.col =  )
+
+
+
+
+
+
+
+    # 4. Append new tables to containers
+    synergy <- rbind.data.frame(synergy, tmp$synergy)
+    surface <- rbind.data.frame(surface, tmp$surface)
+    curve <- rbind.data.frame(curve, tmp$curve)
+    summary <- rbind.data.frame(summary, tmp$summary)
+
+    # Clean temporary file
+    tmp <- list()
+    info <- data.frame()
+    response <- data.frame()
+    respons.mat <- matrix()
+  }
+
 }
