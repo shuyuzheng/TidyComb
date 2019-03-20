@@ -45,18 +45,16 @@ CalculateMat <- function(response.mat, correction = TRUE, ...) {
 
   options(scipen = 999)
 
+  response.out <- response.mat
+
   # 1. Pre-processing
   # 1.1 Impute for missing value in original matrix
   response.mat <- ImputeNear(response.mat, times = 2)
-
-  # 1.2. Add random noise to original matrix
-  response.mat <- AddNoise(response.mat, method = "random")
 
   # 1.3. Correct baseline to 0 if "correction" is TRUE
   if (correction) {
     response.mat <- CorrectBaseLine(response.mat)
   }
-
   # 2. Single drug process
   # 2.1. Fit single drug dose-response curve
   # drug_col
@@ -95,7 +93,7 @@ CalculateMat <- function(response.mat, correction = TRUE, ...) {
   hsa <- CalculateHSA(response.mat)
   bliss <- CalculateBliss(response.mat)
 
-  synergy <- lapply(list(response.mat, zip, loewe, hsa, bliss), reshape2::melt)
+  synergy <- lapply(list(response.out, zip, loewe, hsa, bliss), reshape2::melt)
   synergy <- Reduce(function(x, y) {
     merge(x = x, y = y, by = c("Var1", "Var2"))}, synergy)
 
@@ -132,7 +130,11 @@ CalculateMat <- function(response.mat, correction = TRUE, ...) {
 
   S <- css - max(col.dss, row.dss)
 
-  sum <- apply(synergy[, c(-1, -2, -3)], 2, mean)
+  sum <- synergy %>%
+    dplyr::filter(conc_r != 0 & conc_c != 0) %>%
+    dplyr::select(-conc_r, -conc_c) %>%
+    apply(2, mean, rm.na = TRUE)
+
   sum <- data.frame(t(sum), ic50_row = row.ic50 , ic50_col = col.ic50,
                     dss_row = row.dss, dss_col = col.dss, css_row = row.css,
                     css_col = col.css, css = css, S = S)
@@ -161,22 +163,31 @@ CalculateTemplate <- function(template, ...) {
   synergy <- data.frame(block_id = integer(), conc_r = numeric(),
                         conc_c = numeric(), response = numeric(),
                         synergy_zip = numeric(), synergy_bliss = numeric(),
-                        synergy_loewe = numeric(), synergy_hsa = numeric())
+                        synergy_loewe = numeric(), synergy_hsa = numeric(),
+                        stringsAsFactors = FALSE)
   surface <- synergy
   curve <- data.frame(block_id = integer(), b = numeric(),
                       c = numeric(), d = numeric(), e = numeric(),
                       model = numeric(), drug.row = numeric(),
-                      drug.col = numeric())
-  summary <- NULL
+                      drug.col = numeric, stringsAsFactors = FALSE)
+  summary <- data.frame(block_id = integer(), synergy_zip = numeric(),
+                        synergy_bliss = numeric(), synergy_hsa = numeric(),
+                        synergy_loewe = numeric(), ic50_row = numeric() ,
+                        ic50_col = numeric(), dss_row = numeric(),
+                        dss_col = numeric(), css_row = numeric(),
+                        css_col = numeric(), css = numeric(), S = numeric(),
+                        stringsAsFactors = FALSE)
 
   for (block in blocks) {
     # 1. Generate response matrix for each block
     response <- template %>%
-      dplyr::filter(block_id = block)
+      dplyr::filter(block_id == block)
 
-    respons.mat <- response %>%
+    # 1.2. Add random noise to original matrix
+    response <- AddNoise(response, method = "random")
+    response.mat <- response %>%
       dplyr::select(conc_r, conc_c, response) %>%
-      reshape2::acast(conc_r ~ conc_c)
+      reshape2::acast(conc_r ~ conc_c, value.var = "response")
 
     # 2. Do calculation on matrix
     tmp <- CalculateMat(response.mat = response.mat)
@@ -191,18 +202,24 @@ CalculateTemplate <- function(template, ...) {
                     conc_r_unit, conc_c_unit) %>%
       unique()
 
+    if (nrow(info) > 1) {
+      warning("The summary data of block ", block, " contains ", nrow(info),
+              " different versions.")
+    } else if (nrow(info) < 1) {
+      warning("The summary data of block ", block, " is missing.")
+    }
+
     tmp$summary <- cbind.data.frame(info, tmp$summary)
 
     # 4. fill drug names to curve table
 
-    tmp$curve <- tmp$curve %>%
-      mutate(drug.col =  )
+    tmp$curve$drug_col <- rep(NA, 2)
+    tmp$curve$drug_col[which(tmp$curve$dim ==
+                               "col")] <- as.character(info$drug_col)
 
-
-
-
-
-
+    tmp$curve$drug_row <- rep(NA, 2)
+    tmp$curve$drug_row[which(tmp$curve$dim ==
+                               "row")] <- as.character(info$drug_row)
 
     # 4. Append new tables to containers
     synergy <- rbind.data.frame(synergy, tmp$synergy)
@@ -217,4 +234,7 @@ CalculateTemplate <- function(template, ...) {
     respons.mat <- matrix()
   }
 
+  return(list(synergy = synergy, surface = surface,
+              curve = curve, summary = summary))
 }
+

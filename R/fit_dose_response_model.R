@@ -53,7 +53,7 @@ FitDoseResponse <- function (data, Emin = NA, Emax = NA) {
 
   drug.model <- tryCatch({
     drc::drm(response ~ dose, data = data,
-             fct = drc::LL.4(fixed = c(NA, Emin, Emax, NA)),
+             fct = drc::LL.4(fixed = c(NA, Emin = Emin, Emax = Emax, NA)),
              na.action = stats::na.omit,
              control = drc::drmc(errorm = FALSE, noMessage = TRUE))
   }, warning = function(w) {

@@ -52,8 +52,8 @@ ImputeNear <- function(response.mat, times = 1) {
 #'   number of response values in matrix with 10^-10.
 #' }
 #'
-#' @param response.mat A matrix. It contains the response data for one block of
-#' drug combination screen.
+#' @param response.df A data frame. It contains the response data for one block
+#' of drug combination screen.
 #'
 #' @param method A characer. It refers to the method used for calculating noise.
 #' Available options are "random" and "scale".
@@ -62,18 +62,18 @@ ImputeNear <- function(response.mat, times = 1) {
 #'
 #' @export
 
-AddNoise <- function(response.mat, method) {
+AddNoise <- function(response.df, method) {
   if (method == "random") {
     set.seed(1)
-    noise <- stats::rnorm(nrow(response.mat), 0, 0.001)
-  } else if (method == "scale") {
-    scale <- 10^-10
-    noise <- row(response.mat) * col(response.mat) * scale
+    noise <- stats::rnorm(nrow(response.df), 0, 0.001)
+  # } else if (method == "scale") {
+  #   scale <- 10^-10
+  #   noise <- row(response.mat) * col(response.mat) * scale
   } else {
     stop('The available metods for adding noise are: "random" and "scale".')
   }
-  response.mat <- response.mat + noise
-  return(response.mat)
+  response.df$response <- response.df$response + noise
+  return(response.df)
 }
 
 #' Extract single drug response from matrix

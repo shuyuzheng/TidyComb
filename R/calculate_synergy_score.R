@@ -22,6 +22,7 @@
 #' @return A matrix which base line have been adjusted.
 #' @export
 CorrectBaseLine <- function(response.mat, ...){
+  negative.ind <- which(response.mat < 0, arr.ind = TRUE)
   drug.row <- ExtractSingleDrug(response.mat, dim = "row")
   drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
                                                                  ...)))
@@ -32,7 +33,10 @@ CorrectBaseLine <- function(response.mat, ...){
 
   baseline <- (min(as.numeric(drug.row.fit)) +
                  min(as.numeric(drug.col.fit))) / 2
-
+  response.mat <- sapply(response.mat[negative.ind],
+                        function(x){
+                          response.mat - ((100 - response.mat) / 100 * baseline)
+                        })
   response.mat <- response.mat - ((100 - response.mat) / 100 * baseline)
   return(response.mat)
 }
@@ -379,8 +383,7 @@ CalculateLoewe <- function (response.mat, quiet = TRUE, drug.col.type = NULL,
         slv <- nleqslv::nleqslv(x, eq, method = "Newton", x1=x1, x2=x2,
                                 drug.col.par = drug.col.par,
                                 drug.row.par = drug.row.par)
-        },
-        error = function(){
+        }, error = function(e){
           slv <- list(termcd = 999)
         }
       )

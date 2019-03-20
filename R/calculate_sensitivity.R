@@ -23,7 +23,7 @@ CalculateSens <- function(df) {
                                 c = fitcoefs[2] / 100,
                                 b = fitcoefs[1],
                                 m = log10(fitcoefs[4]),
-                                c1 = log10(df$dose[2]),
+                                c1 = log10(df$dose[1]),
                                 c2 = log10(df$dose[nrow(df)]),
                                 t = 0), 3)
     }, error = function(e) {
@@ -35,7 +35,7 @@ CalculateSens <- function(df) {
                                    c = fitcoefs[2] / 100,
                                    b = fitcoefs[1],
                                    e = fitcoefs[4],
-                                   c1 = log10(df$dose[2]),
+                                   c1 = log10(df$dose[1]),
                                    c2 = log10(df$dose[nrow(df)]),
                                    t = 0), 3)
     }
