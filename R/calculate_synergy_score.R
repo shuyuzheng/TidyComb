@@ -33,11 +33,10 @@ CorrectBaseLine <- function(response.mat, ...){
 
   baseline <- (min(as.numeric(drug.row.fit)) +
                  min(as.numeric(drug.col.fit))) / 2
-  response.mat <- sapply(response.mat[negative.ind],
+  response.mat[negative.ind] <- sapply(response.mat[negative.ind],
                         function(x){
-                          response.mat - ((100 - response.mat) / 100 * baseline)
+                          x - ((100 - x) / 100 * baseline)
                         })
-  response.mat <- response.mat - ((100 - response.mat) / 100 * baseline)
   return(response.mat)
 }
 
