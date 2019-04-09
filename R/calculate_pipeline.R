@@ -35,11 +35,24 @@
 #'     }
 #'   \item Summarize and generate surface
 #' }
-#' @param response.mat
-#' @param correction
-#' @param ...
+#' @param response.mat A matrix contain the drug combination reaponse value.
+#' Its column names are doses of drug added along columns. Its row name are
+#' doses of drug added along rows.
+#' @param correction A logic value to indicate whether or not do baseline
+#' correction before calculation
+#' @param ... Other argumants required by nested functions
 #'
-#' @return
+#' @return It contains 4 tables:
+#'   \itemize{
+#'     \item \strong{synergy} It contains the modified response value and 4
+#'     type of synergy scores of each drug dose response pair.
+#'     \item \strong{summary} It contains summarized information of each
+#'     blocks: synergy scores, css, dss, S
+#'     \item \strong{curve} It contains the coefficients from single drug dose
+#'     response curve.
+#'     \item \strong{surface} It contains the smoothed response value and
+#'     synergy scores of each drug dose response pair.
+#'  }
 #' @export
 CalculateMat <- function(response.mat, correction = TRUE, ...) {
 
@@ -147,6 +160,29 @@ CalculateMat <- function(response.mat, correction = TRUE, ...) {
   gc()
 }
 
+#' Calculate Drug Combination data in template format
+#'
+#' @param template a dataframe in the format as template. Columns "block_id",
+#' "drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
+#' "conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.
+#'
+#' @param ... Other arguments required by nested functions
+#'
+#' @return A list. It contains 4 tables:
+#'   \itemize{
+#'     \item \strong{synergy} It contains the modified response value and 4
+#'     type of synergy scores of each drug dose response pair.
+#'     \item \strong{summary} It contains summarized information of each
+#'     blocks: synergy scores, css, dss, S
+#'     \item \strong{curve} It contains the coefficients from single drug dose
+#'     response curve.
+#'     \item \strong{surface} It contains the smoothed response value and
+#'     synergy scores of each drug dose response pair.
+#'  }
+#'
+#' @import dplyr
+#'
+#' @export
 CalculateTemplate <- function(template, ...) {
   if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
              "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",

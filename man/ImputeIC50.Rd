@@ -4,20 +4,20 @@
 \alias{ImputeIC50}
 \title{Impute missing value at IC50 concentration of drug}
 \usage{
-ImputeIC50(response.mat, ic_r, ic_c)
+ImputeIC50(response.mat, col.ic50, row.ic50)
 }
 \arguments{
 \item{response.mat}{A matrix. It contains response value of a block of drug
 combination.}
 
-\item{ic_r}{A numeric. The IC50 value of drug added to rows.}
+\item{col.ic50}{A numeric. The IC50 value of drug added to columns.}
 
-\item{ic_c}{A numeric. The IC50 value of drug added to columns.}
+\item{row.ic50}{A numeric. The IC50 value of drug added to rows.}
 }
 \value{
 a data frame contains all response value at the IC50 concentration
 of certein drug. It could be directly passed to function
-\code{\link{computeSensitivity}} for scoring.
+\code{CalculateSens} for scoring.
 }
 \description{
 \code{ImputeIC50} uses the particular experiment's values to predict the

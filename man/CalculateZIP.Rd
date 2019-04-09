@@ -4,7 +4,8 @@
 \alias{CalculateZIP}
 \title{Calculate ZIP synergy score}
 \usage{
-CalculateZIP(response.mat, ...)
+CalculateZIP(response.mat, drug.row.model = NULL,
+  drug.col.model = NULL, ...)
 }
 \arguments{
 \item{response.mat}{A drug cobination dose-response matrix. It's column name
@@ -12,19 +13,17 @@ and row name are representing the concerntrations of drug added to column and
 row, respectively. The values in matrix indicate the inhibition rate to cell
 growth.}
 
-\item{correction}{A logical value. It indicates whether \emph{baseline
-correction} needed before calculation. Default value is \code{TRUE}, which
-means the correction will be done.}
+\item{drug.row.model}{(optional) a character. It indicates the model type used for
+fitting dose-response curve for drug added to rows.}
 
-\item{Emin}{A numeric or \code{NA}. It specifies the minimum value in the
-fitted dose-response curve. Default setting is \code{NA}.}
+\item{drug.col.model}{(optional) a character. It indicates the model used for
+fitting dose-response curve for drug added to columns.}
 
-\item{Emax}{A numeric or \code{NA}. It specifies the maximum value in the
-fitted dose-response curve. Default setting is \code{NA}.}
+\item{...}{Other arguments from nested functions.}
 }
 \value{
-A matrix with  \eqn{\Delta} score calculated via Zero Interaction
-Potency (ZIP) method
+A matrix of \eqn{\Delta} score calculated via Zero Interaction
+Potency (ZIP) method.
 }
 \description{
 \code{CalculateZIP} calculates the \eqn{\Delta} score matrix for a block of

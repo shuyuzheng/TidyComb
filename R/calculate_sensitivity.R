@@ -130,13 +130,13 @@ own_log2 = function(x)
 #' @param response.mat A matrix. It contains response value of a block of drug
 #' combination.
 #'
-#' @param ic_r A numeric. The IC50 value of drug added to rows.
+#' @param row.ic50 A numeric. The IC50 value of drug added to rows.
 #'
-#' @param ic_c A numeric. The IC50 value of drug added to columns.
+#' @param col.ic50 A numeric. The IC50 value of drug added to columns.
 #'
 #' @return a data frame contains all response value at the IC50 concentration
 #' of certein drug. It could be directly passed to function
-#' \code{\link{computeSensitivity}} for scoring.
+#' \code{CalculateSens} for scoring.
 #'
 #' @export
 ImputeIC50 <- function(response.mat, col.ic50, row.ic50) {

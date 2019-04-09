@@ -33,20 +33,20 @@ test_that("FitDoseResponse should return a 'drc' object.", {
 })
 
 # BaselineCorrect
-correct.response <- CorrectBaseLine(response.mat.noise)
+# correct.response <- CorrectBaseLine(response.mat.noise)
 # Synergy scores
-test_that("CalculateZIP should reture correct ZIP synergy score", {
-  expect_equal(CalculateZIP(response.mat = correct.response), zip)
-})
-
-test_that("CalculateHSA should reture correct HSA synergy score", {
-  expect_equal(CalculateHSA(response.mat = correct.response), hsa)
-})
-
-test_that("CalculateBliss should reture correct Bliss synergy score", {
-  expect_equal(CalculateBliss(response.mat = correct.response), bliss)
-})
-
-test_that("CalculateLoewe should reture correct Loewe synergy score", {
-  expect_equal(CalculateLoewe(response.mat = correct.response), loewe)
-})
+# test_that("CalculateZIP should reture correct ZIP synergy score", {
+#   expect_equal(CalculateZIP(response.mat = correct.response), zip)
+# })
+#
+# test_that("CalculateHSA should reture correct HSA synergy score", {
+#   expect_equal(CalculateHSA(response.mat = correct.response), hsa)
+# })
+#
+# test_that("CalculateBliss should reture correct Bliss synergy score", {
+#   expect_equal(CalculateBliss(response.mat = correct.response), bliss)
+# })
+#
+# test_that("CalculateLoewe should reture correct Loewe synergy score", {
+#   expect_equal(CalculateLoewe(response.mat = correct.response), loewe)
+# })

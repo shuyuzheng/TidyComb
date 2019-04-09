@@ -13,8 +13,10 @@ row, respectively. The values in matrix indicate the inhibition rate to cell
 growth.}
 }
 \value{
-A matrix with synergy score calculated via reference model introduced
+A matrix for synergy score calculated via reference model introduced
 by C. I. Bliss.
+
+A matrix with
 }
 \description{
 \code{CalculateBliss} calculates the synergy score matrix for a block of

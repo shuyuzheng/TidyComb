@@ -19,6 +19,8 @@
 #' row, respectively. The values in matrix indicate the inhibition rate to cell
 #' growth.
 #'
+#' @param ... Other arguments from nested functions.
+#'
 #' @return A matrix which base line have been adjusted.
 #' @export
 CorrectBaseLine <- function(response.mat, ...){
@@ -57,27 +59,13 @@ CorrectBaseLine <- function(response.mat, ...){
 #' row, respectively. The values in matrix indicate the inhibition rate to cell
 #' growth.
 #'
-#' @param correction A logical value. It indicates whether \emph{baseline
-#' correction} needed before calculation. Default value is \code{TRUE}, which
-#' means the correction will be done.
-#'
-#' @param Emin A numeric or \code{NA}. It specifies the minimum value in the
-#' fitted dose-response curve. Default setting is \code{NA}.
-#'
-#' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
-#' fitted dose-response curve. Default setting is \code{NA}.
-#'
-#' @drug.col.model (optional) a character. It indicates the model used for
+#' @param drug.col.model (optional) a character. It indicates the model used for
 #' fitting dose-response curve for drug added to columns.
 #'
-#' @drug.row.model (optional) a character. It indicates the model type used for
+#' @param drug.row.model (optional) a character. It indicates the model type used for
 #' fitting dose-response curve for drug added to rows.
 #'
-#' @drug.col.par (optional) a named vector. It contains the coeficients of
-#' fitted dose-response model for drug added to columns.
-#'
-#' @drug.row.par (optional) a named vector. It contains the coeficients of
-#' fitted dose-response model for drug added to rows.
+#' @param ... Other arguments from nested functions.
 #'
 #' @return A matrix of \eqn{\Delta} score calculated via Zero Interaction
 #' Potency (ZIP) method.
@@ -320,17 +308,19 @@ fun <- function(col_conc, row_conc, drug.par, model) {
 #' @param quiet A logical value. If it is \code{TRUE} then the warning message
 #' will not show during calculation.
 #'
-#' @drug.col.type (optional) a character. It indicates the model type used for
+#' @param drug.col.type (optional) a character. It indicates the model type used for
 #' fitting dose-response curve for drug added to columns.
 #'
-#' @drug.row.type (optional) a character. It indicates the model type used for
+#' @param drug.row.type (optional) a character. It indicates the model type used for
 #' fitting dose-response curve for drug added to rows.
 #'
-#' @drug.col.par (optional) a named vector. It contains the coeficients of
+#' @param drug.col.par (optional) a named vector. It contains the coeficients of
 #' fitted dose-response model for drug added to columns.
 #'
-#' @drug.row.par (optional) a named vector. It contains the coeficients of
+#' @param drug.row.par (optional) a named vector. It contains the coeficients of
 #' fitted dose-response model for drug added to rows.
+#'
+#' @param ... Other arguments from nested functions.
 #'
 #' @return A matrix for Synergy score calculated via reference model introduced
 #' by Loewe, S.

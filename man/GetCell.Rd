@@ -25,9 +25,3 @@ This function searches the value of <name> tags in Cellosaurus XML document
 to find entries that matches the names provided in the \code{names}
 parameter.
 }
-\examples{
-node <- GetAllCell(file = system.file("extdata", "cellosaurus.xml",
-                                      package = "TidyComb"))
-cell.lines <- GetCell(node, c("U87", "A549"), "name")
-
-}

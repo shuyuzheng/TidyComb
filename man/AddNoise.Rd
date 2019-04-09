@@ -4,11 +4,11 @@
 \alias{AddNoise}
 \title{Add noise to response value}
 \usage{
-AddNoise(response.mat, method)
+AddNoise(response.df, method)
 }
 \arguments{
-\item{response.mat}{A matrix. It contains the response data for one block of
-drug combination screen.}
+\item{response.df}{A data frame. It contains the response data for one block
+of drug combination screen.}
 
 \item{method}{A characer. It refers to the method used for calculating noise.
 Available options are "random" and "scale".}

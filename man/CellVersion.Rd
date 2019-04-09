@@ -30,10 +30,4 @@ a local file, please pass the path of file to argument \code{file}.
 \examples{
 # Check the online Cellosaurus dataset version.
 CellVersion()
-
-# Check the local Cellosaurus XML document version.
-CellVersion(system.file("extdata",
-                        "cellosaurus.xml",
-                        package = "TidyComb"))
-
 }

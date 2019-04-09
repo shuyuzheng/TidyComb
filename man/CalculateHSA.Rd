@@ -13,8 +13,7 @@ row, respectively. The values in matrix indicate the inhibition rate to cell
 growth.}
 }
 \value{
-A matrix with synergy score calculated via Highest Single Agent (HSA)
-reference model.
+A matrix for synergy score calculated via Highest Single Agent (HSA).
 }
 \description{
 \code{CalculateHSA} calculates the synergy score matrix for a block of

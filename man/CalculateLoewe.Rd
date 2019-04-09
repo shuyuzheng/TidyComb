@@ -4,7 +4,9 @@
 \alias{CalculateLoewe}
 \title{Calculate Loewe synergy score}
 \usage{
-CalculateLoewe(response.mat, quiet = TRUE, ...)
+CalculateLoewe(response.mat, quiet = TRUE, drug.col.type = NULL,
+  drug.row.type = NULL, drug.col.par = NULL, drug.row.par = NULL,
+  ...)
 }
 \arguments{
 \item{response.mat}{A drug cobination dose-response matrix. It's column name
@@ -14,10 +16,24 @@ growth.}
 
 \item{quiet}{A logical value. If it is \code{TRUE} then the warning message
 will not show during calculation.}
+
+\item{drug.col.type}{(optional) a character. It indicates the model type used for
+fitting dose-response curve for drug added to columns.}
+
+\item{drug.row.type}{(optional) a character. It indicates the model type used for
+fitting dose-response curve for drug added to rows.}
+
+\item{drug.col.par}{(optional) a named vector. It contains the coeficients of
+fitted dose-response model for drug added to columns.}
+
+\item{drug.row.par}{(optional) a named vector. It contains the coeficients of
+fitted dose-response model for drug added to rows.}
+
+\item{...}{Other arguments from nested functions.}
 }
 \value{
-A matrix with synergy score calculated via reference model introduced
-by C. I. Bliss.
+A matrix for Synergy score calculated via reference model introduced
+by Loewe, S.
 }
 \description{
 \code{CalculateLoewe} calculates the synergy score matrix for a block of

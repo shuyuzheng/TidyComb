@@ -11,6 +11,8 @@ CorrectBaseLine(response.mat, ...)
 and row name are representing the concerntrations of drug added to column and
 row, respectively. The values in matrix indicate the inhibition rate to cell
 growth.}
+
+\item{...}{Other arguments from nested functions.}
 }
 \value{
 A matrix which base line have been adjusted.

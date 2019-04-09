@@ -31,7 +31,3 @@ to function \code{GetAllCell}, it is easy to cause crach of R as the huge
 reuirement of memory. We recommend to download the dataset to a local file
 and then parse this local file by using this function.
 }
-\examples{
-all.cell <- GetAllCell(system.file("extdata", "cellosaurus.xml",
-                                   package = "TidyComb"))
-}
