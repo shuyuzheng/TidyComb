@@ -9,7 +9,23 @@ Description: This package wrapped the functions that could be used to tidy drug
     uploading to DrugComb database. It includes functions for retrieving drug 
     information from chemistry databases: PubChem and Chembl, retrieving cell 
     line information from Cellosaurus, calculating drug synergy scores, etc.
-Depends: R (>= 2.10)
+Depends: 
+    R (>= 2.10),
+    XML,
+    RCurl,
+    jsonlite,
+    dplyr,
+    plyr,
+    reshape2,
+    drc,
+    nleqslv,
+    gplots,
+    SpatialExtremes,
+    magrittr,
+    stats,
+    utils,
+    foreach,
+    doParallel
 License: MIT + file LICENSE
 URL: https://dev.azure.com/shuzhe/_git/TidyComb
 Encoding: UTF-8
@@ -27,7 +43,9 @@ Imports:
     SpatialExtremes,
     magrittr,
     stats,
-    utils
+    utils,
+    foreach,
+    doParallel
 RoxygenNote: 6.1.1
 Suggests: 
     testthat,
