@@ -27,7 +27,3 @@ used to check the dataset version of a "cellosaurus.xml" file. By default it
 will check the online dataset version. If you'd like to check the version of
 a local file, please pass the path of file to argument \code{file}.
 }
-\examples{
-# Check the online Cellosaurus dataset version.
-CellVersion()
-}

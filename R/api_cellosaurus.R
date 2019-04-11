@@ -21,10 +21,6 @@
 #' number of archived cell lines and number of archived publications.
 #'
 #' @export
-#'
-#' @examples
-#' # Check the online Cellosaurus dataset version.
-#' CellVersion()
 CellVersion <- function(
           file = "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml",
           ...){

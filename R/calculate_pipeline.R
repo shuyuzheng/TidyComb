@@ -268,27 +268,12 @@ CalculateTemplate <- function(template, ...) {
     respons.mat <- matrix()
   }
 
+  curve <- dplyr::select(curve, block_id, drug_row, drug_col, b, c, d, e, model)
+
   return(list(synergy = synergy, surface = surface,
               curve = curve, summary = summary))
 }
 
-comb <- function(x, ...) {
-  lapply(seq_along(x),
-        function(i) c(x[[i]], mapply(rbind.data.frame, list(...))))
-}
-
-multi_join <- function(list_of_loaded_data, ...){
-
-  require("dplyr")
-
-  output <- Reduce(function(x, y) {rbind.data.frame(x, y, ...)}, list_of_loaded_data)
-
-  return(output)
-}
-
-for (i in 1:seq_along(test)) {
-
-}
 multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
                              curve = NULL) {
   me <- list(
@@ -309,6 +294,9 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #' "drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
 #' "conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.
 #'
+#' @param cores A integer. It indicates number of cores would be allocated to
+#' the parallel processed
+#'
 #' @param ... Other arguments required by nested functions
 #'
 #' @return A list. It contains 4 tables:
@@ -324,7 +312,7 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #'  }
 #'
 #' @export
-ParCalculateTemplate <- function(template, ...) {
+ParCalculateTemplate <- function(template, cores = 1, ...) {
   if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
              "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",
              "drug_col") %in%
@@ -355,7 +343,7 @@ ParCalculateTemplate <- function(template, ...) {
   #                       css_col = numeric(), css = numeric(), S = numeric(),
   #                       stringsAsFactors = FALSE)
 
-  registerDoParallel(4)
+  registerDoParallel(cores)
 
   res <- foreach::foreach (i = 1:length(blocks)) %dopar% {
     # 1. Generate response matrix for each block
@@ -401,12 +389,15 @@ ParCalculateTemplate <- function(template, ...) {
     tmp$curve$drug_row[which(tmp$curve$dim ==
                                "row")] <- as.character(info$drug_row)
 
+    tmp$curve <- dplyr::select(tmp$curve, block_id, drug_row, drug_col, b, c, d, e, model)
+
     # # 4. Append new tables to container
     # synergy <- rbind.data.frame(synergy, tmp$synergy)
     # surface <- rbind.data.frame(surface, tmp$surface)
     # curve <- rbind.data.frame(curve, tmp$curve)
     # summary <- rbind.data.frame(summary, tmp$summary)
 
+    # 4. collect tables
     result$synergy <- tmp$synergy
     result$surface <- tmp$surface
     result$summary <- tmp$summary
@@ -418,8 +409,11 @@ ParCalculateTemplate <- function(template, ...) {
     response <- data.frame()
     respons.mat <- matrix()
 
-    return(result)
+    gc()
+
+    result
   }
+
   res2 <- list()
   res2$synergy <- Reduce(function(x, y) {rbind.data.frame(x, y)}, lapply(res, "[[" , "synergy"))
   res2$surface <- Reduce(function(x, y) {rbind.data.frame(x, y)}, lapply(res, "[[" , "surface"))
