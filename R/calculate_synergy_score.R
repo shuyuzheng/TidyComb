@@ -25,6 +25,9 @@
 #' @export
 CorrectBaseLine <- function(response.mat, ...){
   negative.ind <- which(response.mat < 0, arr.ind = TRUE)
+  if (length(negative.ind) == 0) {
+    return(response.mat)
+  }
   drug.row <- ExtractSingleDrug(response.mat, dim = "row")
   drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
                                                                  ...)))
