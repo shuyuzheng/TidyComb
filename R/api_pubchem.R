@@ -277,6 +277,57 @@ GetPubPhase <- function(cids, quiet = TRUE) {
   return(clinical_phase)
 }
 
+#' Get drug synonyms from PubChem by Drug names
+#'
+#' \code{GetPubSynonymFromName} queries PubChem database with drug names via
+#' (\href{https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html}{PUG REST} and
+#' retrieves synonyms of drugs.
+#'
+#' @param names A vector of characters containing names of drugs for searching.
+#'
+#' @return A Data frame contains:
+#' \itemize{
+#'   \item \strong{input_name} The name inputted by user.
+#'   \item \strong{synonyms} Synonyms retrieved from PubChem. Different synonyms
+#'   are separated by ";".
+#' }
+#'
+#' @export
+#'
+#' @examples
+#' names <- c("Aspirin", "5-FU")
+#' synonyms <- GetDrugNames(names)
+#'
+
+GetPubSynonymFromName <- function(names) {
+  message("Getting names from PubChem...")
+  url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/",
+                     "%s", "/synonyms/JSON")
+
+  # Build containers
+  input_name <- NULL
+  synonyms <- NULL
+  n <- length(names)
+  for (i in 1:n) {
+    tryCatch({
+      message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
+      utils::flush.console()
+
+      url <- sprintf(url.base, names[i])
+      res <- jsonlite::fromJSON(url)
+      input_name <- c(input_name, names[i])
+      synonyms <- c(synonyms,
+                    paste0(unlist(res[[1]][[1]]$Synonym), collapse = "; "))
+    }, error = function(e){
+      print(e)
+    }, finally = Sys.sleep(0.2)
+    )
+  }
+  df <- data.frame(input_name = input_name, synonyms = synonyms,
+                   stringsAsFactors = FALSE)
+  return(df)
+}
+
 # GetPubIDs <- fuction(cids) {
 #   url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
 #                      "%s", "/xrefs/SourceName,RegistryID/JSON")
