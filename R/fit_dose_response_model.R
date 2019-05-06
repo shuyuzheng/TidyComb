@@ -3,8 +3,13 @@
 # Copyright Shuyu Zheng
 #
 # Functions on this page:
-#
-# FitDoseResponse: Fitting single drug dose-response model
+# Exported fuctions:
+# * FitDoseResponse: Fitting single drug dose-response model
+# Internal functions:
+# * FindModelType: Get the model type which was used to fit dose-response curve.
+# * CalculateIC50: Caluculate absolute IC50 from dose-response curve fitted
+#                  coefficients.
+# * PredictResponse: Get the predict values from fitted dose-response model.
 
 #' Fitting single drug dose-response model
 #'
@@ -107,8 +112,4 @@ PredictResponse <- function(df, dose) {
     }
   }
   return(pred)
-}
-
-FitWholeMat <- function(response.mat) {
-
 }

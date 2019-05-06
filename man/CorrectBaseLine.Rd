@@ -4,7 +4,7 @@
 \alias{CorrectBaseLine}
 \title{Base line correction}
 \usage{
-CorrectBaseLine(response.mat, ...)
+CorrectBaseLine(response.mat, method = c("non", "part", "all"), ...)
 }
 \arguments{
 \item{response.mat}{A drug cobination dose-response matrix. It's column name
@@ -12,7 +12,15 @@ and row name are representing the concerntrations of drug added to column and
 row, respectively. The values in matrix indicate the inhibition rate to cell
 growth.}
 
-\item{...}{Other arguments from nested functions.}
+\item{method}{A character value to indicate using which method to do
+baseline correction. Available values ate:
+  \itemize{
+    \item \strong{non} means no baseline corection.
+    \item \strong{part} means only adjust the negative values in the matrix.
+    \item \strong{all} means adjust all values in the matrix.
+  }}
+
+\item{...}{Other arguments from nested function \code{\link{FitDoseResponse}}}
 }
 \value{
 A matrix which base line have been adjusted.

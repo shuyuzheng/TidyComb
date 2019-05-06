@@ -5,6 +5,27 @@
 # Functions on this page:
 #
 
+#' Calculate sensitivity score
+#'
+#' Function \code{CalculateSens} calculates cell line sensitivity to a drug or a
+#' combination of drugs from dose response curve.
+#'
+#' This function measures the sensitivity by calculating the Area Under Curve
+#' (AUC) according to certurn dose response curve. The lower bouder is chosen at
+#' the first non-zero concentration in the dose response data.
+#'
+#' @param df A data frame. It contains two variables:
+#' \itemize{
+#'   \item \strong{dose} the concentrations of drugs.
+#'   \item \strong{response} the response of cell lines at crresponding doses.
+#'   We use inhibition rate of cell line growth to measure the response.
+#' }
+#'
+#' @return A number. The sensitivity score calculated from input dose-response
+#' data
+#'
+#' @export
+
 CalculateSens <- function(df) {
   #options(show.error.messages = FALSE)
   df <- df[-which(df$dose == 0),]

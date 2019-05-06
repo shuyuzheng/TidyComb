@@ -14,7 +14,15 @@ ParCalculateTemplate(template, cores = 1, ...)
 \item{cores}{A integer. It indicates number of cores would be allocated to
 the parallel processed}
 
-\item{...}{Other arguments required by nested functions}
+\item{...}{Other arguments required by nested functions. Some important
+arguments are:
+ \itemize{
+   \item \code{impute} and \code{noise} inherited from function
+         \code{CalculateMat};
+   \item \code{method} inherited from function \code{CorrectBaseLine};
+   \item \code{Emin} and \code{Emax} inherited from function
+         \code{FitDoseResponse}.
+}}
 }
 \value{
 A list. It contains 4 tables:

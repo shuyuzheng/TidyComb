@@ -4,17 +4,26 @@
 \alias{CalculateMat}
 \title{Chain all calculatrion about one dose-response matrix together}
 \usage{
-CalculateMat(response.mat, correction = TRUE, ...)
+CalculateMat(response.mat, impute = TRUE, noise = TRUE, ...)
 }
 \arguments{
 \item{response.mat}{A matrix contain the drug combination reaponse value.
 Its column names are doses of drug added along columns. Its row name are
 doses of drug added along rows.}
 
-\item{correction}{A logic value to indicate whether or not do baseline
-correction before calculation}
+\item{impute}{A logical function. It indicates whether or not imputing data
+to filling the "NA" values. Defult is \code{TRUE}.}
 
-\item{...}{Other argumants required by nested functions}
+\item{noise}{a logical value. It indicates whether or not adding noise to
+to the "response" values in the matrix. Default is \code{TRUE}.}
+
+\item{...}{Other argumants required by nested functions. Some important
+arguments are:
+\itemize{
+   \item \code{method} inherited from function \code{\link{CorrectBaseLine}};
+   \item \code{Emin} and \code{Emax} inherited from function
+         \code{FitDoseResponse}.
+}}
 }
 \value{
 It contains 4 tables:

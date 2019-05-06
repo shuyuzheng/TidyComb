@@ -19,30 +19,58 @@
 #' row, respectively. The values in matrix indicate the inhibition rate to cell
 #' growth.
 #'
-#' @param ... Other arguments from nested functions.
+#' @param method A character value to indicate using which method to do
+#' baseline correction. Available values ate:
+#'   \itemize{
+#'     \item \strong{non} means no baseline corection.
+#'     \item \strong{part} means only adjust the negative values in the matrix.
+#'     \item \strong{all} means adjust all values in the matrix.
+#'   }
+#'
+#' @param ... Other arguments from nested function \code{\link{FitDoseResponse}}
 #'
 #' @return A matrix which base line have been adjusted.
 #' @export
-CorrectBaseLine <- function(response.mat, ...){
-  negative.ind <- which(response.mat < 0, arr.ind = TRUE)
-  if (length(negative.ind) == 0) {
+CorrectBaseLine <- function(response.mat, method = c("non", "part", "all"), ...){
+
+  method <- match.arg(method)
+
+  if (method == "non") {
+    return(response.mat)
+  } else if (method == "part") {
+    negative.ind <- which(response.mat < 0, arr.ind = TRUE)
+    if (length(negative.ind) == 0) {
+      return(response.mat)
+    }
+    drug.row <- ExtractSingleDrug(response.mat, dim = "row")
+    drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
+                                                                   ...)))
+
+    drug.col <- ExtractSingleDrug(response.mat, dim = "col")
+    drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
+                                                                   ...)))
+
+    baseline <- mean(c(min(as.numeric(drug.row.fit)),
+                       min(as.numeric(drug.col.fit))))
+    response.mat[negative.ind] <- sapply(response.mat[negative.ind],
+                                         function(x) {
+                                           x - ((100 - x) / 100 * baseline)
+                                         })
+    return(response.mat)
+  } else if (method == "all"){
+    drug.row <- ExtractSingleDrug(response.mat, dim = "row")
+    drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
+                                                                   ...)))
+
+    drug.col <- ExtractSingleDrug(response.mat, dim = "col")
+    drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
+                                                                   ...)))
+
+    baseline <- mean(c(min(as.numeric(drug.row.fit)),
+                       min(as.numeric(drug.col.fit))))
+    response.mat <- response.mat - ((100 - response.mat) / 100 * baseline)
     return(response.mat)
   }
-  drug.row <- ExtractSingleDrug(response.mat, dim = "row")
-  drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
-                                                                 ...)))
-
-  drug.col <- ExtractSingleDrug(response.mat, dim = "col")
-  drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
-                                                                 ...)))
-
-  baseline <- (min(as.numeric(drug.row.fit)) +
-                 min(as.numeric(drug.col.fit))) / 2
-  response.mat[negative.ind] <- sapply(response.mat[negative.ind],
-                        function(x){
-                          x - ((100 - x) / 100 * baseline)
-                        })
-  return(response.mat)
 }
 
 #' Calculate ZIP synergy score
@@ -383,8 +411,10 @@ CalculateLoewe <- function (response.mat, quiet = TRUE, drug.col.type = NULL,
       if (slv$termcd < 3) {
         y.loewe <- slv$x
       } else {
-        y.loewe1 <- fun(x1, x2, drug.col.par, drug.col.type) # x1 col, x2 row
-        y.loewe2 <- fun(x1, x2, drug.row.par, drug.row.type) # x1 col, x2 row
+        y.loewe1 <- fun(x1, x2, drug.par = drug.col.par,
+                        model = drug.col.type) # x1 col, x2 row
+        y.loewe2 <- fun(x1, x2, drug.par = drug.row.par,
+                        model = drug.row.type) # x1 col, x2 row
         y.loewe <- max(y.loewe1, y.loewe2)
       }
 

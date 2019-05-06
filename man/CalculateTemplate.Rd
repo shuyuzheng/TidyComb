@@ -11,7 +11,15 @@ CalculateTemplate(template, ...)
 "drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
 "conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.}
 
-\item{...}{Other arguments required by nested functions}
+\item{...}{Other arguments required by nested functions. Some important
+arguments are:
+ \itemize{
+   \item \code{impute} and \code{noise} inherited from function
+         \code{CalculateMat};
+   \item \code{method} inherited from function \code{CorrectBaseLine};
+   \item \code{Emin} and \code{Emax} inherited from function
+         \code{FitDoseResponse}.
+}}
 }
 \value{
 A list. It contains 4 tables:
