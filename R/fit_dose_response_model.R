@@ -39,10 +39,15 @@
 #' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
 #' fitted dose-response curve. Default setting is \code{NA}.
 #'
+#' @param otrace A logical value. It is inherited from \code{\link[drc]{drmc}}
+#'  : If \code{TRUE} the output from \code{\link[stats]{optim}} is displayed.
+#'  In this package, the default value is \code{FALSE}. The \code{TRUE} setting
+#'  only occurs in \code{\link{CalculateZIP}} for shut down the error message.
+#'
 #' @return An object of class 'drc'. It contains imformation of fitted model.
 #'
 #' @export
-FitDoseResponse <- function (data, Emin = NA, Emax = NA) {
+FitDoseResponse <- function (data, Emin = NA, Emax = NA, otrace = FALSE) {
 
   if (!all(c("dose", "response") %in% colnames(data))) {
     stop('The input must contain columns: "dose", "respone".')
@@ -65,12 +70,14 @@ FitDoseResponse <- function (data, Emin = NA, Emax = NA) {
     drc::drm(response ~ log(dose), data = data,
              fct = drc::L.4(fixed = c(NA, Emin, Emax, NA)),
              na.action = stats::na.omit,
-             control = drc::drmc(errorm = FALSE, noMessage = TRUE))
+             control = drc::drmc(errorm = FALSE, noMessage = TRUE,
+                                 otrace = otrace))
   }, error = function(e) {
     drc::drm(response ~ log(dose), data = data,
              fct = drc::L.4(fixed = c(NA, Emin, Emax, NA)),
              na.action = stats::na.omit,
-             control = drc::drmc(errorm = FALSE, noMessage = TRUE))
+             control = drc::drmc(errorm = FALSE, noMessage = TRUE,
+                                 otrace = otrace))
   })
   return(drug.model)
 }

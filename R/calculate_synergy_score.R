@@ -27,7 +27,7 @@
 #'     \item \strong{all} means adjust all values in the matrix.
 #'   }
 #'
-#' @param ... Other arguments from nested function \code{\link{FitDoseResponse}}
+#' @param ... Other arguments inherited from function \code{\link{FitDoseResponse}}
 #'
 #' @return A matrix which base line have been adjusted.
 #' @export
@@ -105,8 +105,8 @@ CorrectBaseLine <- function(response.mat, method = c("non", "part", "all"), ...)
 CalculateZIP <- function(response.mat, drug.row.model = NULL,
                          drug.col.model = NULL, ...) {
   if (is.null(drug.row.model)) {
-      drug.row <- ExtractSingleDrug(response.mat, dim = "row")
-      drug.row.model <- FitDoseResponse(drug.row)
+    drug.row <- ExtractSingleDrug(response.mat, dim = "row")
+    drug.row.model <- FitDoseResponse(drug.row)
   }
   drug.row.fit <- suppressWarnings(stats::fitted(drug.row.model))
 
@@ -131,8 +131,13 @@ CalculateZIP <- function(response.mat, drug.row.model = NULL,
       fitted.response <- tmp$response - 10 ^ -10
     } else {
       tmp.min <- drug.col.fit[i]
-      tmp.model <- FitDoseResponse(data = tmp, Emin = tmp.min, Emax = 100)
-      fitted.response <- suppressWarnings(stats::fitted(tmp.model))
+      tmp.model <- FitDoseResponse(data = tmp, Emin = tmp.min, Emax = 100,
+                                   otrace = TRUE)
+      if (!is.null(tmp.model$convergence)){
+        fitted.response <- tmp$response
+      } else {
+        fitted.response <- suppressWarnings(stats::fitted(tmp.model))
+      }
     }
 
     # if (fitted.inhibition[length(fitted.inhibition)] < 0)
@@ -152,10 +157,14 @@ CalculateZIP <- function(response.mat, drug.row.model = NULL,
       fitted.response <- tmp$response - 10 ^ -10
     } else {
       tmp.min <- drug.row.fit[i]
-      tmp.model <- FitDoseResponse(data = tmp, Emin = tmp.min, Emax = 100)
-      fitted.response <- suppressWarnings(stats::fitted(tmp.model))
+      tmp.model <- FitDoseResponse(data = tmp, Emin = tmp.min, Emax = 100,
+                                   otrace = TRUE)
+      if (!is.null(tmp.model$convergence)){
+        fitted.response <- tmp$response
+      } else {
+        fitted.response <- suppressWarnings(stats::fitted(tmp.model))
+      }
     }
-
     # if (fitted.inhibition[length(fitted.inhibition)] < 0)
     #  fitted.inhibition[length(fitted.inhibition)] <- tmp.min
     updated.row.mat[i - 1 , ] <- fitted.response

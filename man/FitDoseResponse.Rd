@@ -4,7 +4,7 @@
 \alias{FitDoseResponse}
 \title{Fitting single drug dose-response model}
 \usage{
-FitDoseResponse(data, Emin = NA, Emax = NA)
+FitDoseResponse(data, Emin = NA, Emax = NA, otrace = FALSE)
 }
 \arguments{
 \item{data}{A data frame. It contains two columns:
@@ -19,6 +19,11 @@ fitted dose-response curve. Default setting is \code{NA}.}
 
 \item{Emax}{A numeric or \code{NA}. It specifies the maximum value in the
 fitted dose-response curve. Default setting is \code{NA}.}
+
+\item{otrace}{A logical value. It is inherited from \code{\link[drc]{drmc}}
+: If \code{TRUE} the output from \code{\link[stats]{optim}} is displayed.
+In this package, the default value is \code{FALSE}. The \code{TRUE} setting
+only occurs in \code{\link{CalculateZIP}} for shut down the error message.}
 }
 \value{
 An object of class 'drc'. It contains imformation of fitted model.
