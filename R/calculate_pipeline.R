@@ -81,7 +81,10 @@ CalculateMat <- function(response.mat, impute = TRUE, noise = TRUE, ...) {
   }
 
   # 1.2. Add random noise to original matrix
-  response <- AddNoise(response.mat, method = "random")
+  if (noise) {
+    response.mat <- AddNoise(response.mat, method = "random")
+  }
+
 
   # 1.3. Correct baseline with corresponding "method". Available methods are
   #      "non", "part", "all".
@@ -219,7 +222,7 @@ CalculateTemplate <- function(template,...) {
          "block_id, drug_row, drug_col, response,\n",
          "conc_r, conc_c, conc_r_unit, conc_c_unit, \n",
          "cell_line_name, drug_row, drug_col.")
-
+  set.seed(1)
   blocks <- unique(template$block_id)
 
   # generate container
@@ -250,8 +253,12 @@ CalculateTemplate <- function(template,...) {
       dplyr::select(conc_r, conc_c, response) %>%
       reshape2::acast(conc_r ~ conc_c, value.var = "response")
 
-    # 2. Do calculation on matrix
-    tmp <- CalculateMat(response.mat = response.mat, ...)
+    # 2. Do calculation on matrix (with error control)
+    tmp <- tryCatch({
+      CalculateMat(response.mat = response.mat, ...)
+    }, error = function(e) {
+      stop(blocks[i])
+    })
     tmp <- lapply(tmp, function(x){
       x$block_id = rep(block, nrow(x))
       return(x)
@@ -299,6 +306,7 @@ CalculateTemplate <- function(template,...) {
 
   return(list(synergy = synergy, surface = surface,
               curve = curve, summary = summary))
+  rm(.Random.seed)
 }
 
 multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
@@ -386,6 +394,7 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
   doParallel::registerDoParallel(cl)
 
   res <- foreach::foreach (i = 1:length(blocks)) %dopar% {
+    set.seed(1)
     # 1. Generate response matrix for each block
     result <- multiResultClass()
     response <- template %>%
@@ -396,7 +405,12 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
       reshape2::acast(conc_r ~ conc_c, value.var = "response")
 
     # 2. Do calculation on matrix
-    tmp <- CalculateMat(response.mat = response.mat, ...)
+    tmp <- tryCatch({
+      CalculateMat(response.mat = response.mat, ...)
+    }, error = function(e) {
+      print(blocks[i])
+      trace_back()
+    })
     tmp <- lapply(tmp, function(x){
       x$block_id = rep(blocks[i], nrow(x))
       return(x)
@@ -427,7 +441,8 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
     tmp$curve$drug_row[which(tmp$curve$dim ==
                                "row")] <- as.character(info$drug_row)
 
-    tmp$curve <- dplyr::select(tmp$curve, block_id, drug_row, drug_col, b, c, d, e, model)
+    tmp$curve <- dplyr::select(tmp$curve, block_id, drug_row, drug_col,
+                               b, c, d, e, model)
 
     # # 4. Append new tables to container
     # synergy <- rbind.data.frame(synergy, tmp$synergy)
@@ -446,14 +461,19 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
     info <- data.frame()
     response <- data.frame()
     respons.mat <- matrix()
+    rm(.Random.seed)
     result
   }
 
   res2 <- list()
-  res2$synergy <- Reduce(function(x, y) {rbind.data.frame(x, y)}, lapply(res, "[[" , "synergy"))
-  res2$surface <- Reduce(function(x, y) {rbind.data.frame(x, y)}, lapply(res, "[[" , "surface"))
-  res2$summary <- Reduce(function(x, y) {rbind.data.frame(x, y)}, lapply(res, "[[" , "summary"))
-  res2$curve <- Reduce(function(x, y) {rbind.data.frame(x, y)}, lapply(res, "[[" , "curve"))
+  res2$synergy <- Reduce(function(x, y) {rbind.data.frame(x, y)},
+                         lapply(res, "[[" , "synergy"))
+  res2$surface <- Reduce(function(x, y) {rbind.data.frame(x, y)},
+                         lapply(res, "[[" , "surface"))
+  res2$summary <- Reduce(function(x, y) {rbind.data.frame(x, y)},
+                         lapply(res, "[[" , "summary"))
+  res2$curve <- Reduce(function(x, y) {rbind.data.frame(x, y)},
+                       lapply(res, "[[" , "curve"))
 
   return(res2)
 }

@@ -39,15 +39,10 @@
 #' @param Emax A numeric or \code{NA}. It specifies the maximum value in the
 #' fitted dose-response curve. Default setting is \code{NA}.
 #'
-#' @param otrace A logical value. It is inherited from \code{\link[drc]{drmc}}
-#'  : If \code{TRUE} the output from \code{\link[stats]{optim}} is displayed.
-#'  In this package, the default value is \code{FALSE}. The \code{TRUE} setting
-#'  only occurs in \code{\link{CalculateZIP}} for shut down the error message.
-#'
 #' @return An object of class 'drc'. It contains imformation of fitted model.
 #'
 #' @export
-FitDoseResponse <- function (data, Emin = NA, Emax = NA, otrace = FALSE) {
+FitDoseResponse <- function (data, Emin = NA, Emax = NA) {
 
   if (!all(c("dose", "response") %in% colnames(data))) {
     stop('The input must contain columns: "dose", "respone".')
@@ -56,7 +51,6 @@ FitDoseResponse <- function (data, Emin = NA, Emax = NA, otrace = FALSE) {
   # nonzero concentrations to take the log
   data$dose[which(data$dose == 0)] <- 10^-10
 
-  # ???
   if (nrow(data) != 1 & stats::var(data$response) == 0) {
     data$response[nrow(data)] <- data$response[nrow(data)] + 10 ^ -10
   }
@@ -70,14 +64,12 @@ FitDoseResponse <- function (data, Emin = NA, Emax = NA, otrace = FALSE) {
     drc::drm(response ~ log(dose), data = data,
              fct = drc::L.4(fixed = c(NA, Emin, Emax, NA)),
              na.action = stats::na.omit,
-             control = drc::drmc(errorm = FALSE, noMessage = TRUE,
-                                 otrace = otrace))
+             control = drc::drmc(errorm = FALSE, noMessage = TRUE))
   }, error = function(e) {
     drc::drm(response ~ log(dose), data = data,
              fct = drc::L.4(fixed = c(NA, Emin, Emax, NA)),
              na.action = stats::na.omit,
-             control = drc::drmc(errorm = FALSE, noMessage = TRUE,
-                                 otrace = otrace))
+             control = drc::drmc(errorm = FALSE, noMessage = TRUE))
   })
   return(drug.model)
 }
@@ -102,6 +94,30 @@ CalculateIC50 <- function(coef, type, max.conc){
 
 }
 
+
+#' Predict response value at certain drug dose
+#'
+#' \code{PredictResponse} uses \code{\link[drc]{drm}} function to fit the dose
+#' response model and generate the predict response value at the given dose.
+#'
+#' \strong{Note}: Random number generator used in \code{AddNoise} with
+#' \code{method = "random"}. If the analysis requires for reproductiblity,
+#' plesase set the random seed before calling this function.
+#'
+#' @param df A data frame. It contains two variable:
+#' \itemize{
+#'   \item \strong{dose} a serial of concentration of drug;
+#'   \item \strong{response} the cell line response to each concentration of
+#'   drug. It should be the inhibition rate according to negative control.
+#' }
+#'
+#' @param dose A numeric value. It specifies the dose at which user want to
+#' predict the response of cell line to the drug.
+#'
+#' @return A numeric value. It is the response value of cell line to the drug at
+#' inputted dose.
+#'
+#' @export
 PredictResponse <- function(df, dose) {
   if (stats::var(df$response, na.rm = TRUE) == 0) {
     pred <- df$response[1]

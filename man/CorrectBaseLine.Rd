@@ -20,7 +20,7 @@ baseline correction. Available values ate:
     \item \strong{all} means adjust all values in the matrix.
   }}
 
-\item{...}{Other arguments from nested function \code{\link{FitDoseResponse}}}
+\item{...}{Other arguments inherited from function \code{\link{FitDoseResponse}}}
 }
 \value{
 A matrix which base line have been adjusted.

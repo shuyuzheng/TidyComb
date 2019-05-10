@@ -131,8 +131,7 @@ CalculateZIP <- function(response.mat, drug.row.model = NULL,
       fitted.response <- tmp$response - 10 ^ -10
     } else {
       tmp.min <- drug.col.fit[i]
-      tmp.model <- FitDoseResponse(data = tmp, Emin = tmp.min, Emax = 100,
-                                   otrace = TRUE)
+      tmp.model <- FitDoseResponse(data = tmp, Emin = tmp.min, Emax = 100)
       if (!is.null(tmp.model$convergence)){
         fitted.response <- tmp$response
       } else {
@@ -157,8 +156,7 @@ CalculateZIP <- function(response.mat, drug.row.model = NULL,
       fitted.response <- tmp$response - 10 ^ -10
     } else {
       tmp.min <- drug.row.fit[i]
-      tmp.model <- FitDoseResponse(data = tmp, Emin = tmp.min, Emax = 100,
-                                   otrace = TRUE)
+      tmp.model <- FitDoseResponse(data = tmp, Emin = tmp.min, Emax = 100)
       if (!is.null(tmp.model$convergence)){
         fitted.response <- tmp$response
       } else {
