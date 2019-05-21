@@ -11,7 +11,6 @@
 #' @export
 #'
 #' @importFrom magrittr %>%
-#' @importFrom rlang .data
 #' @examples
 #' input <- utils::read.csv(system.file("extdata",
 #'                               "template.csv",

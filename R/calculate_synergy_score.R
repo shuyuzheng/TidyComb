@@ -425,11 +425,7 @@ CalculateLoewe <- function (response.mat, quiet = TRUE, drug.col.type = NULL,
         y.loewe <- max(y.loewe1, y.loewe2)
       }
 
-      if (y.loewe > 100) {
-        y.loewe <- 100
-      }
-
-      loewe.mat[j + 1, i + 1] <- y.loewe
+      loewe.mat[j + 1, i + 1] <- ifelse(y.loewe > 100, 100, y.loewe)
     }
   }
 

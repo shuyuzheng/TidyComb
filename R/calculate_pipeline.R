@@ -39,9 +39,6 @@
 #' Its column names are doses of drug added along columns. Its row name are
 #' doses of drug added along rows.
 #'
-#' @param impute A logical function. It indicates whether or not imputing data
-#' to filling the "NA" values. Defult is \code{TRUE}.
-#'
 #' @param noise a logical value. It indicates whether or not adding noise to
 #' to the "response" values in the matrix. Default is \code{TRUE}.
 #'
@@ -66,18 +63,17 @@
 #'  }
 #'
 #' @importFrom magrittr %>%
-#' @importFrom rlang .data
 #'
 #' @export
 #'
-CalculateMat <- function(response.mat, impute = TRUE, noise = TRUE, ...) {
+CalculateMat <- function(response.mat, noise = TRUE, ...) {
 
   options(scipen = 999)
 
   # 1. Pre-processing
-  # 1.1 Impute for missing value in original matrix
-  if (impute) {
-    response.mat <- ImputeNear(response.mat, times = 2)
+  # 1.1 Impute data until there is no missing value in the response matrix
+  while (sum(is.na(response.mat))) {
+    response.mat <- ImputeNear(response.mat)
   }
 
   # 1.2. Add random noise to original matrix
@@ -167,7 +163,7 @@ CalculateMat <- function(response.mat, impute = TRUE, noise = TRUE, ...) {
   sum <- synergy %>%
     dplyr::filter(conc_r != 0 & conc_c != 0) %>%
     dplyr::select(-conc_r, -conc_c, -response) %>%
-    apply(2, mean, rm.na = TRUE)
+    apply(2, mean, na.rm = TRUE)
 
   sum <- data.frame(t(sum), ic50_row = row.ic50 , ic50_col = col.ic50,
                     dss_row = row.dss, dss_col = col.dss, css_row = row.css,
@@ -257,12 +253,148 @@ CalculateTemplate <- function(template,...) {
     tmp <- tryCatch({
       CalculateMat(response.mat = response.mat, ...)
     }, error = function(e) {
-      stop(blocks[i])
+      print(blocks[i])
+      traceback()
     })
     tmp <- lapply(tmp, function(x){
       x$block_id = rep(block, nrow(x))
       return(x)
       })
+
+    # 3. Add information to summary table
+    info <- response %>%
+      dplyr::select(drug_row, drug_col, cell_line_name,
+                    conc_r_unit, conc_c_unit) %>%
+      unique()
+
+    if (nrow(info) > 1) {
+      warning("The summary data of block ", block, " contains ", nrow(info),
+              " different versions.")
+    } else if (nrow(info) < 1) {
+      warning("The summary data of block ", block, " is missing.")
+    }
+
+    tmp$summary <- cbind.data.frame(info, tmp$summary)
+
+    # 4. fill drug names to curve table
+
+    tmp$curve$drug_col <- rep(NA, 2)
+    tmp$curve$drug_col[which(tmp$curve$dim ==
+                               "col")] <- as.character(info$drug_col)
+
+    tmp$curve$drug_row <- rep(NA, 2)
+    tmp$curve$drug_row[which(tmp$curve$dim ==
+                               "row")] <- as.character(info$drug_row)
+
+    # 4. Append new tables to containers
+    synergy <- rbind.data.frame(synergy, tmp$synergy)
+    surface <- rbind.data.frame(surface, tmp$surface)
+    curve <- rbind.data.frame(curve, tmp$curve)
+    summary <- rbind.data.frame(summary, tmp$summary)
+
+    # Clean temporary file
+    tmp <- list()
+    info <- data.frame()
+    response <- data.frame()
+    respons.mat <- matrix()
+  }
+
+  curve <- dplyr::select(curve, block_id, drug_row, drug_col, b, c, d, e, model)
+
+  return(list(synergy = synergy, surface = surface,
+              curve = curve, summary = summary))
+  rm(.Random.seed)
+}
+
+#' Debug function for CalculateTemplate
+#'
+#' \code{CalculateTemplateDebug} run exactly same codes as
+#' \code{\link{CalculateTemplate}} but print out block_id before each iterations.
+#'
+#' @param template a dataframe in the format as template. Columns "block_id",
+#' "drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
+#' "conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.
+#'
+#' @param ... Other arguments required by nested functions. Some important
+#' arguments are:
+#'  \itemize{
+#'    \item \code{impute} and \code{noise} inherited from function
+#'          \code{CalculateMat};
+#'    \item \code{method} inherited from function \code{CorrectBaseLine};
+#'    \item \code{Emin} and \code{Emax} inherited from function
+#'          \code{FitDoseResponse}.
+#' }
+#'
+#' @return A list. It contains 4 tables:
+#'   \itemize{
+#'     \item \strong{synergy} It contains the modified response value and 4
+#'     type of synergy scores of each drug dose response pair.
+#'     \item \strong{summary} It contains summarized information of each
+#'     blocks: synergy scores, css, dss, S
+#'     \item \strong{curve} It contains the coefficients from single drug dose
+#'     response curve.
+#'     \item \strong{surface} It contains the smoothed response value and
+#'     synergy scores of each drug dose response pair.
+#'  }
+#'
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#'
+#' @export
+CalculateTemplateDebug <- function(template,...) {
+  if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
+             "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",
+             "drug_col") %in%
+           colnames(template)))
+    stop("The input data must contain the following columns: ",
+         "block_id, drug_row, drug_col, response,\n",
+         "conc_r, conc_c, conc_r_unit, conc_c_unit, \n",
+         "cell_line_name, drug_row, drug_col.")
+  set.seed(1)
+  blocks <- unique(template$block_id)
+
+  # generate container
+  synergy <- data.frame(block_id = integer(), conc_r = numeric(),
+                        conc_c = numeric(), response = numeric(),
+                        synergy_zip = numeric(), synergy_bliss = numeric(),
+                        synergy_loewe = numeric(), synergy_hsa = numeric(),
+                        stringsAsFactors = FALSE)
+  surface <- synergy
+  curve <- data.frame(block_id = integer(), b = numeric(),
+                      c = numeric(), d = numeric(), e = numeric(),
+                      model = numeric(), drug.row = numeric(),
+                      drug.col = numeric, stringsAsFactors = FALSE)
+  summary <- data.frame(block_id = integer(), synergy_zip = numeric(),
+                        synergy_bliss = numeric(), synergy_hsa = numeric(),
+                        synergy_loewe = numeric(), ic50_row = numeric() ,
+                        ic50_col = numeric(), dss_row = numeric(),
+                        dss_col = numeric(), css_row = numeric(),
+                        css_col = numeric(), css = numeric(), S = numeric(),
+                        stringsAsFactors = FALSE)
+
+  for (block in blocks) {
+    message("block")
+    utils::flush.console()
+
+    # 1. Generate response matrix for each block
+    response <- template %>%
+      dplyr::filter(block_id == block)
+
+    response.mat <- response %>%
+      dplyr::select(conc_r, conc_c, response) %>%
+      reshape2::acast(conc_r ~ conc_c, value.var = "response")
+
+    # 2. Do calculation on matrix (with error control)
+    tmp <- tryCatch({
+      CalculateMat(response.mat = response.mat, ...)
+    }, error = function(e) {
+      print(blocks[i])
+      traceback()
+    })
+    tmp <- lapply(tmp, function(x){
+      x$block_id = rep(block, nrow(x))
+      return(x)
+    })
 
     # 3. Add information to summary table
     info <- response %>%
@@ -355,7 +487,6 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #'  }
 #'
 #' @importFrom magrittr %>%
-#' @importFrom rlang .data
 #' @importFrom foreach %dopar%
 #'
 #' @export
@@ -409,7 +540,7 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
       CalculateMat(response.mat = response.mat, ...)
     }, error = function(e) {
       print(blocks[i])
-      trace_back()
+      traceback()
     })
     tmp <- lapply(tmp, function(x){
       x$block_id = rep(blocks[i], nrow(x))
