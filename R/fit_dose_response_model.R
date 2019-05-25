@@ -59,17 +59,20 @@ FitDoseResponse <- function (data, Emin = NA, Emax = NA) {
     drc::drm(response ~ dose, data = data,
              fct = drc::LL.4(fixed = c(NA, Emin = Emin, Emax = Emax, NA)),
              na.action = stats::na.omit,
-             control = drc::drmc(errorm = FALSE, noMessage = TRUE))
+             control = drc::drmc(errorm = FALSE, noMessage = TRUE,
+                                 otrace = TRUE))
   }, warning = function(w) {
     drc::drm(response ~ log(dose), data = data,
              fct = drc::L.4(fixed = c(NA, Emin, Emax, NA)),
              na.action = stats::na.omit,
-             control = drc::drmc(errorm = FALSE, noMessage = TRUE))
+             control = drc::drmc(errorm = FALSE, noMessage = TRUE,
+                                 otrace = FALSE))
   }, error = function(e) {
     drc::drm(response ~ log(dose), data = data,
              fct = drc::L.4(fixed = c(NA, Emin, Emax, NA)),
              na.action = stats::na.omit,
-             control = drc::drmc(errorm = FALSE, noMessage = TRUE))
+             control = drc::drmc(errorm = FALSE, noMessage = TRUE,
+                                 otrace = FALSE))
   })
   return(drug.model)
 }

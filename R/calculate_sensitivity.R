@@ -38,8 +38,9 @@ CalculateSens <- function(df) {
       #                       as.numeric(rownames(df)[2:nrow(df)]),
       #                     fct = drc::LL.4())$coefficients
       # If fit works, call scoreCurve()
-      fitcoefs <- drc::drm(response ~ dose, data = df,
-                           fct = drc::LL.4())$coefficients
+      fitcoefs <- drc::drm(response ~ dose, data = df, fct = drc::LL.4(),
+                           control = drc::drmc(errorm = FALSE, noMessage = TRUE,
+                                               otrace = TRUE))$coefficients
       score <- round(scoreCurve(d = fitcoefs[3] / 100,
                                 c = fitcoefs[2] / 100,
                                 b = fitcoefs[1],
@@ -50,8 +51,9 @@ CalculateSens <- function(df) {
     }, error = function(e) {
       # Skip zero conc, log, drc::L.4()
       # message(e)
-      fitcoefs <- drc::drm(response ~ log10(dose), data = df,
-                           fct = drc::L.4())$coefficients
+      fitcoefs <- drc::drm(response ~ log10(dose), data = df, fct = drc::L.4(),
+                           control = drc::drmc(errorm = FALSE, noMessage = TRUE,
+                                               otrace = FALSE))$coefficients
       score <- round(scoreCurve.L4(d = fitcoefs[3] / 100,
                                    c = fitcoefs[2] / 100,
                                    b = fitcoefs[1],

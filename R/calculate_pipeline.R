@@ -373,7 +373,7 @@ CalculateTemplateDebug <- function(template,...) {
                         stringsAsFactors = FALSE)
 
   for (block in blocks) {
-    message("block")
+    message(block)
     utils::flush.console()
 
     # 1. Generate response matrix for each block
@@ -385,12 +385,8 @@ CalculateTemplateDebug <- function(template,...) {
       reshape2::acast(conc_r ~ conc_c, value.var = "response")
 
     # 2. Do calculation on matrix (with error control)
-    tmp <- tryCatch({
-      CalculateMat(response.mat = response.mat, ...)
-    }, error = function(e) {
-      print(blocks[i])
-      traceback()
-    })
+    tmp <- CalculateMat(response.mat = response.mat, ...)
+
     tmp <- lapply(tmp, function(x){
       x$block_id = rep(block, nrow(x))
       return(x)
@@ -536,12 +532,8 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
       reshape2::acast(conc_r ~ conc_c, value.var = "response")
 
     # 2. Do calculation on matrix
-    tmp <- tryCatch({
-      CalculateMat(response.mat = response.mat, ...)
-    }, error = function(e) {
-      print(blocks[i])
-      traceback()
-    })
+    tmp <- CalculateMat(response.mat = response.mat, ...)
+
     tmp <- lapply(tmp, function(x){
       x$block_id = rep(blocks[i], nrow(x))
       return(x)
@@ -569,6 +561,7 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
                                "col")] <- as.character(info$drug_col)
 
     tmp$curve$drug_row <- rep(NA, 2)
+
     tmp$curve$drug_row[which(tmp$curve$dim ==
                                "row")] <- as.character(info$drug_row)
 
