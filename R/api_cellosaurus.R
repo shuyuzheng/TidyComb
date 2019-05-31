@@ -21,17 +21,6 @@
 #' number of archived cell lines and number of archived publications.
 #'
 #' @export
-#'
-#' @examples
-#' # Check the online Cellosaurus dataset version.
-#' CellVersion()
-#'
-#' # Check the local Cellosaurus XML document version.
-#' CellVersion(system.file("extdata",
-#'                         "cellosaurus.xml",
-#'                         package = "TidyComb"))
-#'
-
 CellVersion <- function(
           file = "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml",
           ...){
@@ -76,9 +65,6 @@ CellVersion <- function(
 #' Cellosaurus data.
 #'
 #' @export
-#'
-#' @examples
-#' UpdateCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
 UpdateCell <- function(file) {
   version.local <- as.numeric(CellVersion(file)["version"])
   version.online <- as.numeric(CellVersion()["version"])
@@ -122,10 +108,6 @@ UpdateCell <- function(file) {
 #' Cellosaurus dataset.
 #'
 #' @export
-#'
-#' @examples
-#' all.cell <- GetAllCell(system.file("extdata", "cellosaurus.xml",
-#'                                    package = "TidyComb"))
 GetAllCell <- function(file) {
   doc <- XML::xmlInternalTreeParse(file)
   all.cell <- XML::xmlRoot(doc)[[2]]
@@ -151,12 +133,6 @@ GetAllCell <- function(file) {
 #' cell line is matched, a NULL list will be return.
 #'
 #' @export
-#'
-#' @examples
-#' node <- GetAllCell(file = system.file("extdata", "cellosaurus.xml",
-#'                                       package = "TidyComb"))
-#' cell.lines <- GetCell(node, c("U87", "A549"), "name")
-#'
 GetCell <- function(node, ids, type = "name"){
   if(type == "name"){
 
@@ -322,12 +298,6 @@ GetAccession <- function(node){
 #' @return A data frame contains cell line information selected by \code{info}
 #'
 #' @export
-#'
-#' @examples
-#' node <- GetAllCell(system.file("extdata", "cellosaurus.xml",
-#'                                package = "TidyComb"))
-#' cell.lines <- GetCell(node, c("U87", "A549"), "name")
-#' cell.info <- GetCellInfo(cell.lines)
 GetCellInfo <- function(node, info = "accession") {
 
   if (info == "name") {

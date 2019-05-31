@@ -33,9 +33,3 @@ If you prefer some not all of these data, \code{\link{GetCellName}},
 \code{\link{GetCellNameInOne}}, \code{\link{GetDisease}}, or
 \code{\link{GetAccession}} are recommended.
 }
-\examples{
-node <- GetAllCell(system.file("extdata", "cellosaurus.xml",
-                               package = "TidyComb"))
-cell.lines <- GetCell(node, c("U87", "A549"), "name")
-cell.info <- GetCellInfo(cell.lines)
-}

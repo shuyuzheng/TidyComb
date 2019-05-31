@@ -53,7 +53,7 @@
 #' @export
 #'
 #' @examples
-#' study <- GetPubmed(c(26551875, 15627163))
+#' study <- GetPubmed(c(26551875, 15627163), email = "shuyu.zheng1992@gmail.com")
 GetPubmed <- function(pmids, tool = "TidyComb", email = NULL ) {
   if (is.null(email)) {
     stop("As the PMC API ask for user's contact information, please provide

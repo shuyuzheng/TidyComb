@@ -33,6 +33,3 @@ file. It will automatically update the local file if it is not up-to-date.
 Warning: The local file will be overwritted when updating data. If you'd like
 to keep the old version of dataset, please backup it before updating.
 }
-\examples{
-UpdateCell(system.file("extdata", "cellosaurus.xml", package = "TidyComb"))
-}
