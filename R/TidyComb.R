@@ -7,8 +7,9 @@
 #' The TidyComb package provides three categories of important
 #' functions :
 #' \enumerate{
-#'   \item Retrieving data from PubChem and Chembl, and Cellosaurus databases;
-#'   \item calculating drug synergy scores and curves;
+#'   \item Retrieving data from external databases, like PubChem, Chembl, ...;
+#'   \item Estimating cell line's sensitivity to drugs. Methods includs fitting
+#'   and visaulizing dose-response curve, ;
 #'   \item Calculating drug combination effect surface.
 #' }
 #'

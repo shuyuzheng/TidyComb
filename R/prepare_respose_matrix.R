@@ -52,8 +52,12 @@ ImputeNear <- function(response.mat, times = 1) {
 #'   number of response values in matrix with 10^-10.
 #' }
 #'
-#' @param response.mat A matrix. It contains the response data for one block of
-#' drug combination screen.
+#' \strong{Note}: Random number generator used in \code{AddNoise} with
+#' \code{method = "random"}. If the analysis requires for reproductiblity,
+#' plesase set the random seed before calling this function.
+#'
+#' @param response.mat A matrix. It contains the response data for one block
+#' of drug combination screen.
 #'
 #' @param method A characer. It refers to the method used for calculating noise.
 #' Available options are "random" and "scale".
@@ -64,8 +68,10 @@ ImputeNear <- function(response.mat, times = 1) {
 
 AddNoise <- function(response.mat, method) {
   if (method == "random") {
-    set.seed(1)
-    noise <- stats::rnorm(nrow(response.mat), 0, 0.001)
+    noise <- matrix(stats::rnorm(nrow(response.mat) * ncol(response.mat),
+                                 0, 0.001),
+                    nrow = nrow(response.mat),
+                    ncol = ncol(response.mat))
   } else if (method == "scale") {
     scale <- 10^-10
     noise <- row(response.mat) * col(response.mat) * scale

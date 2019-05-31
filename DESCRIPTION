@@ -1,16 +1,17 @@
 Package: TidyComb
 Type: Package
 Title: Preparing drug combination data for DrugComb 
-Version: 0.0.0.9000
-Authors@R: person("Shuyu", "Zheng", email = "shuyu.zheng@helsinki.fi",
+Version: 0.0.0.9002
+Authors: person("Shuyu", "Zheng", email = "shuyu.zheng@helsinki.fi",
     role = c("aut", "cre")) 
 Description: This package wrapped the functions that could be used to tidy drug
     combination data from various sources into the format that is required by 
     uploading to DrugComb database. It includes functions for retrieving drug 
     information from chemistry databases: PubChem and Chembl, retrieving cell 
     line information from Cellosaurus, calculating drug synergy scores, etc.
-Depends: R (>= 2.10)
-License: MIT + file LICENSE
+Depends: 
+    R (>= 2.10)
+License: Mozilla Public License 2.0 + file LICENSE
 URL: https://dev.azure.com/shuzhe/_git/TidyComb
 Encoding: UTF-8
 LazyData: true
@@ -27,7 +28,10 @@ Imports:
     SpatialExtremes,
     magrittr,
     stats,
-    utils
+    utils,
+    foreach,
+    doParallel,
+    rlang
 RoxygenNote: 6.1.1
 Suggests: 
     testthat,

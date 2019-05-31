@@ -56,5 +56,5 @@ application to our servers:
 }
 }
 \examples{
-study <- GetPubmed(c(26551875, 15627163))
+study <- GetPubmed(c(26551875, 15627163), email = "shuyu.zheng1992@gmail.com")
 }
