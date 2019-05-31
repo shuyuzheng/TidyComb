@@ -11,8 +11,9 @@ smoothing <-  function (scores.mat, len = 2) {
   nc <- ncol(scores.mat)
 
   # missing value imputation
-  scores.mat <- ImputeNear(scores.mat)
-
+  while (sum(is.na(scores.mat))) {
+    scores.mat <- ImputeNear(scores.mat)
+  }
   ext.row.len <- (nr - 1) * (len + 2) - (nr - 2)
   ext.col.len <- (nc - 1) * (len + 2) - (nc - 2)
 
@@ -40,12 +41,12 @@ smoothing <-  function (scores.mat, len = 2) {
   extend.row.dose <- mapply(function(x, y){seq(from = x, to = y,
                                                length.out = len + 2)},
                             row.dose[-nr], row.dose[-1])
-  extend.row.dose <- unique(round(c(extend.row.dose), 7))
+  extend.row.dose <- unique(round(c(extend.row.dose), 8))
 
   extend.col.dose <- mapply(function(x, y){seq(from = x, to = y,
                                                length.out = len + 2)},
                             col.dose[-nc], col.dose[-1])
-  extend.col.dose <- unique(round(c(extend.col.dose), 7))
+  extend.col.dose <- unique(round(c(extend.col.dose), 8))
 
   rownames(extended.scores) <- extend.row.dose
   colnames(extended.scores) <- extend.col.dose

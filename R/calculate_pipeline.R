@@ -217,7 +217,7 @@ CalculateTemplate <- function(template,...) {
     stop("The input data must contain the following columns: ",
          "block_id, drug_row, drug_col, response,\n",
          "conc_r, conc_c, conc_r_unit, conc_c_unit, \n",
-         "cell_line_name, drug_row, drug_col.")
+         "cell_line_name.")
   set.seed(1)
   blocks <- unique(template$block_id)
 
@@ -231,7 +231,7 @@ CalculateTemplate <- function(template,...) {
   curve <- data.frame(block_id = integer(), b = numeric(),
                       c = numeric(), d = numeric(), e = numeric(),
                       model = numeric(), drug.row = numeric(),
-                      drug.col = numeric, stringsAsFactors = FALSE)
+                      drug.col = numeric(), stringsAsFactors = FALSE)
   summary <- data.frame(block_id = integer(), synergy_zip = numeric(),
                         synergy_bliss = numeric(), synergy_hsa = numeric(),
                         synergy_loewe = numeric(), ic50_row = numeric() ,
@@ -253,7 +253,7 @@ CalculateTemplate <- function(template,...) {
     tmp <- tryCatch({
       CalculateMat(response.mat = response.mat, ...)
     }, error = function(e) {
-      print(blocks[i])
+      print(block)
       traceback()
     })
     tmp <- lapply(tmp, function(x){
@@ -349,7 +349,7 @@ CalculateTemplateDebug <- function(template,...) {
     stop("The input data must contain the following columns: ",
          "block_id, drug_row, drug_col, response,\n",
          "conc_r, conc_c, conc_r_unit, conc_c_unit, \n",
-         "cell_line_name, drug_row, drug_col.")
+         "cell_line_name.")
   set.seed(1)
   blocks <- unique(template$block_id)
 
@@ -363,7 +363,7 @@ CalculateTemplateDebug <- function(template,...) {
   curve <- data.frame(block_id = integer(), b = numeric(),
                       c = numeric(), d = numeric(), e = numeric(),
                       model = numeric(), drug.row = numeric(),
-                      drug.col = numeric, stringsAsFactors = FALSE)
+                      drug.col = numeric(), stringsAsFactors = FALSE)
   summary <- data.frame(block_id = integer(), synergy_zip = numeric(),
                         synergy_bliss = numeric(), synergy_hsa = numeric(),
                         synergy_loewe = numeric(), ic50_row = numeric() ,
@@ -494,33 +494,15 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
     stop("The input data must contain the following columns: ",
          "block_id, drug_row, drug_col, response,\n",
          "conc_r, conc_c, conc_r_unit, conc_c_unit, \n",
-         "cell_line_name, drug_row, drug_col.")
+         "cell_line_name.")
 
   blocks <- unique(template$block_id)
-
-  # generate container
-  # synergy <- data.frame(block_id = integer(), conc_r = numeric(),
-  #                       conc_c = numeric(), response = numeric(),
-  #                       synergy_zip = numeric(), synergy_bliss = numeric(),
-  #                       synergy_loewe = numeric(), synergy_hsa = numeric(),
-  #                       stringsAsFactors = FALSE)
-  # surface <- synergy
-  # curve <- data.frame(block_id = integer(), b = numeric(),
-  #                     c = numeric(), d = numeric(), e = numeric(),
-  #                     model = numeric(), drug.row = numeric(),
-  #                     drug.col = numeric, stringsAsFactors = FALSE)
-  # summary <- data.frame(block_id = integer(), synergy_zip = numeric(),
-  #                       synergy_bliss = numeric(), synergy_hsa = numeric(),
-  #                       synergy_loewe = numeric(), ic50_row = numeric() ,
-  #                       ic50_col = numeric(), dss_row = numeric(),
-  #                       dss_col = numeric(), css_row = numeric(),
-  #                       css_col = numeric(), css = numeric(), S = numeric(),
-  #                       stringsAsFactors = FALSE)
 
   cl <- parallel::makeForkCluster(cores)
   doParallel::registerDoParallel(cl)
 
   res <- foreach::foreach (i = 1:length(blocks)) %dopar% {
+    print(blocks[i])
     set.seed(1)
     # 1. Generate response matrix for each block
     result <- multiResultClass()
