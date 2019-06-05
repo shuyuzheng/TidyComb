@@ -14,11 +14,15 @@ FitDoseResponse(data, Emin = NA, Emax = NA)
   concentrations.
 }}
 
-\item{Emin}{A numeric or \code{NA}. It specifies the minimum value in the
-fitted dose-response curve. Default setting is \code{NA}.}
+\item{Emin}{A numeric or \code{NA}. the minimal effect of the drug used in
+the 4-parameter log-logistic function to fit the dose-response curve. If
+it is not NA, it is fixed the value assigned by the user. Default setting
+is \code{NA}.}
 
-\item{Emax}{A numeric or \code{NA}. It specifies the maximum value in the
-fitted dose-response curve. Default setting is \code{NA}.}
+\item{Emax}{A numeric or \code{NA}. the maximal effect of the drug used in
+the 4-parameter log-logistic function to fit the dose-response curve. If
+it is not NA, it is fixed the value assigned by the user. Default setting
+is \code{NA}.}
 }
 \value{
 An object of class 'drc'. It contains imformation of fitted model.
@@ -36,5 +40,16 @@ when taking log.
 
 Model choice:
 First use "L.4" model to fit the raw data. If error or waring occurs, use
-"LL.4" model to fit log(raw data).
+"LL.4" model to fit \code{log(raw data)}.
+}
+\references{
+Seber, G. A. F. and Wild, C. J (1989)
+href{https://onlinelibrary.wiley.com/doi/book/10.1002/0471725315}{Nonlinear
+Regression, New York}: Wiley \& Sons (p. 330).
+}
+\author{
+\itemize{
+   \item{Liye He \email{liye.he@helsinki.fi}}
+   \item{Shuyu Zheng \email{shuyu.zheng@helsinki.fi}}
+}
 }

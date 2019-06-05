@@ -27,3 +27,6 @@ corresponding drug concertration.
 \code{ExtractSingleDrug} extracts the dose-response values of single drug (
 drug added in column or row) from a drug combination dose-response matrix.
 }
+\author{
+Shuyu Zheng{shuyu.zheng@helsinki.fi}
+}
