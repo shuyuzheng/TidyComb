@@ -22,7 +22,23 @@ drug combination by using Highest Single Agent (HSA) reference model.
 \details{
 This model is a reference model for evaluating the interaction between two
 drugs. The basic assumption of this model is "The reference effect of drug
-combination is the maximal single drug effect". More details about this model
-could be found in original publication:
-\href{https://www.ncbi.nlm.nih.gov/pubmed/2692037}{(Berenbaum, 1989)}.
+combination is the maximal single drug effect".
+}
+\references{
+\itemize{
+   \item{Yadav B, Wennerberg K, Aittokallio T, Tang J.(2015).
+   \href{https://doi.org/10.1016/j.csbj.2015.09.001}{Searching for Drug
+   Synergy in Complex Dose-Response Landscape Using an Interaction Potency
+   Model.}Comput Struct Biotechnol J, 13:504– 513.}
+   \item{Berenbaum MC. (1989).
+   \href{https://www.ncbi.nlm.nih.gov/pubmed/2692037}{What is synergy?}
+   Pharmacol Rev 1990 Sep;41(3):422.
+   }
+}
+}
+\author{
+\itemize{
+   \item{Liye He \email{liye.he@helsinki.fi}}
+   \item{Shuyu Zheng \email{shuyu.zheng@helsinki.fi}}
+}
 }

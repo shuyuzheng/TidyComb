@@ -33,3 +33,6 @@ There are two options for calculating noise in this function:
 \code{method = "random"}. If the analysis requires for reproductiblity,
 plesase set the random seed before calling this function.
 }
+\author{
+Shuyu Zheng{shuyu.zheng@helsinki.fi}
+}

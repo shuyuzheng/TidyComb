@@ -1,13 +1,12 @@
 # TidyComb
 # Functions for processing drug response matrix.
-# Copyrighte Shuyu Zheng
 #
 # Functions in this page:
 #
 # ImputeNear: Impute missing value with nearest values
 # AddNoise: Add noise to response value
-# ImputeIC50: Impute missing value at IC50 concentration of drug
 # ExtractSingleDrug: Extract single drug response from matrix
+# CorrectBaseLine: Do base line correction to dose-response matrix.
 
 #' Impute missing value with nearest values
 #'
@@ -23,6 +22,8 @@
 #'
 #' @return A matrix which is same as input matrix except the NA cells are filled
 #' with numbers.
+#'
+#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 ImputeNear <- function(response.mat, times = 1) {
@@ -64,6 +65,8 @@ ImputeNear <- function(response.mat, times = 1) {
 #'
 #' @return A matrix. It contains the response value added with noises.
 #'
+#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
+#'
 #' @export
 
 AddNoise <- function(response.mat, method) {
@@ -102,6 +105,8 @@ AddNoise <- function(response.mat, method) {
 #' corresponding drug concertration.
 #' }
 #'
+#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
+#'
 #' @export
 ExtractSingleDrug <- function(response.mat, dim = "row") {
   if (dim == "row") {
@@ -116,3 +121,77 @@ ExtractSingleDrug <- function(response.mat, dim = "row") {
   rownames(single.drug) <- NULL
   return(single.drug)
 }
+
+#' Base line correction
+#'
+#' \code{CorrectBaseLine} adjusts the base line of drug combination
+#' dose-response matrix up to positive values.
+#'
+#' @param response.mat A drug cobination dose-response matrix. It's column name
+#' and row name are representing the concerntrations of drug added to column and
+#' row, respectively. The values in matrix indicate the inhibition rate to cell
+#' growth.
+#'
+#' @param method A character value to indicate using which method to do
+#' baseline correction. Available values ate:
+#'   \itemize{
+#'     \item \strong{non} means no baseline corection.
+#'     \item \strong{part} means only adjust the negative values in the matrix.
+#'     \item \strong{all} means adjust all values in the matrix.
+#'   }
+#'
+#' @param ... Other arguments inherited from function
+#'   \code{\link{FitDoseResponse}}
+#'
+#' @return A matrix which base line have been adjusted.
+#'
+#' @author \itemize{
+#'    \item{Liye He \email{liye.he@helsinki.fi}}
+#'    \item{Shuyu Zheng \email{shuyu.zheng@helsinki.fi}}
+#' }
+#'
+#' @export
+#'
+CorrectBaseLine <- function(response.mat,
+                            method = c("non", "part", "all"), ...){
+
+  method <- match.arg(method)
+
+  if (method == "non") {
+    return(response.mat)
+  } else if (method == "part") {
+    negative.ind <- which(response.mat < 0, arr.ind = TRUE)
+    if (length(negative.ind) == 0) {
+      return(response.mat)
+    }
+    drug.row <- ExtractSingleDrug(response.mat, dim = "row")
+    drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
+                                                                   ...)))
+
+    drug.col <- ExtractSingleDrug(response.mat, dim = "col")
+    drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
+                                                                   ...)))
+
+    baseline <- mean(c(min(as.numeric(drug.row.fit)),
+                       min(as.numeric(drug.col.fit))))
+    response.mat[negative.ind] <- sapply(response.mat[negative.ind],
+                                         function(x) {
+                                           x - ((100 - x) / 100 * baseline)
+                                         })
+    return(response.mat)
+  } else if (method == "all"){
+    drug.row <- ExtractSingleDrug(response.mat, dim = "row")
+    drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
+                                                                   ...)))
+
+    drug.col <- ExtractSingleDrug(response.mat, dim = "col")
+    drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
+                                                                   ...)))
+
+    baseline <- mean(c(min(as.numeric(drug.row.fit)),
+                       min(as.numeric(drug.col.fit))))
+    response.mat <- response.mat - ((100 - response.mat) / 100 * baseline)
+    return(response.mat)
+  }
+}
+

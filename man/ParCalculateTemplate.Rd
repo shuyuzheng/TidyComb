@@ -40,3 +40,6 @@ A list. It contains 4 tables:
 \description{
 Parallel Calculate Drug Combination data in template format
 }
+\author{
+Shuyu Zheng{shuyu.zheng@helsinki.fi}
+}

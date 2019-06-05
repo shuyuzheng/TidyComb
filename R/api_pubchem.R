@@ -119,11 +119,12 @@ GetCid <- function(ids, type , quiet = TRUE) {
 #'
 #' @examples
 #' GetPubNames("2244")
-GetPubNames <- function(cids){
-  message("Getting names from PubChem...")
+GetPubNames <- function(cids, quiet = TRUE){
+  if (!quiet) {
+    message("Getting names from PubChem...")
+  }
   url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
                      "%s", "/synonyms/JSON")
-
   # Build containers
   cid <- NULL
   name <- NULL
@@ -133,9 +134,10 @@ GetPubNames <- function(cids){
   n <- length(cids)
   for (compound in cids) {
     tryCatch({
-      message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
-      utils::flush.console()
-
+      if (!quiet) {
+        message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
+        utils::flush.console()
+      }
       url <- sprintf(url.base, compound)
       res <- jsonlite::fromJSON(url)
       cid <- c(cid, res[[1]][[1]]$CID)

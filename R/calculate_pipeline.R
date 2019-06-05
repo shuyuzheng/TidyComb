@@ -1,11 +1,17 @@
 # TidyComb
 # Functions for pipe all calculation togather
-# Copyright Shuyu Zheng
 #
-# Functions on this page:
+# Functions in this page:
 #
+# CalculateMat: Calculate scores from one dose-response matrix.
+# CalculateTemplate: Calculate scores from template file which might contain
+#                    several drug combination blocks.
+# CalculateTemplateDebug: Debug version of CalculateTemplate.
+# ParCalculateTemplate: Parallel calculate scores from template file. It using
+#                    multi-core method to do parallel. (It might not work under
+#                    Windows system)
 
-#' Chain all calculatrion about one dose-response matrix together
+#' Chain all calculation about one dose-response matrix
 #'
 #' \code{CalculateMat} chains all calculations about one dose-response matrix (
 #' one drug-drug interaction block) together. The calculations includes:
@@ -17,8 +23,12 @@
 #' \enumerate{
 #'   \item Pre-process Matrix
 #'     \enumerate{
-#'       \item Impute for missing value in original matrix.
-#'       \item Add noise to original matrix.
+#'       \item Impute for missing values (with the average of values from the
+#'           nearest four cells) in original matrix by using function
+#'           \code{\link{ImputeNear}}.
+#'       \item Add noise(A small random number ranging from 0 to 0.001) to
+#'           original matrix by using function \code{line{AddNoise}}.
+#'       )
 #'       \item Correct baseline to 0, if \code{correction} is \code{TRUE}.
 #'     }
 #'   \item Single drug process
@@ -61,6 +71,8 @@
 #'     \item \strong{surface} It contains the smoothed response value and
 #'     synergy scores of each drug dose response pair.
 #'  }
+#'
+#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
 #'
 #' @importFrom magrittr %>%
 #'
@@ -183,6 +195,8 @@ CalculateMat <- function(response.mat, noise = TRUE, ...) {
 #' "drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
 #' "conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.
 #'
+#' @param debug a logical value. If it is \code{TRUE}, block ID will be printed
+#'    to console. The default setting is \code{FALSE}
 #' @param ... Other arguments required by nested functions. Some important
 #' arguments are:
 #'  \itemize{
@@ -205,11 +219,13 @@ CalculateMat <- function(response.mat, noise = TRUE, ...) {
 #'     synergy scores of each drug dose response pair.
 #'  }
 #'
+#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
+#'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
 #' @export
-CalculateTemplate <- function(template,...) {
+CalculateTemplate <- function(template, debug = FALSE, ...) {
   if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
              "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",
              "drug_col") %in%
@@ -241,6 +257,10 @@ CalculateTemplate <- function(template,...) {
                         stringsAsFactors = FALSE)
 
   for (block in blocks) {
+    if (debug) {
+      message(block)
+      utils::flush.console()
+    }
     # 1. Generate response matrix for each block
     response <- template %>%
       dplyr::filter(block_id == block)
@@ -260,137 +280,6 @@ CalculateTemplate <- function(template,...) {
       x$block_id = rep(block, nrow(x))
       return(x)
       })
-
-    # 3. Add information to summary table
-    info <- response %>%
-      dplyr::select(drug_row, drug_col, cell_line_name,
-                    conc_r_unit, conc_c_unit) %>%
-      unique()
-
-    if (nrow(info) > 1) {
-      warning("The summary data of block ", block, " contains ", nrow(info),
-              " different versions.")
-    } else if (nrow(info) < 1) {
-      warning("The summary data of block ", block, " is missing.")
-    }
-
-    tmp$summary <- cbind.data.frame(info, tmp$summary)
-
-    # 4. fill drug names to curve table
-
-    tmp$curve$drug_col <- rep(NA, 2)
-    tmp$curve$drug_col[which(tmp$curve$dim ==
-                               "col")] <- as.character(info$drug_col)
-
-    tmp$curve$drug_row <- rep(NA, 2)
-    tmp$curve$drug_row[which(tmp$curve$dim ==
-                               "row")] <- as.character(info$drug_row)
-
-    # 4. Append new tables to containers
-    synergy <- rbind.data.frame(synergy, tmp$synergy)
-    surface <- rbind.data.frame(surface, tmp$surface)
-    curve <- rbind.data.frame(curve, tmp$curve)
-    summary <- rbind.data.frame(summary, tmp$summary)
-
-    # Clean temporary file
-    tmp <- list()
-    info <- data.frame()
-    response <- data.frame()
-    respons.mat <- matrix()
-  }
-
-  curve <- dplyr::select(curve, block_id, drug_row, drug_col, b, c, d, e, model)
-
-  return(list(synergy = synergy, surface = surface,
-              curve = curve, summary = summary))
-  rm(.Random.seed)
-}
-
-#' Debug function for CalculateTemplate
-#'
-#' \code{CalculateTemplateDebug} run exactly same codes as
-#' \code{\link{CalculateTemplate}} but print out block_id before each iterations.
-#'
-#' @param template a dataframe in the format as template. Columns "block_id",
-#' "drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
-#' "conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.
-#'
-#' @param ... Other arguments required by nested functions. Some important
-#' arguments are:
-#'  \itemize{
-#'    \item \code{impute} and \code{noise} inherited from function
-#'          \code{CalculateMat};
-#'    \item \code{method} inherited from function \code{CorrectBaseLine};
-#'    \item \code{Emin} and \code{Emax} inherited from function
-#'          \code{FitDoseResponse}.
-#' }
-#'
-#' @return A list. It contains 4 tables:
-#'   \itemize{
-#'     \item \strong{synergy} It contains the modified response value and 4
-#'     type of synergy scores of each drug dose response pair.
-#'     \item \strong{summary} It contains summarized information of each
-#'     blocks: synergy scores, css, dss, S
-#'     \item \strong{curve} It contains the coefficients from single drug dose
-#'     response curve.
-#'     \item \strong{surface} It contains the smoothed response value and
-#'     synergy scores of each drug dose response pair.
-#'  }
-#'
-#' @importFrom magrittr %>%
-#' @importFrom rlang .data
-#'
-#' @export
-CalculateTemplateDebug <- function(template,...) {
-  if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
-             "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",
-             "drug_col") %in%
-           colnames(template)))
-    stop("The input data must contain the following columns: ",
-         "block_id, drug_row, drug_col, response,\n",
-         "conc_r, conc_c, conc_r_unit, conc_c_unit, \n",
-         "cell_line_name.")
-  set.seed(1)
-  blocks <- unique(template$block_id)
-
-  # generate container
-  synergy <- data.frame(block_id = integer(), conc_r = numeric(),
-                        conc_c = numeric(), response = numeric(),
-                        synergy_zip = numeric(), synergy_bliss = numeric(),
-                        synergy_loewe = numeric(), synergy_hsa = numeric(),
-                        stringsAsFactors = FALSE)
-  surface <- synergy
-  curve <- data.frame(block_id = integer(), b = numeric(),
-                      c = numeric(), d = numeric(), e = numeric(),
-                      model = numeric(), drug.row = numeric(),
-                      drug.col = numeric(), stringsAsFactors = FALSE)
-  summary <- data.frame(block_id = integer(), synergy_zip = numeric(),
-                        synergy_bliss = numeric(), synergy_hsa = numeric(),
-                        synergy_loewe = numeric(), ic50_row = numeric() ,
-                        ic50_col = numeric(), dss_row = numeric(),
-                        dss_col = numeric(), css_row = numeric(),
-                        css_col = numeric(), css = numeric(), S = numeric(),
-                        stringsAsFactors = FALSE)
-
-  for (block in blocks) {
-    message(block)
-    utils::flush.console()
-
-    # 1. Generate response matrix for each block
-    response <- template %>%
-      dplyr::filter(block_id == block)
-
-    response.mat <- response %>%
-      dplyr::select(conc_r, conc_c, response) %>%
-      reshape2::acast(conc_r ~ conc_c, value.var = "response")
-
-    # 2. Do calculation on matrix (with error control)
-    tmp <- CalculateMat(response.mat = response.mat, ...)
-
-    tmp <- lapply(tmp, function(x){
-      x$block_id = rep(block, nrow(x))
-      return(x)
-    })
 
     # 3. Add information to summary table
     info <- response %>%
@@ -482,6 +371,8 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #'     synergy scores of each drug dose response pair.
 #'  }
 #'
+#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
+#'
 #' @importFrom magrittr %>%
 #' @importFrom foreach %dopar%
 #'
@@ -502,7 +393,6 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
   doParallel::registerDoParallel(cl)
 
   res <- foreach::foreach (i = 1:length(blocks)) %dopar% {
-    print(blocks[i])
     set.seed(1)
     # 1. Generate response matrix for each block
     result <- multiResultClass()

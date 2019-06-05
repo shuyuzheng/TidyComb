@@ -12,9 +12,7 @@ Description: This package wrapped the functions that could be used to tidy drug
 Depends: 
     R (>= 2.10)
 License: Mozilla Public License 2.0 + file LICENSE
-URL: https://dev.azure.com/shuzhe/_git/TidyComb
 Encoding: UTF-8
-LazyData: true
 Imports: 
     XML,
     RCurl,

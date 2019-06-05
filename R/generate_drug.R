@@ -26,18 +26,19 @@ GenerateDrug <- function(cids) {
   # PubChem
   drug <- dplyr::left_join(GetPubNames(check$new),
                            GetPubchemPro(check$new),
-                           by = "cid")
-  drug <- dplyr::left_join(drug, GetPubPhase(check$new), by = "cid")
+                           by = "cid") %>% unique()
+  drug <- dplyr::left_join(drug, GetPubPhase(check$new), by = "cid") %>%
+    unique()
 
   # UniChem
   drug <- dplyr::left_join(drug, GetIds(stats::na.omit(drug$inchikey)),
-                           by = "inchikey")
+                           by = "inchikey") %>% unique()
 
   # ChEMBL
   chembl_id <- stats::na.omit(drug$chembl_id)
   if (length(chembl_id) != 0) {
   drug <- dplyr::left_join(drug, GetChemblPhase(chembl_id),
-                           by = "chembl_id")
+                           by = "chembl_id") %>% unique()
   drug$chembl_phase[is.na(drug$chembl_phase)] <- 0
   drug$clinical_phase <- apply(drug[, grepl(".*phase$", colnames(drug))],
                                1, max)

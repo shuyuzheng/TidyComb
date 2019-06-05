@@ -22,3 +22,6 @@ Function \code{ImputeNear} do missing value inputation by assigning the
 average of values in nearest 4 cells (top, bottom, left, right) to the NA
 cell.
 }
+\author{
+Shuyu Zheng{shuyu.zheng@helsinki.fi}
+}

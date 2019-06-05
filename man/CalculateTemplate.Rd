@@ -4,12 +4,15 @@
 \alias{CalculateTemplate}
 \title{Calculate Drug Combination data in template format}
 \usage{
-CalculateTemplate(template, ...)
+CalculateTemplate(template, debug = FALSE, ...)
 }
 \arguments{
 \item{template}{a dataframe in the format as template. Columns "block_id",
 "drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
 "conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.}
+
+\item{debug}{a logical value. If it is \code{TRUE}, block ID will be printed
+to console. The default setting is \code{FALSE}}
 
 \item{...}{Other arguments required by nested functions. Some important
 arguments are:
@@ -36,4 +39,7 @@ A list. It contains 4 tables:
 }
 \description{
 Calculate Drug Combination data in template format
+}
+\author{
+Shuyu Zheng{shuyu.zheng@helsinki.fi}
 }

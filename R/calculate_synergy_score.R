@@ -1,79 +1,13 @@
 # TidyComb
 # Functions for calculating drug synergy scores.
-# Copyright Shuyu Zheng
 #
 # Functions in this page:
 #
-# CorrectBaseLine: Do base line correction to matrix
-# CalculateZIP/Bliss/HSA/Loewe: Calculat synergy scores
+# CalculateZIP/Bliss/HSA/Loewe: Four functions to calculate synergy scores.
 # eq.LL4/L4.LL4/L4: Four functions to calculate loewe score in CalculateLoewe.
 # fun: Function used in CalculateLoewe
 
-#' Base line correction
-#'
-#' \code{CorrectBaseLine} adjusts the base line of drug combination
-#' dose-response matrix up to positive values.
-#'
-#' @param response.mat A drug cobination dose-response matrix. It's column name
-#' and row name are representing the concerntrations of drug added to column and
-#' row, respectively. The values in matrix indicate the inhibition rate to cell
-#' growth.
-#'
-#' @param method A character value to indicate using which method to do
-#' baseline correction. Available values ate:
-#'   \itemize{
-#'     \item \strong{non} means no baseline corection.
-#'     \item \strong{part} means only adjust the negative values in the matrix.
-#'     \item \strong{all} means adjust all values in the matrix.
-#'   }
-#'
-#' @param ... Other arguments inherited from function \code{\link{FitDoseResponse}}
-#'
-#' @return A matrix which base line have been adjusted.
-#' @export
-CorrectBaseLine <- function(response.mat, method = c("non", "part", "all"), ...){
-
-  method <- match.arg(method)
-
-  if (method == "non") {
-    return(response.mat)
-  } else if (method == "part") {
-    negative.ind <- which(response.mat < 0, arr.ind = TRUE)
-    if (length(negative.ind) == 0) {
-      return(response.mat)
-    }
-    drug.row <- ExtractSingleDrug(response.mat, dim = "row")
-    drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
-                                                                   ...)))
-
-    drug.col <- ExtractSingleDrug(response.mat, dim = "col")
-    drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
-                                                                   ...)))
-
-    baseline <- mean(c(min(as.numeric(drug.row.fit)),
-                       min(as.numeric(drug.col.fit))))
-    response.mat[negative.ind] <- sapply(response.mat[negative.ind],
-                                         function(x) {
-                                           x - ((100 - x) / 100 * baseline)
-                                         })
-    return(response.mat)
-  } else if (method == "all"){
-    drug.row <- ExtractSingleDrug(response.mat, dim = "row")
-    drug.row.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.row,
-                                                                   ...)))
-
-    drug.col <- ExtractSingleDrug(response.mat, dim = "col")
-    drug.col.fit <- suppressWarnings(stats::fitted(FitDoseResponse(drug.col,
-                                                                   ...)))
-
-    baseline <- mean(c(min(as.numeric(drug.row.fit)),
-                       min(as.numeric(drug.col.fit))))
-    response.mat <- response.mat - ((100 - response.mat) / 100 * baseline)
-    return(response.mat)
-  }
-}
-
-#' Calculate ZIP synergy score
+#' Calculate Delta synergy score based on ZIP model
 #'
 #' \code{CalculateZIP} calculates the \eqn{\Delta} score matrix for a block of
 #' drug combination by using Zero Interaction Potency (ZIP) method.
@@ -82,8 +16,7 @@ CorrectBaseLine <- function(response.mat, method = c("non", "part", "all"), ...)
 #' interaction between two drugs. It captures the drug interaction relationships
 #' by comparing the change in the potency of the dose-response curves between
 #' individual drugs and their combinations. More details about this model could
-#' be found in original publication
-#' \href{10.1016/j.csbj.2015.09.001}{(Yadav.et.al., 2015)}.
+#' be found in original publication.
 #'
 #' @param response.mat A drug cobination dose-response matrix. It's column name
 #' and row name are representing the concerntrations of drug added to column and
@@ -93,17 +26,26 @@ CorrectBaseLine <- function(response.mat, method = c("non", "part", "all"), ...)
 #' @param drug.col.model (optional) a character. It indicates the model used for
 #' fitting dose-response curve for drug added to columns.
 #'
-#' @param drug.row.model (optional) a character. It indicates the model type used for
-#' fitting dose-response curve for drug added to rows.
+#' @param drug.row.model (optional) a character. It indicates the model type
+#' used for fitting dose-response curve for drug added to rows.
 #'
 #' @param ... Other arguments from nested functions.
-#'
+#' @author \itemize{
+#'    \item{Liye He \email{liye.he@helsinki.fi}}
+#'    \item{Jing Tang \email{jing.tang@helsinki.fi}}
+#'    \item{Shuyu Zheng \email{shuyu.zheng@helsinki.fi}}
+#' }
+#' @references \itemize{
+#'    \item{Yadav B, Wennerberg K, Aittokallio T, Tang J. (2015).
+#'    \href{https://doi.org/10.1016/j.csbj.2015.09.001}{Searching for Drug
+#'    Synergy in Complex Dose-Response Landscape Using an Interaction Potency
+#'    Model.} Comput Struct Biotechnol J, 13:504– 513.}
+#' }
 #' @return A matrix of \eqn{\Delta} score calculated via Zero Interaction
 #' Potency (ZIP) method.
 #'
 #' @export
-CalculateZIP <- function(response.mat, drug.row.model = NULL,
-                         drug.col.model = NULL, ...) {
+CalculateZIP <- function(response.mat, drug.row.model = NULL, drug.col.model = NULL, ...) {
   if (is.null(drug.row.model)) {
     drug.row <- ExtractSingleDrug(response.mat, dim = "row")
     drug.row.model <- FitDoseResponse(drug.row)
@@ -204,7 +146,7 @@ CalculateZIP <- function(response.mat, drug.row.model = NULL,
 #' drugs. The basic assumption of this model is "The expected effect of two
 #' drugs acting independently". More details about this model could be found in
 #' original publication:
-#' \href{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-7348.1939.tb06990.x}{(Bliss, 1939)}.
+#' .
 #'
 #' @param response.mat A drug cobination dose-response matrix. It's column name
 #' and row name are representing the concerntrations of drug added to column and
@@ -214,7 +156,21 @@ CalculateZIP <- function(response.mat, drug.row.model = NULL,
 #' @return A matrix for synergy score calculated via reference model introduced
 #' by C. I. Bliss.
 #'
-#' @return A matrix with
+#' @author \itemize{
+#'    \item{Liye He \email{liye.he@helsinki.fi}}
+#'    \item{Shuyu Zheng \email{shuyu.zheng@helsinki.fi}}
+#' }
+#'
+#' @references \itemize{
+#'    \item{Yadav B, Wennerberg K, Aittokallio T, Tang J. (2015).
+#'    \href{https://doi.org/10.1016/j.csbj.2015.09.001}{Searching for Drug
+#'    Synergy in Complex Dose-Response Landscape Using an Interaction Potency
+#'    Model.} Comput Struct Biotechnol J, 13:504– 513.}
+#'    \item{Bliss, C. I. (1939).
+#'    \href{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-7348.1939.tb06990.x}{The
+#'    toxicity of poisons applied jointly.} Annals of Applied Biology,
+#'    26(3):585–615.}
+#' }
 #'
 #' @export
 CalculateBliss <- function (response.mat) {
@@ -242,9 +198,7 @@ CalculateBliss <- function (response.mat) {
 #'
 #' This model is a reference model for evaluating the interaction between two
 #' drugs. The basic assumption of this model is "The reference effect of drug
-#' combination is the maximal single drug effect". More details about this model
-#' could be found in original publication:
-#' \href{https://www.ncbi.nlm.nih.gov/pubmed/2692037}{(Berenbaum, 1989)}.
+#' combination is the maximal single drug effect".
 #'
 #' @param response.mat A drug cobination dose-response matrix. It's column name
 #' and row name are representing the concerntrations of drug added to column and
@@ -252,6 +206,22 @@ CalculateBliss <- function (response.mat) {
 #' growth.
 #'
 #' @return A matrix for synergy score calculated via Highest Single Agent (HSA).
+#'
+#' @author \itemize{
+#'    \item{Liye He \email{liye.he@helsinki.fi}}
+#'    \item{Shuyu Zheng \email{shuyu.zheng@helsinki.fi}}
+#' }
+#'
+#' @references \itemize{
+#'    \item{Yadav B, Wennerberg K, Aittokallio T, Tang J.(2015).
+#'    \href{https://doi.org/10.1016/j.csbj.2015.09.001}{Searching for Drug
+#'    Synergy in Complex Dose-Response Landscape Using an Interaction Potency
+#'    Model.}Comput Struct Biotechnol J, 13:504– 513.}
+#'    \item{Berenbaum MC. (1989).
+#'    \href{https://www.ncbi.nlm.nih.gov/pubmed/2692037}{What is synergy?}
+#'    Pharmacol Rev 1990 Sep;41(3):422.
+#'    }
+#' }
 #'
 #' @export
 CalculateHSA <- function(response.mat) {
@@ -305,8 +275,8 @@ eq.L4.LL4 <- function(x, x1, x2, drug.col.par, drug.row.par) {
 # * -10 User supplied Jacobian is most likely incorrect.
 # * 1 Function criterion is near zero. Convergence of function values has been
 # achieved.
-# * 2 x-values within tolerance. This means that the relative distance between two
-# consecutive x-values is smaller than xtol but that the function value
+# * 2 x-values within tolerance. This means that the relative distance between
+# two consecutive x-values is smaller than xtol but that the function value
 # criterion is still larger than ftol. Function values may not be near zero;
 # therefore the user must check if function values are acceptably small.
 #
@@ -334,9 +304,7 @@ fun <- function(col_conc, row_conc, drug.par, model) {
 #'
 #' This model is a reference model for evaluating the interaction between two
 #' drugs. The basic assumption of this model is "The referece effect of drug
-#' combination is the expected effect of a drug combined with itself". More
-#' details about this model could be found in original publication:
-#' \href{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-7348.1939.tb06990.x}{(Bliss, 1939)}.
+#' combination is the expected effect of a drug combined with itself".
 #'
 #' @param response.mat A drug cobination dose-response matrix. It's column name
 #' and row name are representing the concerntrations of drug added to column and
@@ -346,11 +314,11 @@ fun <- function(col_conc, row_conc, drug.par, model) {
 #' @param quiet A logical value. If it is \code{TRUE} then the warning message
 #' will not show during calculation.
 #'
-#' @param drug.col.type (optional) a character. It indicates the model type used for
-#' fitting dose-response curve for drug added to columns.
+#' @param drug.col.type (optional) a character. It indicates the model type used
+#' for fitting dose-response curve for drug added to columns.
 #'
-#' @param drug.row.type (optional) a character. It indicates the model type used for
-#' fitting dose-response curve for drug added to rows.
+#' @param drug.row.type (optional) a character. It indicates the model type used
+#' for fitting dose-response curve for drug added to rows.
 #'
 #' @param drug.col.par (optional) a named vector. It contains the coeficients of
 #' fitted dose-response model for drug added to columns.
@@ -362,6 +330,24 @@ fun <- function(col_conc, row_conc, drug.par, model) {
 #'
 #' @return A matrix for Synergy score calculated via reference model introduced
 #' by Loewe, S.
+#'
+#' @author \itemize{
+#'    \item{Liye He \email{liye.he@helsinki.fi}}
+#'    \item{Jing Tang \email{jing.tang@helsinki.fi}}
+#'    \item{Shuyu Zheng \email{shuyu.zheng@helsinki.fi}}
+#' }
+#'
+#' @references \itemize{
+#'    \item{Yadav B, Wennerberg K, Aittokallio T, Tang J.(2015).
+#'    \href{https://doi.org/10.1016/j.csbj.2015.09.001}{Searching for Drug
+#'    Synergy in Complex Dose-Response Landscape Using an Interaction Potency
+#'    Model.}Comput Struct Biotechnol J, 13:504– 513.}
+#'    \item{[Loewe, 1953] Loewe, S. (1953).
+#'    \href{https://www.ncbi.nlm.nih.gov/pubmed/13081480}{The problem of
+#'    synergism and antagonism of combined drugs.} Arzneimittelforschung,
+#'    3(6):285–290.
+#'    }
+#' }
 #'
 #' @export
 CalculateLoewe <- function (response.mat, quiet = TRUE, drug.col.type = NULL,
