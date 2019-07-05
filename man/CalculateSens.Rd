@@ -12,7 +12,9 @@ CalculateSens(df)
   \item \strong{dose} the concentrations of drugs.
   \item \strong{response} the response of cell lines at crresponding doses.
   We use inhibition rate of cell line growth to measure the response.
-}}
+}
+\strong{Note}: The input data frame must be sorted by "dose" with ascending
+order.}
 }
 \value{
 A number. The sensitivity score calculated from input dose-response
@@ -26,4 +28,9 @@ combination of drugs from dose response curve.
 This function measures the sensitivity by calculating the Area Under Curve
 (AUC) according to certurn dose response curve. The lower bouder is chosen at
 the first non-zero concentration in the dose response data.
+}
+\examples{
+df <- data.frame(dose = c(0, 0.1954, 0.7812, 3.125, 12.5, 50),
+                 response = c(2.95, 3.76, 18.13, 28.69, 46.66, 58.82))
+sensitivity <- CalculateSens(df)
 }

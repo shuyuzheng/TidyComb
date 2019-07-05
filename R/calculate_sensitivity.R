@@ -20,15 +20,22 @@
 #'   \item \strong{response} the response of cell lines at crresponding doses.
 #'   We use inhibition rate of cell line growth to measure the response.
 #' }
+#' \strong{Note}: The input data frame must be sorted by "dose" with ascending
+#' order.
 #'
 #' @return A number. The sensitivity score calculated from input dose-response
 #' data
 #'
 #' @export
+#'
+#' @examples
+#' df <- data.frame(dose = c(0, 0.1954, 0.7812, 3.125, 12.5, 50),
+#'                  response = c(2.95, 3.76, 18.13, 28.69, 46.66, 58.82))
+#' sensitivity <- CalculateSens(df)
 
 CalculateSens <- function(df) {
   #options(show.error.messages = FALSE)
-  df <- df[-which(df$dose == 0),]
+  df <- df[which(df$dose != 0),]
   if (nrow(df) == 1) {
     score <- df$response[1]
   } else {
@@ -45,8 +52,8 @@ CalculateSens <- function(df) {
                                 c = fitcoefs[2] / 100,
                                 b = fitcoefs[1],
                                 m = log10(fitcoefs[4]),
-                                c1 = log10(df$dose[1]),
-                                c2 = log10(df$dose[nrow(df)]),
+                                c1 = log10(min(df$dose)),
+                                c2 = log10(max(df$dose)),
                                 t = 0), 3)
     }, error = function(e) {
       # Skip zero conc, log, drc::L.4()
@@ -58,8 +65,8 @@ CalculateSens <- function(df) {
                                    c = fitcoefs[2] / 100,
                                    b = fitcoefs[1],
                                    e = fitcoefs[4],
-                                   c1 = log10(df$dose[1]),
-                                   c2 = log10(df$dose[nrow(df)]),
+                                   c1 = log10(min(df$dose)),
+                                   c2 = log10(max(df$dose)),
                                    t = 0), 3)
     }
     )
