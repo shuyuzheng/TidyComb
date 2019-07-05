@@ -4,15 +4,12 @@
 \alias{CalculateMat}
 \title{Chain all calculatrion about one dose-response matrix together}
 \usage{
-CalculateMat(response.mat, impute = TRUE, noise = TRUE, ...)
+CalculateMat(response.mat, noise = TRUE, ...)
 }
 \arguments{
 \item{response.mat}{A matrix contain the drug combination reaponse value.
 Its column names are doses of drug added along columns. Its row name are
 doses of drug added along rows.}
-
-\item{impute}{A logical function. It indicates whether or not imputing data
-to filling the "NA" values. Defult is \code{TRUE}.}
 
 \item{noise}{a logical value. It indicates whether or not adding noise to
 to the "response" values in the matrix. Default is \code{TRUE}.}
