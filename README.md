@@ -1,6 +1,6 @@
 [![Contributors][contributors-shield]][contributors-url]
 [![MPL2.0 License][license-shield]][license-url]
-[![Twitter][twitter-shield]]
+![Twitter][twitter-shield]
 
 
 <!-- PROJECT LOGO -->
