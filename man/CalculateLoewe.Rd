@@ -17,11 +17,11 @@ growth.}
 \item{quiet}{A logical value. If it is \code{TRUE} then the warning message
 will not show during calculation.}
 
-\item{drug.col.type}{(optional) a character. It indicates the model type used for
-fitting dose-response curve for drug added to columns.}
+\item{drug.col.type}{(optional) a character. It indicates the model type used
+for fitting dose-response curve for drug added to columns.}
 
-\item{drug.row.type}{(optional) a character. It indicates the model type used for
-fitting dose-response curve for drug added to rows.}
+\item{drug.row.type}{(optional) a character. It indicates the model type used
+for fitting dose-response curve for drug added to rows.}
 
 \item{drug.col.par}{(optional) a named vector. It contains the coeficients of
 fitted dose-response model for drug added to columns.}
@@ -43,7 +43,25 @@ Loewe in 1953.
 \details{
 This model is a reference model for evaluating the interaction between two
 drugs. The basic assumption of this model is "The referece effect of drug
-combination is the expected effect of a drug combined with itself". More
-details about this model could be found in original publication:
-\href{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-7348.1939.tb06990.x}{(Bliss, 1939)}.
+combination is the expected effect of a drug combined with itself".
+}
+\references{
+\itemize{
+   \item{Yadav B, Wennerberg K, Aittokallio T, Tang J.(2015).
+   \href{https://doi.org/10.1016/j.csbj.2015.09.001}{Searching for Drug
+   Synergy in Complex Dose-Response Landscape Using an Interaction Potency
+   Model.}Comput Struct Biotechnol J, 13:504– 513.}
+   \item{[Loewe, 1953] Loewe, S. (1953).
+   \href{https://www.ncbi.nlm.nih.gov/pubmed/13081480}{The problem of
+   synergism and antagonism of combined drugs.} Arzneimittelforschung,
+   3(6):285–290.
+   }
+}
+}
+\author{
+\itemize{
+   \item{Liye He \email{liye.he@helsinki.fi}}
+   \item{Jing Tang \email{jing.tang@helsinki.fi}}
+   \item{Shuyu Zheng \email{shuyu.zheng@helsinki.fi}}
+}
 }

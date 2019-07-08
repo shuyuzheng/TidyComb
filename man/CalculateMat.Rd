@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_pipeline.R
 \name{CalculateMat}
 \alias{CalculateMat}
-\title{Chain all calculatrion about one dose-response matrix together}
+\title{Chain all calculation about one dose-response matrix}
 \usage{
 CalculateMat(response.mat, noise = TRUE, ...)
 }
@@ -65,4 +65,7 @@ The steps for calculation:
     }
   \item Summarize and generate surface
 }
+}
+\author{
+Shuyu Zheng{shuyu.zheng@helsinki.fi}
 }

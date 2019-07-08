@@ -30,3 +30,6 @@ response model and generate the predict response value at the given dose.
 \code{method = "random"}. If the analysis requires for reproductiblity,
 plesase set the random seed before calling this function.
 }
+\author{
+Shuyu Zheng{shuyu.zheng@helsinki.fi}
+}
