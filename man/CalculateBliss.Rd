@@ -15,8 +15,6 @@ growth.}
 \value{
 A matrix for synergy score calculated via reference model introduced
 by C. I. Bliss.
-
-A matrix with
 }
 \description{
 \code{CalculateBliss} calculates the synergy score matrix for a block of
@@ -28,5 +26,23 @@ This model is a reference model for evaluating the interaction between two
 drugs. The basic assumption of this model is "The expected effect of two
 drugs acting independently". More details about this model could be found in
 original publication:
-\href{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-7348.1939.tb06990.x}{(Bliss, 1939)}.
+.
+}
+\references{
+\itemize{
+   \item{Yadav B, Wennerberg K, Aittokallio T, Tang J. (2015).
+   \href{https://doi.org/10.1016/j.csbj.2015.09.001}{Searching for Drug
+   Synergy in Complex Dose-Response Landscape Using an Interaction Potency
+   Model.} Comput Struct Biotechnol J, 13:504– 513.}
+   \item{Bliss, C. I. (1939).
+   \href{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-7348.1939.tb06990.x}{The
+   toxicity of poisons applied jointly.} Annals of Applied Biology,
+   26(3):585–615.}
+}
+}
+\author{
+\itemize{
+   \item{Liye He \email{liye.he@helsinki.fi}}
+   \item{Shuyu Zheng \email{shuyu.zheng@helsinki.fi}}
+}
 }
