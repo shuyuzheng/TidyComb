@@ -47,8 +47,12 @@ The steps for calculation:
 \enumerate{
   \item Pre-process Matrix
     \enumerate{
-      \item Impute for missing value in original matrix.
-      \item Add noise to original matrix.
+      \item Impute for missing values (with the average of values from the
+          nearest four cells) in original matrix by using function
+          \code{\link{ImputeNear}}.
+      \item Add noise(A small random number ranging from 0 to 0.001) to
+          original matrix by using function \code{line{AddNoise}}.
+      )
       \item Correct baseline to 0, if \code{correction} is \code{TRUE}.
     }
   \item Single drug process
