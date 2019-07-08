@@ -11,11 +11,8 @@
   <p align="center">
     Tidy drug combination high-throughput screening data for DrugComb portal
     <br />
-    <a href="https://github.com/shuyuzheng/TidyComb"><strong>Explore the docs »</strong></a>
+    <a href="https://drugcomb.fimm.fi"><strong>Explore DrugComb Portal »</strong></a>
     <br />
-    <br />
-    <a href="https://drugcomb.fimm.fi">DrugComb Portal</a>
-    ·
     <a href="https://github.com/shuyuzheng/TidyComb/issues">Report Bug</a>
     ·
     <a href="https://github.com/shuyuzheng/TidyComb/issues">Request Feature</a>
@@ -32,6 +29,7 @@
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
 * [Usage](#usage)
+* [Reference](#reference)
 * [License](#license)
 * [Contact](#contact)
 
@@ -69,10 +67,47 @@ install_github("shuyuzheng/TidyComb")
 
 ## Usage
 
+The functions in **TidyComb** can be devided into 2 categories:
 
-## Roadmap
+1. Functions for collecting information from external databases:
 
-## Contributing
+* [Pubmed](https://www.ncbi.nlm.nih.gov/pubmed)
+* [PubChem](https://pubchem.ncbi.nlm.nih.gov/)
+* [ChEMBL](https://www.ebi.ac.uk/chembl/)
+* [UniChem](https://www.ebi.ac.uk/unichem/)
+* [DrugBank](https://www.drugbank.ca/)
+* [Cellosaurus](https://web.expasy.org/cgi-bin/cellosaurus/search)
+
+The APIs used in those functions:
+
+* [PubMed Central APIs](https://www.ncbi.nlm.nih.gov/pmc/tools/developers/)
+* [PubChem PUG REST](https://pubchemdocs.ncbi.nlm.nih.gov/pug-rest)
+* [ChEMBL web services API](https://www.ebi.ac.uk/chembl/api/data/docs)
+* [UniChem RESTful Web Service API](https://www.ebi.ac.uk/unichem/info/webservices)
+
+2. Functions for analysizing drug synergy and sensitivity. Synergy scores are calculated using four different reference models:
+
+* Bliss model [Bliss, 1939][2] assumes a stochastic process in which two drugs elicit their effects independently, and the expected combination effect can be calculated based on the probability of independent events 
+* Highest Single Agent (HSA) [Berenbaum, 1989][3] states that the expected combination effect equals to the higher effect of individual drugs
+* Loewe additivity model [Loewe, 1953][4] defines the expected effect yLOEW E as if a drug was combined with itself. Unlike the HSA and the Bliss independence models giving a point estimate using different assumptions, the Loewe additivity model considers the dose-response curves of individual drugs.
+* Zero Interaction Potency (ZIP) [Yadav et al., 2015][5] calculates the expected effect of two drugs under the assumption that they do not potentiate each other.
+
+Sensitivity is calculated by CSS [Malyutina et al., 2019][6] - drug combination sensitivity score is derived using relative IC50 values of compounds and the area under their dose-response curves. 
+
+For more detail about using **TidyComb** please check `vignette`. Invoke R and then type:
+
+```
+vignette('TidyComb')
+```
+
+## Reference
+
+[1]: Zagidullin B., Aldahdooh J., Zheng S., Wang W., Wang Y., Saad J., Malyutina A., Jafari M., Tanoli Z., Pessia A., Tang J. (2019). DrugComb: an integrative cancer drug combination data portal, Nucleic Acids Research, 47(W1):W43-W51.
+[2]: Bliss, C. I. (1939). The toxicity of poisons applied jointly1. Annals of Applied Biology, 26(3):585–615.
+[3]: Berenbaum, M. C. (1989). What is synergy? Pharmacol. Rev., 41(2):93–141.
+[4]: Loewe, S. (1953). The problem of synergism and antagonism of combined drugs. Arzneimit- telforschung, 3(6):285–290.
+[5]: Yadav, B., Wennerberg, K., Aittokallio, T., and Tang, J. (2015). Searching for Drug Synergy in Complex Dose-Response Landscapes Using an Interaction Potency Model. Comput Struct Biotechnol J, 13:504– 513.
+[6]: Malyutina A., Majumder MM., Wang W., Pessia A., Heckman CA., Tang J. (2019). Drug combination sensitivity scoring facilitates the discovery of synergistic and efficacious drug combinations in cancer. PLoS Comput Biol, 15(5):e1006752. 
 
 ## License
 
