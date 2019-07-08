@@ -1,6 +1,6 @@
 [![Contributors][contributors-shield]][contributors-url]
 [![MPL2.0 License][license-shield]][license-url]
-[![LinkedIn][twitter-shield]][twitter-url]
+[![Twitter][twitter-shield]]
 
 
 <!-- PROJECT LOGO -->
@@ -92,8 +92,6 @@ Project Link: https://github.com/shuyuzheng/TidyComb
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/badge/contributors-1-orange.svg?style=flat-square
 [contributors-url]: https://github.com/shuyuzheng/TidyComb/graphs/contributors
-[license-shield]: https://img.shields.io/badge/license-MPL-2.0-blue.svg
+[license-shield]: https://img.shields.io/badge/license-MPL--2.0-blue.svg
 [license-url]: https://choosealicense.com/licenses/mpl-2.0
-[twitter-shield]: https://img.shields.io/badge/twitter/url/:protocol/:hostAndPath+.svg
-[twitter-url]: https://twitter.com/DrugComb
-
+[twitter-shield]: https://img.shields.io/twitter/follow/DrugComb.svg?label=Follow
