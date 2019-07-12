@@ -265,6 +265,8 @@ GetTissue <- function(node){
 #' which was extracted from Cellosaurus xml file.
 #'
 #' @return A character. The Cellosaurus accession ID of cell line
+#'
+#' @export
 GetAccession <- function(node){
   accession <- XML::xpathSApply(node,
                                 './accession-list/accession[@type="primary"]',
