@@ -7,9 +7,33 @@
 CalculateTemplate(template, debug = FALSE, ...)
 }
 \arguments{
-\item{template}{a dataframe in the format as template. Columns "block_id",
-"drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
-"conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.}
+\item{template}{a dataframe which must contains following columns:
+\itemize{
+ \item \emph{block_id}: (integer) the identifier for a drug combination.
+  If mul-tiple drug combinations are present, e.g. in the standard 384-well
+  platewhere 6 drug combinations are fitted, then the identifiers for each
+  of themmust be unique.
+  \item \emph{drug_col}: (character) the name of the drug on the columns in
+  adose-response matrix.
+  \item \emph{drug_row}: (character) the name of the drug on the rows in
+  adose-response matrix.
+  \item \emph{conc_c}: (numeric) the concentrations of the column drugs
+  in a combination.
+  \item \emph{conc_r}: (numeric) the concentrations of the row drugs
+  in a combination.
+  \item \emph{conc_c_unit}: (character) the unit of concentrations of the
+  column drugs. It is typically nM or \eqn{\mu}M.
+  \item \emph{conc_r_unit}: (character) the unit of concentrations of the
+  row drugs. It is typically nM or \eqn{\mu}M.
+  \item \emph{response}: (numeric) the effect of drug combinations at the
+  concentra-tions specified by conc_r and conc_c. The effect must be
+  normalized to \%inhibition based on the positive and
+  negative controls. For a well-controlled experiment, the range of the
+  response values is expected from 0 to 100. However, missing values or
+  extreme values are allowed.
+  \item \emph{cell_line_name}: (character) the name of cell lines on which
+  the drug combination was tested.
+}}
 
 \item{debug}{a logical value. If it is \code{TRUE}, block ID will be printed
 to console. The default setting is \code{FALSE}}
@@ -17,11 +41,10 @@ to console. The default setting is \code{FALSE}}
 \item{...}{Other arguments required by nested functions. Some important
 arguments are:
  \itemize{
-   \item \code{impute} and \code{noise} inherited from function
-         \code{CalculateMat};
-   \item \code{method} inherited from function \code{CorrectBaseLine};
+   \item \code{correction} and \code{noise} inherited from function
+         \code{\link{alculateMat}};
    \item \code{Emin} and \code{Emax} inherited from function
-         \code{FitDoseResponse}.
+         \code{\link{FitDoseResponse}}.
 }}
 }
 \value{
@@ -41,5 +64,5 @@ A list. It contains 4 tables:
 Calculate Drug Combination data in template format
 }
 \author{
-Shuyu Zheng{shuyu.zheng@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }
