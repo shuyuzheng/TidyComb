@@ -29,7 +29,8 @@
 #'       \item Add noise(A small random number ranging from 0 to 0.001) to
 #'           original matrix by using function \code{line{AddNoise}}.
 #'       )
-#'       \item Correct baseline to 0, if \code{correction} is \code{TRUE}.
+#'       \item Correct baseline using function \code{correction} with the method
+#'       selected by parameter \code{correction}.
 #'     }
 #'   \item Single drug process
 #'     \enumerate{
@@ -47,17 +48,27 @@
 #' }
 #' @param response.mat A matrix contain the drug combination reaponse value.
 #' Its column names are doses of drug added along columns. Its row name are
-#' doses of drug added along rows.
+#' doses of drug added along rows. \cr
+#' \strong{Note}: the matrix should be sorted by: 1. The concentrations along
+#' the column increase \emph{from left to right}; 2. The concentrations along
+#' the row increase \emph{from top to bottom}.
 #'
 #' @param noise a logical value. It indicates whether or not adding noise to
 #' to the "response" values in the matrix. Default is \code{TRUE}.
 #'
+#' @param correction a string. It indicates which method used by function
+#' \code{\link{CorrectBaseLine}} for base line correction.
+#'   \itemize{
+#'     \item \code{non}: no baseline correction;
+#'     \item \code{par}: only correct base line on negative values in the matrix;
+#'     \item \code{all}: correct base line on all the values in the matrix.
+#'   }
+#'
 #' @param ... Other argumants required by nested functions. Some important
 #' arguments are:
 #' \itemize{
-#'    \item \code{method} inherited from function \code{\link{CorrectBaseLine}};
 #'    \item \code{Emin} and \code{Emax} inherited from function
-#'          \code{FitDoseResponse}.
+#'          \code{link{FitDoseResponse}}.
 #' }
 #'
 #' @return It contains 4 tables:
@@ -68,17 +79,17 @@
 #'     blocks: synergy scores, css, dss, S
 #'     \item \strong{curve} It contains the coefficients from single drug dose
 #'     response curve.
-#'     \item \strong{surface} It contains the smoothed response value and
-#'     synergy scores of each drug dose response pair.
+#'     \item \strong{surface} It contains the smoothed response values and
+#'     synergy scores for plotting the scores' landscape.
 #'  }
 #'
-#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @importFrom magrittr %>%
 #'
 #' @export
 #'
-CalculateMat <- function(response.mat, noise = TRUE, ...) {
+CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
 
   options(scipen = 999)
 
@@ -96,7 +107,7 @@ CalculateMat <- function(response.mat, noise = TRUE, ...) {
 
   # 1.3. Correct baseline with corresponding "method". Available methods are
   #      "non", "part", "all".
-    response.mat <- CorrectBaseLine(response.mat, ...)
+    response.mat <- CorrectBaseLine(response.mat, method = correction, ...)
   # 2. Single drug process
   # 2.1. Fit single drug dose-response curve
   # drug_col
@@ -191,20 +202,44 @@ CalculateMat <- function(response.mat, noise = TRUE, ...) {
 
 #' Calculate Drug Combination data in template format
 #'
-#' @param template a dataframe in the format as template. Columns "block_id",
-#' "drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
-#' "conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.
+#' @param template a dataframe which must contains following columns:
+#'  \itemize{
+#'   \item \emph{block_id}: (integer) the identifier for a drug combination.
+#'    If mul-tiple drug combinations are present, e.g. in the standard 384-well
+#'    platewhere 6 drug combinations are fitted, then the identifiers for each
+#'    of themmust be unique.
+#'    \item \emph{drug_col}: (character) the name of the drug on the columns in
+#'    adose-response matrix.
+#'    \item \emph{drug_row}: (character) the name of the drug on the rows in
+#'    adose-response matrix.
+#'    \item \emph{conc_c}: (numeric) the concentrations of the column drugs
+#'    in a combination.
+#'    \item \emph{conc_r}: (numeric) the concentrations of the row drugs
+#'    in a combination.
+#'    \item \emph{conc_c_unit}: (character) the unit of concentrations of the
+#'    column drugs. It is typically nM or \eqn{\mu}M.
+#'    \item \emph{conc_r_unit}: (character) the unit of concentrations of the
+#'    row drugs. It is typically nM or \eqn{\mu}M.
+#'    \item \emph{response}: (numeric) the effect of drug combinations at the
+#'    concentra-tions specified by conc_r and conc_c. The effect must be
+#'    normalized to \%inhibition based on the positive and
+#'    negative controls. For a well-controlled experiment, the range of the
+#'    response values is expected from 0 to 100. However, missing values or
+#'    extreme values are allowed.
+#'    \item \emph{cell_line_name}: (character) the name of cell lines on which
+#'    the drug combination was tested.
+#'  }
 #'
 #' @param debug a logical value. If it is \code{TRUE}, block ID will be printed
 #'    to console. The default setting is \code{FALSE}
+#'
 #' @param ... Other arguments required by nested functions. Some important
 #' arguments are:
 #'  \itemize{
-#'    \item \code{impute} and \code{noise} inherited from function
-#'          \code{CalculateMat};
-#'    \item \code{method} inherited from function \code{CorrectBaseLine};
+#'    \item \code{correction} and \code{noise} inherited from function
+#'          \code{\link{alculateMat}};
 #'    \item \code{Emin} and \code{Emax} inherited from function
-#'          \code{FitDoseResponse}.
+#'          \code{\link{FitDoseResponse}}.
 #' }
 #'
 #' @return A list. It contains 4 tables:
@@ -219,21 +254,20 @@ CalculateMat <- function(response.mat, noise = TRUE, ...) {
 #'     synergy scores of each drug dose response pair.
 #'  }
 #'
-#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
 #' @export
-CalculateTemplate <- function(template, debug = FALSE, ...) {
+CalculateTemplate <- function(template, debug=FALSE, ...) {
   if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
              "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",
              "drug_col") %in%
            colnames(template)))
-    stop("The input data must contain the following columns: ",
-         "block_id, drug_row, drug_col, response,\n",
-         "conc_r, conc_c, conc_r_unit, conc_c_unit, \n",
-         "cell_line_name.")
+    stop("The input data must contain the following columns: block_id, ",
+         "drug_row, drug_col, response, conc_r, conc_c, conc_r_unit, ",
+         "conc_c_unit, cell_line_name.")
   set.seed(1)
   blocks <- unique(template$block_id)
 

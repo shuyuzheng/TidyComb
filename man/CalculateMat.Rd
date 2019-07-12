@@ -4,22 +4,32 @@
 \alias{CalculateMat}
 \title{Chain all calculation about one dose-response matrix}
 \usage{
-CalculateMat(response.mat, noise = TRUE, ...)
+CalculateMat(response.mat, noise = TRUE, correction = "non", ...)
 }
 \arguments{
 \item{response.mat}{A matrix contain the drug combination reaponse value.
 Its column names are doses of drug added along columns. Its row name are
-doses of drug added along rows.}
+doses of drug added along rows. \cr
+\strong{Note}: the matrix should be sorted by: 1. The concentrations along
+the column increase \emph{from left to right}; 2. The concentrations along
+the row increase \emph{from top to bottom}.}
 
 \item{noise}{a logical value. It indicates whether or not adding noise to
 to the "response" values in the matrix. Default is \code{TRUE}.}
 
+\item{correction}{a string. It indicates which method used by function
+\code{\link{CorrectBaseLine}} for base line correction.
+  \itemize{
+    \item \code{non}: no baseline correction;
+    \item \code{par}: only correct base line on negative values in the matrix;
+    \item \code{all}: correct base line on all the values in the matrix.
+  }}
+
 \item{...}{Other argumants required by nested functions. Some important
 arguments are:
 \itemize{
-   \item \code{method} inherited from function \code{\link{CorrectBaseLine}};
    \item \code{Emin} and \code{Emax} inherited from function
-         \code{FitDoseResponse}.
+         \code{link{FitDoseResponse}}.
 }}
 }
 \value{
@@ -31,8 +41,8 @@ It contains 4 tables:
     blocks: synergy scores, css, dss, S
     \item \strong{curve} It contains the coefficients from single drug dose
     response curve.
-    \item \strong{surface} It contains the smoothed response value and
-    synergy scores of each drug dose response pair.
+    \item \strong{surface} It contains the smoothed response values and
+    synergy scores for plotting the scores' landscape.
  }
 }
 \description{
@@ -53,7 +63,8 @@ The steps for calculation:
       \item Add noise(A small random number ranging from 0 to 0.001) to
           original matrix by using function \code{line{AddNoise}}.
       )
-      \item Correct baseline to 0, if \code{correction} is \code{TRUE}.
+      \item Correct baseline using function \code{correction} with the method
+      selected by parameter \code{correction}.
     }
   \item Single drug process
     \enumerate{
@@ -71,5 +82,5 @@ The steps for calculation:
 }
 }
 \author{
-Shuyu Zheng{shuyu.zheng@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }
