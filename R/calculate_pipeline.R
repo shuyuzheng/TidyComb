@@ -93,6 +93,12 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
 
   options(scipen = 999)
 
+  # 0. Check input data
+  if (!is.matrix(response.mat)) {
+    warning("Input data is not 'matrix'. Trying to transform it.")
+    response.mat <- as.matrix(response.mat)
+  }
+
   # 1. Pre-processing
   # 1.1 Impute data until there is no missing value in the response matrix
   while (sum(is.na(response.mat))) {
@@ -103,7 +109,6 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
   if (noise) {
     response.mat <- AddNoise(response.mat, method = "random")
   }
-
 
   # 1.3. Correct baseline with corresponding "method". Available methods are
   #      "non", "part", "all".
