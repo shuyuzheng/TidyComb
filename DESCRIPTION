@@ -30,7 +30,9 @@ Imports:
     utils,
     foreach,
     doParallel,
-    rlang
+    rlang,
+    adabag,
+    ape
 RoxygenNote: 6.1.1
 Suggests: 
     testthat,
