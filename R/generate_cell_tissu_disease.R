@@ -93,6 +93,7 @@ GenerateCell <- function(acc, file){
   } else {
     cell <- GetCell(doc, ids = as.character(exist.cell$new), type = "accession")
     names <- GetCellInfo(cell, "name")
+
     dis <- GetCellInfo(cell, "disease")
     dis.uni <- unique(dis)
     tis <- GetCellInfo(cell, "tissue")

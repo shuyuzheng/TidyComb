@@ -178,7 +178,7 @@ GetCellName <- function(node) {
   name <- name.list[1,]
   synonyms <- sapply(name.list,
                      function(x) {
-                       paste(x[-1], collapse = "; ")
+                       paste(x, collapse = "; ")
                      })
   names <- cbind(name = name, synonyms = synonyms)
   return(names)
