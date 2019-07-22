@@ -14,13 +14,8 @@ tissue <- read.csv("data-raw/tissue.csv",
                    stringsAsFactors = FALSE,
                    header = FALSE,
                    col.names = c("id", "name"))
-study <- read.csv("data-raw/study.csv",
-                  stringsAsFactors = FALSE,
-                  header = FALSE,
-                  col.names = "id")
 drugcomb <- list(cell_line = cell_line,
                  drug = drug,
                  disease = disease,
-                 tissue = tissue,
-                 study = study)
+                 tissue = tissue)
 usethis::use_data(drugcomb, overwrite = TRUE, internal = TRUE)
