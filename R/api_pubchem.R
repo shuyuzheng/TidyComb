@@ -330,6 +330,54 @@ GetPubSynonymFromName <- function(names) {
   return(df)
 }
 
+#' Get "Preferred Compound" of "Non-live" compounds in PubChem
+#'
+#' Fuction \code{UpdateCid} takes CIDs as input. If inputted compounds was
+#' labeled as "Non-live" in PubChem, the CID of the "preferred Compound" will
+#' be returned. If the inputted CID is still "live" in PubChem, \code{NA} will
+#' be returned.
+#'
+#' @param cids a vector contains the CIDs of drugs on which test will be done.
+#'
+#' @return a data frame contains 2 columns:
+#'   \itemize{
+#'     \item \strong{old_cid} The inputted CIDs.
+#'     \item \strong{new_cid} If the tested compound is "Non-live", it is the
+#'     CID of "preferred compound". If the tested compound is still "live", it
+#'     is \code{NA}.
+#'   }
+#'
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @export
+#'
+#' @examples
+#' res <- UpdateCid(1:10)
+UpdateCid <- function(cids) {
+  url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/",
+                     "compound/%s/JSON")
+  output <- NULL
+
+    for (cid in cids) {
+      tmp <- data.frame(old_cid = cid, new_cid = NA, stringsAsFactors = FALSE)
+      new_cid <- NA
+      tryCatch({
+        url <- sprintf(url.base, cid)
+        res <- jsonlite::fromJSON(url)
+        if ("Preferred Compound" %in% res$Record$Section$TOCHeading) {
+          new_cid <- res$Record$Section$Information[[1]]$Value$Number
+        }
+      }, error = function(e) {
+        print(e)
+      }, finally = Sys.sleep(0.2)
+      )
+
+      tmp$new_cid <- new_cid
+      output <- rbind.data.frame(output, tmp)
+    }
+
+  gc()
+  return(output)
+}
 # GetPubIDs <- fuction(cids) {
 #   url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/",
 #                      "%s", "/xrefs/SourceName,RegistryID/JSON")
