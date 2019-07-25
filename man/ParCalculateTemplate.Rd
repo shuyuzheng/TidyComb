@@ -30,7 +30,7 @@ A list. It contains 4 tables:
     \item \strong{synergy} It contains the modified response value and 4
     type of synergy scores of each drug dose response pair.
     \item \strong{summary} It contains summarized information of each
-    blocks: synergy scores, css, dss, S
+    blocks: synergy scores, css, ri, S
     \item \strong{curve} It contains the coefficients from single drug dose
     response curve.
     \item \strong{surface} It contains the smoothed response value and
@@ -39,6 +39,11 @@ A list. It contains 4 tables:
 }
 \description{
 Parallel Calculate Drug Combination data in template format
+}
+\examples{
+data <- read.csv(system.file("template.csv", package = "TidyComb"),
+                 stringsAsFactors = FALSE)
+res <- ParCalculateTemplate(data, cores = 4)
 }
 \author{
 Shuyu Zheng{shuyu.zheng@helsinki.fi}
