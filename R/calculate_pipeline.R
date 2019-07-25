@@ -16,7 +16,7 @@
 #' \code{CalculateMat} chains all calculations about one dose-response matrix (
 #' one drug-drug interaction block) together. The calculations includes:
 #' dose-response curve fitting, synergy scores (ZIP, Bliss, Loewe,
-#' HSA), drug sensitivity (DSS, CSS), generate drug-drug response surface and
+#' HSA), drug sensitivity (RI, CSS), generate drug-drug response surface and
 #' generating summary scores for each block.
 #'
 #' The steps for calculation:
@@ -36,7 +36,7 @@
 #'     \enumerate{
 #'       \item Extract and fitting single drugs.
 #'       \item Extract coeficients from fitted model. (b, c, d, e, IC50)
-#'       \item Calculate DSS
+#'       \item Calculate RI
 #'     }
 #'   \item Whole response matrix process
 #'     \enumerate{
@@ -76,7 +76,7 @@
 #'     \item \strong{synergy} It contains the modified response value and 4
 #'     type of synergy scores of each drug dose response pair.
 #'     \item \strong{summary} It contains summarized information of each
-#'     blocks: synergy scores, css, dss, S
+#'     blocks: synergy scores, css, ri, S
 #'     \item \strong{curve} It contains the coefficients from single drug dose
 #'     response curve.
 #'     \item \strong{surface} It contains the smoothed response values and
@@ -89,6 +89,12 @@
 #'
 #' @export
 #'
+#' @examples
+#' data <- read.csv(system.file("template.csv", package = "TidyComb"),
+#'                  stringsAsFactors = FALSE)
+#' response.mat <- reshape2::acast(conc_r~conc_c, value.var = "response",
+#'                                 data = data[data$block_id == 1, ])
+#' res <- CalculateMat(response.mat)
 CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
 
   options(scipen = 999)
@@ -106,6 +112,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
   }
 
   # 1.2. Add random noise to original matrix
+  set.seed(1)
   if (noise) {
     response.mat <- AddNoise(response.mat, method = "random")
   }
@@ -136,10 +143,10 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
     curves$model <- c(col.type, row.type)
   curves$dim <- c("col", "row")
 
-  # 2.3 Calculate DSS (using single drug response but without that at 0
+  # 2.3 Calculate RI (using single drug response but without that at 0
   # concentration)
-  col.dss <- CalculateSens(drug.col)
-  row.dss <- CalculateSens(drug.row)
+  col.ri <- CalculateSens(drug.col)
+  row.ri <- CalculateSens(drug.row)
 
   # 3. whole matrix process
   # 3.1 Calculate synergyscores
@@ -186,7 +193,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
 
   css <- mean(c(col.css, row.css), na.rm = TRUE)
 
-  S <- css - sum(col.dss, row.dss)
+  S <- css - sum(col.ri, row.ri)
 
   sum <- synergy %>%
     dplyr::filter(conc_r != 0 & conc_c != 0) %>%
@@ -194,7 +201,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
     apply(2, mean, na.rm = TRUE)
 
   sum <- data.frame(t(sum), ic50_row = row.ic50 , ic50_col = col.ic50,
-                    dss_row = row.dss, dss_col = col.dss, css_row = row.css,
+                    ri_row = row.ri, ri_col = col.ri, css_row = row.css,
                     css_col = col.css, css = css, S = S)
 
   res <- list(synergy = synergy, surface = surface,
@@ -203,6 +210,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
 
   # clean up
   gc()
+  rm(.Random.seed)
 }
 
 #' Calculate Drug Combination data in template format
@@ -252,7 +260,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
 #'     \item \strong{synergy} It contains the modified response value and 4
 #'     type of synergy scores of each drug dose response pair.
 #'     \item \strong{summary} It contains summarized information of each
-#'     blocks: synergy scores, css, dss, S
+#'     blocks: synergy scores, css, ri, S
 #'     \item \strong{curve} It contains the coefficients from single drug dose
 #'     response curve.
 #'     \item \strong{surface} It contains the smoothed response value and
@@ -265,6 +273,10 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
 #' @importFrom rlang .data
 #'
 #' @export
+#' @examples
+#' data <- read.csv(system.file("template.csv", package = "TidyComb"),
+#'                  stringsAsFactors = FALSE)
+#' res <- CalculateTemplate(data)
 CalculateTemplate <- function(template, debug=FALSE, ...) {
   if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
              "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",
@@ -273,7 +285,6 @@ CalculateTemplate <- function(template, debug=FALSE, ...) {
     stop("The input data must contain the following columns: block_id, ",
          "drug_row, drug_col, response, conc_r, conc_c, conc_r_unit, ",
          "conc_c_unit, cell_line_name.")
-  set.seed(1)
   blocks <- unique(template$block_id)
 
   # generate container
@@ -290,8 +301,8 @@ CalculateTemplate <- function(template, debug=FALSE, ...) {
   summary <- data.frame(block_id = integer(), synergy_zip = numeric(),
                         synergy_bliss = numeric(), synergy_hsa = numeric(),
                         synergy_loewe = numeric(), ic50_row = numeric() ,
-                        ic50_col = numeric(), dss_row = numeric(),
-                        dss_col = numeric(), css_row = numeric(),
+                        ic50_col = numeric(), ri_row = numeric(),
+                        ri_col = numeric(), css_row = numeric(),
                         css_col = numeric(), css = numeric(), S = numeric(),
                         stringsAsFactors = FALSE)
 
@@ -362,7 +373,6 @@ CalculateTemplate <- function(template, debug=FALSE, ...) {
 
   return(list(synergy = synergy, surface = surface,
               curve = curve, summary = summary))
-  rm(.Random.seed)
 }
 
 multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
@@ -403,7 +413,7 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #'     \item \strong{synergy} It contains the modified response value and 4
 #'     type of synergy scores of each drug dose response pair.
 #'     \item \strong{summary} It contains summarized information of each
-#'     blocks: synergy scores, css, dss, S
+#'     blocks: synergy scores, css, ri, S
 #'     \item \strong{curve} It contains the coefficients from single drug dose
 #'     response curve.
 #'     \item \strong{surface} It contains the smoothed response value and
@@ -416,6 +426,10 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #' @importFrom foreach %dopar%
 #'
 #' @export
+#' @examples
+#' data <- read.csv(system.file("template.csv", package = "TidyComb"),
+#'                  stringsAsFactors = FALSE)
+#' res <- ParCalculateTemplate(data, cores = 4)
 ParCalculateTemplate <- function(template, cores = 1, ...) {
   if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
              "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",

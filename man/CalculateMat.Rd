@@ -38,7 +38,7 @@ It contains 4 tables:
     \item \strong{synergy} It contains the modified response value and 4
     type of synergy scores of each drug dose response pair.
     \item \strong{summary} It contains summarized information of each
-    blocks: synergy scores, css, dss, S
+    blocks: synergy scores, css, ri, S
     \item \strong{curve} It contains the coefficients from single drug dose
     response curve.
     \item \strong{surface} It contains the smoothed response values and
@@ -49,7 +49,7 @@ It contains 4 tables:
 \code{CalculateMat} chains all calculations about one dose-response matrix (
 one drug-drug interaction block) together. The calculations includes:
 dose-response curve fitting, synergy scores (ZIP, Bliss, Loewe,
-HSA), drug sensitivity (DSS, CSS), generate drug-drug response surface and
+HSA), drug sensitivity (RI, CSS), generate drug-drug response surface and
 generating summary scores for each block.
 }
 \details{
@@ -70,7 +70,7 @@ The steps for calculation:
     \enumerate{
       \item Extract and fitting single drugs.
       \item Extract coeficients from fitted model. (b, c, d, e, IC50)
-      \item Calculate DSS
+      \item Calculate RI
     }
   \item Whole response matrix process
     \enumerate{
@@ -80,6 +80,13 @@ The steps for calculation:
     }
   \item Summarize and generate surface
 }
+}
+\examples{
+data <- read.csv(system.file("template.csv", package = "TidyComb"),
+                 stringsAsFactors = FALSE)
+response.mat <- reshape2::acast(conc_r~conc_c, value.var = "response",
+                                data = data[data$block_id == 1, ])
+res <- CalculateMat(response.mat)
 }
 \author{
 Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
