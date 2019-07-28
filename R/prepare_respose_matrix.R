@@ -110,11 +110,13 @@ AddNoise <- function(response.mat, method) {
 #' @export
 ExtractSingleDrug <- function(response.mat, dim = "row") {
   if (dim == "row") {
-    single.drug <- data.frame(response = response.mat[, "0"],
-                              dose = as.numeric(rownames(response.mat)))
+    dose <- as.numeric(rownames(response.mat))
+    single.drug <- data.frame(response = response.mat[, dose == 0],
+                              dose = dose)
   } else if (dim == "col") {
-    single.drug <- data.frame(response = response.mat["0", ],
-                              dose = as.numeric(colnames(response.mat)))
+    dose <- as.numeric(colnames(response.mat))
+    single.drug <- data.frame(response = response.mat[dose == 0, ],
+                              dose = dose)
   } else {
     stop("Values for 'dim' should be eighther 'row' or 'col'!")
   }

@@ -41,12 +41,12 @@ smoothing <-  function (scores.mat, len = 2) {
   extend.row.dose <- mapply(function(x, y){seq(from = x, to = y,
                                                length.out = len + 2)},
                             row.dose[-nr], row.dose[-1])
-  extend.row.dose <- unique(round(c(extend.row.dose), 8))
+  extend.row.dose <- c(extend.row.dose[1, 1], extend.row.dose[-1, ])
 
   extend.col.dose <- mapply(function(x, y){seq(from = x, to = y,
                                                length.out = len + 2)},
                             col.dose[-nc], col.dose[-1])
-  extend.col.dose <- unique(round(c(extend.col.dose), 8))
+  extend.col.dose <- c(extend.col.dose[1, 1], extend.col.dose[-1, ])
 
   rownames(extended.scores) <- extend.row.dose
   colnames(extended.scores) <- extend.col.dose
