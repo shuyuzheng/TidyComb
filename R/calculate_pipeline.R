@@ -54,7 +54,7 @@
 #' the row increase \emph{from top to bottom}.
 #'
 #' @param noise a logical value. It indicates whether or not adding noise to
-#' to the "response" values in the matrix. Default is \code{TRUE}.
+#' to the "inhibition" values in the matrix. Default is \code{TRUE}.
 #'
 #' @param correction a string. It indicates which method used by function
 #' \code{\link{CorrectBaseLine}} for base line correction.
@@ -73,13 +73,13 @@
 #'
 #' @return It contains 4 tables:
 #'   \itemize{
-#'     \item \strong{synergy} It contains the modified response value and 4
+#'     \item \strong{synergy} It contains the modified inhibition value and 4
 #'     type of synergy scores of each drug dose response pair.
 #'     \item \strong{summary} It contains summarized information of each
 #'     blocks: synergy scores, css, ri, S
 #'     \item \strong{curve} It contains the coefficients from single drug dose
 #'     response curve.
-#'     \item \strong{surface} It contains the smoothed response values and
+#'     \item \strong{surface} It contains the smoothed inhibition values and
 #'     synergy scores for plotting the scores' landscape.
 #'  }
 #'
@@ -92,7 +92,7 @@
 #' @examples
 #' data <- read.csv(system.file("template.csv", package = "TidyComb"),
 #'                  stringsAsFactors = FALSE)
-#' response.mat <- reshape2::acast(conc_r~conc_c, value.var = "response",
+#' response.mat <- reshape2::acast(conc_r~conc_c, value.var = "inhibition",
 #'                                 data = data[data$block_id == 1, ])
 #' res <- CalculateMat(response.mat)
 CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
@@ -162,7 +162,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
   synergy <- Reduce(function(x, y) {
     merge(x = x, y = y, by = c("Var1", "Var2"))}, synergy)
 
-  colnames(synergy) <- c("conc_r", "conc_c", "response", "synergy_zip",
+  colnames(synergy) <- c("conc_r", "conc_c", "inhibition", "synergy_zip",
                          "synergy_loewe", "synergy_hsa", "synergy_bliss")
 
   # 3.2 calculate surface
@@ -177,7 +177,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
   surface <- Reduce(function(x, y) {
     merge(x = x, y = y, by = c("Var1", "Var2"))}, surface)
 
-  colnames(surface) <- c("conc_r", "conc_c", "response", "synergy_zip",
+  colnames(surface) <- c("conc_r", "conc_c", "inhibition", "synergy_zip",
                          "synergy_loewe", "synergy_hsa", "synergy_bliss")
 
   # 3.3 Calculate CSS
@@ -197,7 +197,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
 
   sum <- synergy %>%
     dplyr::filter(conc_r != 0 & conc_c != 0) %>%
-    dplyr::select(-conc_r, -conc_c, -response) %>%
+    dplyr::select(-conc_r, -conc_c, -inhibition) %>%
     apply(2, mean, na.rm = TRUE)
 
   sum <- data.frame(t(sum), ic50_row = row.ic50 , ic50_col = col.ic50,
@@ -278,18 +278,12 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
 #'                  stringsAsFactors = FALSE)
 #' res <- CalculateTemplate(data)
 CalculateTemplate <- function(template, debug=FALSE, ...) {
-  if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
-             "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",
-             "drug_col") %in%
-           colnames(template)))
-    stop("The input data must contain the following columns: block_id, ",
-         "drug_row, drug_col, response, conc_r, conc_c, conc_r_unit, ",
-         "conc_c_unit, cell_line_name.")
+  CheckTemplate(template)
   blocks <- unique(template$block_id)
 
   # generate container
   synergy <- data.frame(block_id = integer(), conc_r = numeric(),
-                        conc_c = numeric(), response = numeric(),
+                        conc_c = numeric(), inhibition = numeric(),
                         synergy_zip = numeric(), synergy_bliss = numeric(),
                         synergy_loewe = numeric(), synergy_hsa = numeric(),
                         stringsAsFactors = FALSE)
@@ -316,8 +310,8 @@ CalculateTemplate <- function(template, debug=FALSE, ...) {
       dplyr::filter(block_id == block)
 
     response.mat <- response %>%
-      dplyr::select(conc_r, conc_c, response) %>%
-      reshape2::acast(conc_r ~ conc_c, value.var = "response")
+      dplyr::select(conc_r, conc_c, inhibition) %>%
+      reshape2::acast(conc_r ~ conc_c, value.var = "inhibition")
 
     # 2. Do calculation on matrix (with error control)
     tmp <- tryCatch({
@@ -392,7 +386,7 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #' Parallel Calculate Drug Combination data in template format
 #'
 #' @param template a dataframe in the format as template. Columns "block_id",
-#' "drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
+#' "drug_row", "drug_col", "inhibition", "conc_r", "conc_c", "conc_r_unit",
 #' "conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.
 #'
 #' @param cores A integer. It indicates number of cores would be allocated to
@@ -410,13 +404,13 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #'
 #' @return A list. It contains 4 tables:
 #'   \itemize{
-#'     \item \strong{synergy} It contains the modified response value and 4
+#'     \item \strong{synergy} It contains the modified inhibition value and 4
 #'     type of synergy scores of each drug dose response pair.
 #'     \item \strong{summary} It contains summarized information of each
 #'     blocks: synergy scores, css, ri, S
 #'     \item \strong{curve} It contains the coefficients from single drug dose
 #'     response curve.
-#'     \item \strong{surface} It contains the smoothed response value and
+#'     \item \strong{surface} It contains the smoothed inhibition value and
 #'     synergy scores of each drug dose response pair.
 #'  }
 #'
@@ -431,14 +425,6 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #'                  stringsAsFactors = FALSE)
 #' res <- ParCalculateTemplate(data, cores = 4)
 ParCalculateTemplate <- function(template, cores = 1, ...) {
-  if (!all(c("block_id", "drug_row", "drug_col", "response", "conc_r", "conc_c",
-             "conc_r_unit", "conc_c_unit","cell_line_name", "drug_row",
-             "drug_col") %in%
-           colnames(template)))
-    stop("The input data must contain the following columns: ",
-         "block_id, drug_row, drug_col, response,\n",
-         "conc_r, conc_c, conc_r_unit, conc_c_unit, \n",
-         "cell_line_name.")
 
   blocks <- unique(template$block_id)
 
@@ -453,8 +439,8 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
       dplyr::filter(block_id == blocks[i])
 
     response.mat <- response %>%
-      dplyr::select(conc_r, conc_c, response) %>%
-      reshape2::acast(conc_r ~ conc_c, value.var = "response")
+      dplyr::select(conc_r, conc_c, inhibition) %>%
+      reshape2::acast(conc_r ~ conc_c, value.var = "inhibition")
 
     # 2. Do calculation on matrix
     tmp <- CalculateMat(response.mat = response.mat, ...)
