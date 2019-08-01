@@ -15,7 +15,7 @@ the column increase \emph{from left to right}; 2. The concentrations along
 the row increase \emph{from top to bottom}.}
 
 \item{noise}{a logical value. It indicates whether or not adding noise to
-to the "response" values in the matrix. Default is \code{TRUE}.}
+to the "inhibition" values in the matrix. Default is \code{TRUE}.}
 
 \item{correction}{a string. It indicates which method used by function
 \code{\link{CorrectBaseLine}} for base line correction.
@@ -35,13 +35,13 @@ arguments are:
 \value{
 It contains 4 tables:
   \itemize{
-    \item \strong{synergy} It contains the modified response value and 4
+    \item \strong{synergy} It contains the modified inhibition value and 4
     type of synergy scores of each drug dose response pair.
     \item \strong{summary} It contains summarized information of each
     blocks: synergy scores, css, ri, S
     \item \strong{curve} It contains the coefficients from single drug dose
     response curve.
-    \item \strong{surface} It contains the smoothed response values and
+    \item \strong{surface} It contains the smoothed inhibition values and
     synergy scores for plotting the scores' landscape.
  }
 }
@@ -84,7 +84,7 @@ The steps for calculation:
 \examples{
 data <- read.csv(system.file("template.csv", package = "TidyComb"),
                  stringsAsFactors = FALSE)
-response.mat <- reshape2::acast(conc_r~conc_c, value.var = "response",
+response.mat <- reshape2::acast(conc_r~conc_c, value.var = "inhibition",
                                 data = data[data$block_id == 1, ])
 res <- CalculateMat(response.mat)
 }

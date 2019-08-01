@@ -425,7 +425,7 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #'                  stringsAsFactors = FALSE)
 #' res <- ParCalculateTemplate(data, cores = 4)
 ParCalculateTemplate <- function(template, cores = 1, ...) {
-
+  CheckTemplate(template)
   blocks <- unique(template$block_id)
 
   cl <- parallel::makeForkCluster(cores)

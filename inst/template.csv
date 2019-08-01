@@ -1,4 +1,4 @@
-block_id,conc_r,conc_c,response,drug_row,drug_col,conc_r_unit,conc_c_unit,cell_line_name,drug_row_cid,drug_col_cid
+block_id,conc_r,conc_c,inhibition,drug_row,drug_col,conc_r_unit,conc_c_unit,cell_line_name,drug_row_cid,drug_col_cid
 62898,0,0,0,(-)-BLEBBISTATIN,TEMOZOLOMIDE,uM,uM,U87,5287792,5394
 62898,0,400,6.892556744,(-)-BLEBBISTATIN,TEMOZOLOMIDE,uM,uM,U87,5287792,5394
 62898,5,0,-87.25139276,(-)-BLEBBISTATIN,TEMOZOLOMIDE,uM,uM,U87,5287792,5394
