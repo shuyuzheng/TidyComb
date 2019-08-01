@@ -8,7 +8,7 @@ ParCalculateTemplate(template, cores = 1, ...)
 }
 \arguments{
 \item{template}{a dataframe in the format as template. Columns "block_id",
-"drug_row", "drug_col", "response", "conc_r", "conc_c", "conc_r_unit",
+"drug_row", "drug_col", "inhibition", "conc_r", "conc_c", "conc_r_unit",
 "conc_c_unit","cell_line_name", "drug_row", "drug_col" are reqired.}
 
 \item{cores}{A integer. It indicates number of cores would be allocated to
@@ -27,13 +27,13 @@ arguments are:
 \value{
 A list. It contains 4 tables:
   \itemize{
-    \item \strong{synergy} It contains the modified response value and 4
+    \item \strong{synergy} It contains the modified inhibition value and 4
     type of synergy scores of each drug dose response pair.
     \item \strong{summary} It contains summarized information of each
     blocks: synergy scores, css, ri, S
     \item \strong{curve} It contains the coefficients from single drug dose
     response curve.
-    \item \strong{surface} It contains the smoothed response value and
+    \item \strong{surface} It contains the smoothed inhibition value and
     synergy scores of each drug dose response pair.
  }
 }
