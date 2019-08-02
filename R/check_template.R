@@ -3,11 +3,15 @@
 #' \code{CheckTemplate} function check the template inputted from users to
 #' ensure they are acceptable to downstream functions.
 #'
+#' @details Function \code{CheckTemplate} checks the template file inputted by
+#' users. If the template contains problems, an error will raise and a message
+#' will given to user for checking their files.
+#'
 #' @param template a data frame. It is the input data from users for analysis
 #'
 #' @return Non
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #' @export
-#'
 #' @examples
 #' data <- read.csv(system.file("template.csv", package = "TidyComb"),
 #'                  stringsAsFactors = FALSE)
@@ -19,6 +23,7 @@
 #' CheckTemplate(data_m)
 #'
 CheckTemplate <- function(template){
+
   # Column names
   missing_col <- setdiff(c("block_id", "drug_row", "drug_col", "inhibition",
                            "conc_r", "conc_c", "conc_r_unit", "conc_c_unit",
@@ -80,4 +85,6 @@ CheckTemplate <- function(template){
          "Analysis function can not handle replicate data right now. Please ",
          "remove the duplicated rows and re-upload the data.")
   }
+
+  gc()
 }
