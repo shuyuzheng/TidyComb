@@ -4,8 +4,18 @@
 #
 # Functions on this page:
 #
+# Exported:
+#
+# CalculateSens: Calculate sensitivity score (relative inhibition)
+# ImputeIC50: Impute missing value at IC50 concentration of drug
+# PredictResponse: Predict response value at certain drug dose
+#
+# Internal:
+# scoreCurve/scoreCurve.L4: facility functions for CalculateSens
+# own_log/own_log2: facility functions for CalculateSens
+# CalculateIC50: Transform IC50 from coefficients from FitDoseResponse function
 
-#' Calculate sensitivity score
+#' Calculate sensitivity score (relative inhibition)
 #'
 #' Function \code{CalculateSens} calculates cell line sensitivity to a drug or a
 #' combination of drugs from dose response curve.
@@ -205,4 +215,63 @@ ImputeIC50 <- function(response.mat, col.ic50, row.ic50) {
 
   # Clean up
   gc()
+}
+
+CalculateIC50 <- function(coef, type, max.conc){
+  if (type == "LL.4") {
+    ic50 <- coef[["e:(Intercept)"]]
+  } else if (type == "L.4") {
+    ic50 <- exp(coef[["e:(Intercept)"]])
+  }
+
+  if (ic50 > max.conc) {
+    ic50 = max.conc
+  }
+
+  return (ic50)
+
+}
+
+#' Predict response value at certain drug dose
+#'
+#' \code{PredictResponse} uses \code{\link[drc]{drm}} function to fit the dose
+#' response model and generate the predict response value at the given dose.
+#'
+#' \strong{Note}: Random number generator used in \code{AddNoise} with
+#' \code{method = "random"}. If the analysis requires for reproductiblity,
+#' plesase set the random seed before calling this function.
+#'
+#' @param df A data frame. It contains two variable:
+#' \itemize{
+#'   \item \strong{dose} a serial of concentration of drug;
+#'   \item \strong{response} the cell line response to each concentration of
+#'   drug. It should be the inhibition rate according to negative control.
+#' }
+#'
+#' @param dose A numeric value. It specifies the dose at which user want to
+#' predict the response of cell line to the drug.
+#'
+#' @return A numeric value. It is the response value of cell line to the drug at
+#' inputted dose.
+#'
+#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
+#'
+#' @export
+PredictResponse <- function(df, dose) {
+  if (stats::var(df$response, na.rm = TRUE) == 0) {
+    pred <- df$response[1]
+  } else {
+    model <- FitDoseResponse(df)
+
+    if (model$call$fct[[1]][[3]] == "LL.4") {
+      pred <- stats::predict(model, data.frame(dose = dose))
+    } else {
+      pred <- stats::predict(model, data.frame(dose = log(dose)))# NB! use log
+    }
+
+    if (pred > 100) {
+      pred <- 100 + stats::runif(1, -0.01, 0)
+    }
+  }
+  return(pred)
 }

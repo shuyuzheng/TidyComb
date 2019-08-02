@@ -1,7 +1,7 @@
 Package: TidyComb
 Type: Package
 Title: Preparing drug combination data for DrugComb 
-Version: 0.0.0.9011
+Version: 0.0.0.9012
 Authors: person("Shuyu", "Zheng", email = "shuyu.zheng@helsinki.fi",
     role = c("aut", "cre")) 
 Description: This package wrapped the functions that could be used to tidy drug
@@ -15,27 +15,10 @@ Depends:
 License: Mozilla Public License 2.0 + file LICENSE
 Encoding: UTF-8
 Imports: 
-    XML,
-    RCurl,
-    jsonlite,
-    dplyr,
-    plyr,
-    reshape2,
-    drc,
-    nleqslv,
-    gplots,
-    SpatialExtremes,
-    magrittr,
-    stats,
-    utils,
-    foreach,
-    doParallel,
-    rlang,
-    adabag,
-    ape
+    XML, RCurl, jsonlite, dplyr, plyr, reshape2, drc, nleqslv, gplots,
+    SpatialExtremes, magrittr, stats, utils, foreach, doParallel, rlang, adabag,
+    ape, synergyfinder (>= 1.10.3)
 RoxygenNote: 6.1.1
 Suggests: 
-    testthat,
-    knitr,
-    rmarkdown
+    testthat, knitr, rmarkdown
 VignetteBuilder: knitr
