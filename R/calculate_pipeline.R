@@ -16,7 +16,7 @@
 #' \code{CalculateMat} chains all calculations about one dose-response matrix (
 #' one drug-drug interaction block) together. The calculations includes:
 #' dose-response curve fitting, synergy scores (ZIP, Bliss, Loewe,
-#' HSA), drug sensitivity (RI, CSS), generate drug-drug response surface and
+#' HSA, S), drug sensitivity (RI, CSS), generate drug-drug response surface and
 #' generating summary scores for each block.
 #'
 #' The steps for calculation:
@@ -25,24 +25,29 @@
 #'     \enumerate{
 #'       \item Impute for missing values (with the average of values from the
 #'           nearest four cells) in original matrix by using function
-#'           \code{\link{ImputeNear}}.
+#'           \code{\link[synergyfinder]{ImputeNA}}.
 #'       \item Add noise(A small random number ranging from 0 to 0.001) to
-#'           original matrix by using function \code{line{AddNoise}}.
+#'           original matrix by using function \code{\link[synergyfinder]{AddNoise}}.
 #'       )
-#'       \item Correct baseline using function \code{correction} with the method
+#'       \item Correct baseline using function
+#'       \code{\link[synergyfinder]{CorrectBaseLine}} with the method
 #'       selected by parameter \code{correction}.
 #'     }
 #'   \item Single drug process
 #'     \enumerate{
 #'       \item Extract and fitting single drugs.
 #'       \item Extract coeficients from fitted model. (b, c, d, e, IC50)
-#'       \item Calculate RI
+#'       \item Calculate RI(Relative inhibition for single drug) with function
+#'       \code{CalculateSens}
 #'     }
 #'   \item Whole response matrix process
 #'     \enumerate{
-#'       \item Calculate Synergy Scores
-#'       \item Calculate Surface
-#'       \item Calculate CSS
+#'       \item Calculate Synergy Scores with function \code{\link[synergyfinder]{ZIP}},
+#'       \code{\link[synergyfinder]{Bliss}}, \code{\link[synergyfinder]{HSA}},
+#'       \code{\link[synergyfinder]{Loewe}} in \code{synergyfinder} package.
+#'       \item Calculate Surface(The landscape of response, synergy scores)
+#'       \item Calculate CSS(drug combination sensitivity score), S(synergy
+#'       score calculated from CSS and IR)
 #'     }
 #'   \item Summarize and generate surface
 #' }
@@ -57,19 +62,13 @@
 #' to the "inhibition" values in the matrix. Default is \code{TRUE}.
 #'
 #' @param correction a string. It indicates which method used by function
-#' \code{\link{CorrectBaseLine}} for base line correction.
+#' \code{\link[synergyfinder]{CorrectBaseLine}} for base line correction.
 #'   \itemize{
 #'     \item \code{non}: no baseline correction;
 #'     \item \code{par}: only correct base line on negative values in the matrix;
 #'     \item \code{all}: correct base line on all the values in the matrix.
 #'   }
 #'
-#' @param ... Other argumants required by nested functions. Some important
-#' arguments are:
-#' \itemize{
-#'    \item \code{Emin} and \code{Emax} inherited from function
-#'          \code{link{FitDoseResponse}}.
-#' }
 #'
 #' @return It contains 4 tables:
 #'   \itemize{
@@ -95,7 +94,8 @@
 #' response.mat <- reshape2::acast(conc_r~conc_c, value.var = "inhibition",
 #'                                 data = data[data$block_id == 1, ])
 #' res <- CalculateMat(response.mat)
-CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
+CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
+                         summary.only = FALSE) {
 
   options(scipen = 999)
 
@@ -108,28 +108,29 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
   # 1. Pre-processing
   # 1.1 Impute data until there is no missing value in the response matrix
   while (sum(is.na(response.mat))) {
-    response.mat <- ImputeNear(response.mat)
+    response.mat <- synergyfinder::ImputeNA(response.mat)
   }
 
   # 1.2. Add random noise to original matrix
   set.seed(1)
   if (noise) {
-    response.mat <- AddNoise(response.mat, method = "random")
+    response.mat <- synergyfinder::AddNoise(response.mat)
   }
 
   # 1.3. Correct baseline with corresponding "method". Available methods are
   #      "non", "part", "all".
-    response.mat <- CorrectBaseLine(response.mat, method = correction, ...)
+    response.mat <- synergyfinder::CorrectBaseLine(response.mat,
+                                                   method = correction)
   # 2. Single drug process
   # 2.1. Fit single drug dose-response curve
   # drug_col
   drug.col <- ExtractSingleDrug(response.mat, dim = "col")
-  col.model <- FitDoseResponse(drug.col, ...)
+  col.model <- FitDoseResponse(drug.col)
   col.type <- as.character(FindModelType(col.model))
 
   # drug_row
   drug.row <- ExtractSingleDrug(response.mat, dim = "row")
-  row.model <- FitDoseResponse(drug.row, ...)
+  row.model <- FitDoseResponse(drug.row)
   row.type <- as.character(FindModelType(row.model))
 
   # 2.2 Extract coeficients
@@ -138,10 +139,13 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
   # drug_rowr
   row.coe <- stats::coef(row.model)
 
-  curves <- as.data.frame(rbind(col.coe, row.coe))
-  colnames(curves) <- sub(":(Intercept)", "", colnames(curves), fixed = TRUE)
+  if (!summary.only) {
+    curves <- as.data.frame(rbind(col.coe, row.coe))
+    colnames(curves) <- sub(":(Intercept)", "", colnames(curves), fixed = TRUE)
     curves$model <- c(col.type, row.type)
-  curves$dim <- c("col", "row")
+    curves$dim <- c("col", "row")
+  }
+
 
   # 2.3 Calculate RI (using single drug response but without that at 0
   # concentration)
@@ -150,35 +154,37 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
 
   # 3. whole matrix process
   # 3.1 Calculate synergyscores
-  zip <- CalculateZIP(response.mat, drug.row.model = row.model,
-                      drug.col.model = col.model)
-  loewe <- CalculateLoewe(response.mat, drug.row.type = row.type,
-                          drug.row.par = row.coe, drug.col.type = col.type,
-                          drug.col.par = col.coe)
-  hsa <- CalculateHSA(response.mat)
-  bliss <- CalculateBliss(response.mat)
+  zip <- synergyfinder::ZIP(response.mat, drug.row.model = row.model,
+                                     drug.col.model = col.model)
+  loewe <- synergyfinder::Loewe(response.mat, drug.row.model = row.model,
+                                drug.col.model = col.model)
+  hsa <- synergyfinder::HSA(response.mat)
+  bliss <- synergyfinder::Bliss(response.mat)
 
-  synergy <- lapply(list(response.mat, zip, loewe, hsa, bliss), reshape2::melt)
-  synergy <- Reduce(function(x, y) {
-    merge(x = x, y = y, by = c("Var1", "Var2"))}, synergy)
+  if (!summary.only) {
+    synergy <- lapply(list(response.mat, zip, loewe, hsa, bliss), reshape2::melt)
+    synergy <- Reduce(function(x, y) {
+      merge(x = x, y = y, by = c("Var1", "Var2"))}, synergy)
 
-  colnames(synergy) <- c("conc_r", "conc_c", "inhibition", "synergy_zip",
-                         "synergy_loewe", "synergy_hsa", "synergy_bliss")
+    colnames(synergy) <- c("conc_r", "conc_c", "inhibition", "synergy_zip",
+                           "synergy_loewe", "synergy_hsa", "synergy_bliss")
 
-  # 3.2 calculate surface
-  smooth.res <- smoothing(response.mat)
-  smooth.zip <- smoothing(zip)
-  smooth.hsa <- smoothing(hsa)
-  smooth.bliss <- smoothing(bliss)
-  smooth.loewe <- smoothing(loewe)
+    # 3.2 calculate surface
+    smooth.res <- smoothing(response.mat)
+    smooth.zip <- smoothing(zip)
+    smooth.hsa <- smoothing(hsa)
+    smooth.bliss <- smoothing(bliss)
+    smooth.loewe <- smoothing(loewe)
 
-  surface <- lapply(list(smooth.res, smooth.zip, smooth.loewe, smooth.hsa,
-                         smooth.bliss), reshape2::melt)
-  surface <- Reduce(function(x, y) {
-    merge(x = x, y = y, by = c("Var1", "Var2"))}, surface)
+    surface <- lapply(list(smooth.res, smooth.zip, smooth.loewe, smooth.hsa,
+                           smooth.bliss), reshape2::melt)
+    surface <- Reduce(function(x, y) {
+      merge(x = x, y = y, by = c("Var1", "Var2"))}, surface)
 
-  colnames(surface) <- c("conc_r", "conc_c", "inhibition", "synergy_zip",
-                         "synergy_loewe", "synergy_hsa", "synergy_bliss")
+    colnames(surface) <- c("conc_r", "conc_c", "inhibition", "synergy_zip",
+                           "synergy_loewe", "synergy_hsa", "synergy_bliss")
+  }
+
 
   # 3.3 Calculate CSS
   col.ic50 <- CalculateIC50(col.coe, col.type, max(drug.col$dose))
@@ -203,10 +209,13 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non", ...) {
   sum <- data.frame(t(sum), ic50_row = row.ic50 , ic50_col = col.ic50,
                     ri_row = row.ri, ri_col = col.ri, css_row = row.css,
                     css_col = col.css, css = css, S = S)
-
-  res <- list(synergy = synergy, surface = surface,
-              summary = sum, curve = curves)
-  return(res)
+  if (summary.only) {
+    return(sum)
+  } else{
+    res <- list(synergy = synergy, surface = surface,
+                summary = sum, curve = curves)
+    return(res)
+  }
 
   # clean up
   gc()
@@ -315,7 +324,7 @@ CalculateTemplate <- function(template, debug=FALSE, ...) {
 
     # 2. Do calculation on matrix (with error control)
     tmp <- tryCatch({
-      CalculateMat(response.mat = response.mat, ...)
+      CalculateMat(response.mat = response.mat)
     }, error = function(e) {
       print(block)
       traceback()

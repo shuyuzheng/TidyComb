@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_sensitivity.R
 \name{CalculateSens}
 \alias{CalculateSens}
-\title{Calculate sensitivity score}
+\title{Calculate sensitivity score (relative inhibition)}
 \usage{
 CalculateSens(df)
 }

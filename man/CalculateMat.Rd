@@ -4,7 +4,7 @@
 \alias{CalculateMat}
 \title{Chain all calculation about one dose-response matrix}
 \usage{
-CalculateMat(response.mat, noise = TRUE, correction = "non", ...)
+CalculateMat(response.mat, noise = TRUE, correction = "non")
 }
 \arguments{
 \item{response.mat}{A matrix contain the drug combination reaponse value.
@@ -18,19 +18,12 @@ the row increase \emph{from top to bottom}.}
 to the "inhibition" values in the matrix. Default is \code{TRUE}.}
 
 \item{correction}{a string. It indicates which method used by function
-\code{\link{CorrectBaseLine}} for base line correction.
+\code{\link[synergyfinder]{CorrectBaseLine}} for base line correction.
   \itemize{
     \item \code{non}: no baseline correction;
     \item \code{par}: only correct base line on negative values in the matrix;
     \item \code{all}: correct base line on all the values in the matrix.
   }}
-
-\item{...}{Other argumants required by nested functions. Some important
-arguments are:
-\itemize{
-   \item \code{Emin} and \code{Emax} inherited from function
-         \code{link{FitDoseResponse}}.
-}}
 }
 \value{
 It contains 4 tables:
@@ -49,7 +42,7 @@ It contains 4 tables:
 \code{CalculateMat} chains all calculations about one dose-response matrix (
 one drug-drug interaction block) together. The calculations includes:
 dose-response curve fitting, synergy scores (ZIP, Bliss, Loewe,
-HSA), drug sensitivity (RI, CSS), generate drug-drug response surface and
+HSA, S), drug sensitivity (RI, CSS), generate drug-drug response surface and
 generating summary scores for each block.
 }
 \details{
@@ -59,24 +52,29 @@ The steps for calculation:
     \enumerate{
       \item Impute for missing values (with the average of values from the
           nearest four cells) in original matrix by using function
-          \code{\link{ImputeNear}}.
+          \code{\link[synergyfinder]{ImputeNA}}.
       \item Add noise(A small random number ranging from 0 to 0.001) to
-          original matrix by using function \code{line{AddNoise}}.
+          original matrix by using function \code{\link[synergyfinder]{AddNoise}}.
       )
-      \item Correct baseline using function \code{correction} with the method
+      \item Correct baseline using function
+      \code{\link[synergyfinder]{CorrectBaseLine}} with the method
       selected by parameter \code{correction}.
     }
   \item Single drug process
     \enumerate{
       \item Extract and fitting single drugs.
       \item Extract coeficients from fitted model. (b, c, d, e, IC50)
-      \item Calculate RI
+      \item Calculate RI(Relative inhibition for single drug) with function
+      \code{CalculateSens}
     }
   \item Whole response matrix process
     \enumerate{
-      \item Calculate Synergy Scores
-      \item Calculate Surface
-      \item Calculate CSS
+      \item Calculate Synergy Scores with function \code{\link[synergyfinder]{ZIP}},
+      \code{\link[synergyfinder]{Bliss}}, \code{\link[synergyfinder]{HSA}},
+      \code{\link[synergyfinder]{Loewe}} in \code{synergyfinder} package.
+      \item Calculate Surface(The landscape of response, synergy scores)
+      \item Calculate CSS(drug combination sensitivity score), S(synergy
+      score calculated from CSS and IR)
     }
   \item Summarize and generate surface
 }
