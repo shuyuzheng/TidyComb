@@ -124,14 +124,14 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
   # 2. Single drug process
   # 2.1. Fit single drug dose-response curve
   # drug_col
-  drug.col <- ExtractSingleDrug(response.mat, dim = "col")
-  col.model <- FitDoseResponse(drug.col)
-  col.type <- as.character(FindModelType(col.model))
+  drug.col <- synergyfinder::ExtractSingleDrug(response.mat, dim = "col")
+  col.model <- synergyfinder::FitDoseResponse(drug.col)
+  col.type <- as.character(synergyfinder::FindModelType(col.model))
 
   # drug_row
-  drug.row <- ExtractSingleDrug(response.mat, dim = "row")
-  row.model <- FitDoseResponse(drug.row)
-  row.type <- as.character(FindModelType(row.model))
+  drug.row <- synergyfinder::ExtractSingleDrug(response.mat, dim = "row")
+  row.model <- synergyfinder::FitDoseResponse(drug.row)
+  row.type <- as.character(synergyfinder::FindModelType(row.model))
 
   # 2.2 Extract coeficients
   # drug_col
@@ -310,10 +310,6 @@ CalculateTemplate <- function(template, debug=FALSE, ...) {
                         stringsAsFactors = FALSE)
 
   for (block in blocks) {
-    if (debug) {
-      message(block)
-      utils::flush.console()
-    }
     # 1. Generate response matrix for each block
     response <- template %>%
       dplyr::filter(block_id == block)
@@ -369,7 +365,7 @@ CalculateTemplate <- function(template, debug=FALSE, ...) {
     tmp <- list()
     info <- data.frame()
     response <- data.frame()
-    respons.mat <- matrix()
+    response.mat <- matrix()
   }
 
   curve <- dplyr::select(curve, block_id, drug_row, drug_col, b, c, d, e, model)
@@ -504,7 +500,7 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
     tmp <- list()
     info <- data.frame()
     response <- data.frame()
-    respons.mat <- matrix()
+    response.mat <- matrix()
     rm(.Random.seed)
     result
   }
