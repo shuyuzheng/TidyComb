@@ -13,7 +13,7 @@
 # Internal:
 # scoreCurve/scoreCurve.L4: facility functions for CalculateSens
 # own_log/own_log2: facility functions for CalculateSens
-# CalculateIC50: Transform IC50 from coefficients from FitDoseResponse function
+# CalculateIC50: Transform IC50 from coefficients from fitted dose-response model
 
 #' Calculate sensitivity score (relative inhibition)
 #'
@@ -261,7 +261,7 @@ PredictResponse <- function(df, dose) {
   if (stats::var(df$response, na.rm = TRUE) == 0) {
     pred <- df$response[1]
   } else {
-    model <- FitDoseResponse(df)
+    model <- synergyfinder::FitDoseResponse(df)
 
     if (model$call$fct[[1]][[3]] == "LL.4") {
       pred <- stats::predict(model, data.frame(dose = dose))

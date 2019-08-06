@@ -87,4 +87,5 @@ CheckTemplate <- function(template){
   }
 
   gc()
+  return(NULL)
 }
