@@ -4,7 +4,7 @@
 \alias{ParCalculateTemplate}
 \title{Parallel Calculate Drug Combination data in template format}
 \usage{
-ParCalculateTemplate(template, cores = 1, ...)
+ParCalculateTemplate(template, cores = 1, summary.only = FALSE)
 }
 \arguments{
 \item{template}{a dataframe in the format as template. Columns "block_id",
@@ -13,6 +13,10 @@ ParCalculateTemplate(template, cores = 1, ...)
 
 \item{cores}{A integer. It indicates number of cores would be allocated to
 the parallel processed}
+
+\item{summary.only}{a logical value. If it is \code{TRUE} then only summary
+table is calculated and returned, otherwise, for tables will be return.
+Default setting is \code{FALSE}.}
 
 \item{...}{Other arguments required by nested functions. Some important
 arguments are:

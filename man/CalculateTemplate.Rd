@@ -4,7 +4,7 @@
 \alias{CalculateTemplate}
 \title{Calculate Drug Combination data in template format}
 \usage{
-CalculateTemplate(template, debug = FALSE, ...)
+CalculateTemplate(template, summary.only = FALSE)
 }
 \arguments{
 \item{template}{a dataframe which must contains following columns:
@@ -35,8 +35,9 @@ CalculateTemplate(template, debug = FALSE, ...)
   the drug combination was tested.
 }}
 
-\item{debug}{a logical value. If it is \code{TRUE}, block ID will be printed
-to console. The default setting is \code{FALSE}}
+\item{summary.only}{a logical value. If it is \code{TRUE} then only summary
+table is calculated and returned, otherwise, for tables will be return.
+Default setting is \code{FALSE}.}
 
 \item{...}{Other arguments required by nested functions. Some important
 arguments are:

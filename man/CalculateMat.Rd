@@ -4,7 +4,8 @@
 \alias{CalculateMat}
 \title{Chain all calculation about one dose-response matrix}
 \usage{
-CalculateMat(response.mat, noise = TRUE, correction = "non")
+CalculateMat(response.mat, noise = TRUE, correction = "non",
+  summary.only = FALSE)
 }
 \arguments{
 \item{response.mat}{A matrix contain the drug combination reaponse value.
@@ -24,9 +25,13 @@ to the "inhibition" values in the matrix. Default is \code{TRUE}.}
     \item \code{par}: only correct base line on negative values in the matrix;
     \item \code{all}: correct base line on all the values in the matrix.
   }}
+
+\item{summary.only}{a logical value. If it is \code{TRUE} then only summary
+table is calculated and returned, otherwise, for tables will be return.
+Default setting is \code{FALSE}.}
 }
 \value{
-It contains 4 tables:
+A list contains 4 tables:
   \itemize{
     \item \strong{synergy} It contains the modified inhibition value and 4
     type of synergy scores of each drug dose response pair.
@@ -37,6 +42,8 @@ It contains 4 tables:
     \item \strong{surface} It contains the smoothed inhibition values and
     synergy scores for plotting the scores' landscape.
  }
+ If \code{summary.only} is \code{TRUE}, it will return only the "summary"
+ data frame.
 }
 \description{
 \code{CalculateMat} chains all calculations about one dose-response matrix (

@@ -69,8 +69,11 @@
 #'     \item \code{all}: correct base line on all the values in the matrix.
 #'   }
 #'
+#' @param summary.only a logical value. If it is \code{TRUE} then only summary
+#' table is calculated and returned, otherwise, for tables will be return.
+#' Default setting is \code{FALSE}.
 #'
-#' @return It contains 4 tables:
+#' @return A list contains 4 tables:
 #'   \itemize{
 #'     \item \strong{synergy} It contains the modified inhibition value and 4
 #'     type of synergy scores of each drug dose response pair.
@@ -81,6 +84,8 @@
 #'     \item \strong{surface} It contains the smoothed inhibition values and
 #'     synergy scores for plotting the scores' landscape.
 #'  }
+#'  If \code{summary.only} is \code{TRUE}, it will return only the "summary"
+#'  data frame.
 #'
 #' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
@@ -161,14 +166,14 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
   hsa <- synergyfinder::HSA(response.mat)
   bliss <- synergyfinder::Bliss(response.mat)
 
+  synergy <- lapply(list(response.mat, zip, loewe, hsa, bliss), reshape2::melt)
+  synergy <- Reduce(function(x, y) {
+    merge(x = x, y = y, by = c("Var1", "Var2"))}, synergy)
+
+  colnames(synergy) <- c("conc_r", "conc_c", "inhibition", "synergy_zip",
+                         "synergy_loewe", "synergy_hsa", "synergy_bliss")
+
   if (!summary.only) {
-    synergy <- lapply(list(response.mat, zip, loewe, hsa, bliss), reshape2::melt)
-    synergy <- Reduce(function(x, y) {
-      merge(x = x, y = y, by = c("Var1", "Var2"))}, synergy)
-
-    colnames(synergy) <- c("conc_r", "conc_c", "inhibition", "synergy_zip",
-                           "synergy_loewe", "synergy_hsa", "synergy_bliss")
-
     # 3.2 calculate surface
     smooth.res <- smoothing(response.mat)
     smooth.zip <- smoothing(zip)
@@ -252,8 +257,9 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
 #'    the drug combination was tested.
 #'  }
 #'
-#' @param debug a logical value. If it is \code{TRUE}, block ID will be printed
-#'    to console. The default setting is \code{FALSE}
+#' @param summary.only a logical value. If it is \code{TRUE} then only summary
+#' table is calculated and returned, otherwise, for tables will be return.
+#' Default setting is \code{FALSE}.
 #'
 #' @param ... Other arguments required by nested functions. Some important
 #' arguments are:
@@ -286,21 +292,12 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
 #' data <- read.csv(system.file("template.csv", package = "TidyComb"),
 #'                  stringsAsFactors = FALSE)
 #' res <- CalculateTemplate(data)
-CalculateTemplate <- function(template, debug=FALSE, ...) {
+CalculateTemplate <- function(template, summary.only=FALSE) {
   CheckTemplate(template)
+
   blocks <- unique(template$block_id)
 
   # generate container
-  synergy <- data.frame(block_id = integer(), conc_r = numeric(),
-                        conc_c = numeric(), inhibition = numeric(),
-                        synergy_zip = numeric(), synergy_bliss = numeric(),
-                        synergy_loewe = numeric(), synergy_hsa = numeric(),
-                        stringsAsFactors = FALSE)
-  surface <- synergy
-  curve <- data.frame(block_id = integer(), b = numeric(),
-                      c = numeric(), d = numeric(), e = numeric(),
-                      model = numeric(), drug.row = numeric(),
-                      drug.col = numeric(), stringsAsFactors = FALSE)
   summary <- data.frame(block_id = integer(), synergy_zip = numeric(),
                         synergy_bliss = numeric(), synergy_hsa = numeric(),
                         synergy_loewe = numeric(), ic50_row = numeric() ,
@@ -308,6 +305,19 @@ CalculateTemplate <- function(template, debug=FALSE, ...) {
                         ri_col = numeric(), css_row = numeric(),
                         css_col = numeric(), css = numeric(), S = numeric(),
                         stringsAsFactors = FALSE)
+
+  if (!summary.only) {
+    synergy <- data.frame(block_id = integer(), conc_r = numeric(),
+                          conc_c = numeric(), inhibition = numeric(),
+                          synergy_zip = numeric(), synergy_bliss = numeric(),
+                          synergy_loewe = numeric(), synergy_hsa = numeric(),
+                          stringsAsFactors = FALSE)
+    surface <- synergy
+    curve <- data.frame(block_id = integer(), b = numeric(),
+                        c = numeric(), d = numeric(), e = numeric(),
+                        model = numeric(), drug.row = numeric(),
+                        drug.col = numeric(), stringsAsFactors = FALSE)
+  }
 
   for (block in blocks) {
     # 1. Generate response matrix for each block
@@ -320,15 +330,22 @@ CalculateTemplate <- function(template, debug=FALSE, ...) {
 
     # 2. Do calculation on matrix (with error control)
     tmp <- tryCatch({
-      CalculateMat(response.mat = response.mat)
+      CalculateMat(response.mat = response.mat,
+                   summary.only = summary.only)
     }, error = function(e) {
       print(block)
       traceback()
     })
-    tmp <- lapply(tmp, function(x){
-      x$block_id = rep(block, nrow(x))
-      return(x)
+
+    if (summary.only) {
+      tmp$block_id <- rep(block, nrow(tmp))
+    } else {
+      tmp <- lapply(tmp, function(x){
+        x$block_id = rep(block, nrow(x))
+        return(x)
       })
+    }
+
 
     # 3. Add information to summary table
     info <- response %>%
@@ -343,36 +360,48 @@ CalculateTemplate <- function(template, debug=FALSE, ...) {
       warning("The summary data of block ", block, " is missing.")
     }
 
-    tmp$summary <- cbind.data.frame(info, tmp$summary)
+    if (!summary.only) {
+      tmp$summary <- cbind.data.frame(info, tmp$summary)
 
-    # 4. fill drug names to curve table
+      # 4. fill drug names to curve table
 
-    tmp$curve$drug_col <- rep(NA, 2)
-    tmp$curve$drug_col[which(tmp$curve$dim ==
-                               "col")] <- as.character(info$drug_col)
+      tmp$curve$drug_col <- rep(NA, 2)
+      tmp$curve$drug_col[which(tmp$curve$dim ==
+                                 "col")] <- as.character(info$drug_col)
 
-    tmp$curve$drug_row <- rep(NA, 2)
-    tmp$curve$drug_row[which(tmp$curve$dim ==
-                               "row")] <- as.character(info$drug_row)
+      tmp$curve$drug_row <- rep(NA, 2)
+      tmp$curve$drug_row[which(tmp$curve$dim ==
+                                 "row")] <- as.character(info$drug_row)
 
-    # 4. Append new tables to containers
-    synergy <- rbind.data.frame(synergy, tmp$synergy)
-    surface <- rbind.data.frame(surface, tmp$surface)
-    curve <- rbind.data.frame(curve, tmp$curve)
-    summary <- rbind.data.frame(summary, tmp$summary)
+      # 4. Append new tables to containers
+      synergy <- rbind.data.frame(synergy, tmp$synergy)
+      surface <- rbind.data.frame(surface, tmp$surface)
+      curve <- rbind.data.frame(curve, tmp$curve)
+      summary <- rbind.data.frame(summary, tmp$summary)
+    } else {
+      tmp <- cbind.data.frame(info, tmp)
+      summary <- rbind.data.frame(summary, tmp)
+    }
+
+
 
     # Clean temporary file
-    tmp <- list()
+    tmp <- NULL
     info <- data.frame()
     response <- data.frame()
     response.mat <- matrix()
   }
 
-  curve <- dplyr::select(curve, block_id, drug_row, drug_col, b, c, d, e, model)
+  if (summary.only) {
+    return(summary)
+  } else {
+    curve <- dplyr::select(curve, block_id, drug_row, drug_col, b, c, d, e, model)
 
-  return(list(synergy = synergy, surface = surface,
-              curve = curve, summary = summary))
+    return(list(synergy = synergy, surface = surface,
+                curve = curve, summary = summary))
+  }
 }
+
 
 multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
                              curve = NULL) {
@@ -396,6 +425,10 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #'
 #' @param cores A integer. It indicates number of cores would be allocated to
 #' the parallel processed
+#'
+#' @param summary.only a logical value. If it is \code{TRUE} then only summary
+#' table is calculated and returned, otherwise, for tables will be return.
+#' Default setting is \code{FALSE}.
 #'
 #' @param ... Other arguments required by nested functions. Some important
 #' arguments are:
@@ -429,7 +462,7 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #' data <- read.csv(system.file("template.csv", package = "TidyComb"),
 #'                  stringsAsFactors = FALSE)
 #' res <- ParCalculateTemplate(data, cores = 4)
-ParCalculateTemplate <- function(template, cores = 1, ...) {
+ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE) {
   CheckTemplate(template)
   blocks <- unique(template$block_id)
 
@@ -448,12 +481,16 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
       reshape2::acast(conc_r ~ conc_c, value.var = "inhibition")
 
     # 2. Do calculation on matrix
-    tmp <- CalculateMat(response.mat = response.mat, ...)
-
-    tmp <- lapply(tmp, function(x){
-      x$block_id = rep(blocks[i], nrow(x))
-      return(x)
+    tmp <- CalculateMat(response.mat = response.mat,
+                        summary.only = summary.only)
+    if (summary.only) {
+      tmp$block_id = rep(blocks[i], nrow(tmp))
+    } else {
+      tmp <- lapply(tmp, function(x){
+        x$block_id = rep(blocks[i], nrow(x))
+        return(x)
       })
+    }
 
     # 3. Add information to summary table
     info <- response %>%
@@ -468,52 +505,55 @@ ParCalculateTemplate <- function(template, cores = 1, ...) {
       warning("The summary data of block ", blocks[i], " is missing.")
     }
 
-    tmp$summary <- cbind.data.frame(info, tmp$summary)
+    if (summary.only) {
+      result <- cbind.data.frame(info, tmp)
+    } else {
+      tmp$summary <- cbind.data.frame(info, tmp$summary)
 
-    # 4. fill drug names to curve table
+      # 4. fill drug names to curve table
 
-    tmp$curve$drug_col <- rep(NA, 2)
-    tmp$curve$drug_col[which(tmp$curve$dim ==
-                               "col")] <- as.character(info$drug_col)
+      tmp$curve$drug_col <- rep(NA, 2)
+      tmp$curve$drug_col[which(tmp$curve$dim ==
+                                 "col")] <- as.character(info$drug_col)
 
-    tmp$curve$drug_row <- rep(NA, 2)
+      tmp$curve$drug_row <- rep(NA, 2)
 
-    tmp$curve$drug_row[which(tmp$curve$dim ==
-                               "row")] <- as.character(info$drug_row)
+      tmp$curve$drug_row[which(tmp$curve$dim ==
+                                 "row")] <- as.character(info$drug_row)
 
-    tmp$curve <- dplyr::select(tmp$curve, block_id, drug_row, drug_col,
-                               b, c, d, e, model)
+      tmp$curve <- dplyr::select(tmp$curve, block_id, drug_row, drug_col,
+                                 b, c, d, e, model)
 
-    # # 4. Append new tables to container
-    # synergy <- rbind.data.frame(synergy, tmp$synergy)
-    # surface <- rbind.data.frame(surface, tmp$surface)
-    # curve <- rbind.data.frame(curve, tmp$curve)
-    # summary <- rbind.data.frame(summary, tmp$summary)
-
-    # 4. collect tables
-    result$synergy <- tmp$synergy
-    result$surface <- tmp$surface
-    result$summary <- tmp$summary
-    result$curve <- tmp$curve
+      # 5. collect tables
+      result$synergy <- tmp$synergy
+      result$surface <- tmp$surface
+      result$summary <- tmp$summary
+      result$curve <- tmp$curve
+    }
 
     # Clean temporary file
-    tmp <- list()
+    tmp <- NULL
     info <- data.frame()
     response <- data.frame()
     response.mat <- matrix()
     rm(.Random.seed)
-    result
+    return(result)
   }
 
-  res2 <- list()
-  res2$synergy <- Reduce(function(x, y) {rbind.data.frame(x, y)},
-                         lapply(res, "[[" , "synergy"))
-  res2$surface <- Reduce(function(x, y) {rbind.data.frame(x, y)},
-                         lapply(res, "[[" , "surface"))
-  res2$summary <- Reduce(function(x, y) {rbind.data.frame(x, y)},
-                         lapply(res, "[[" , "summary"))
-  res2$curve <- Reduce(function(x, y) {rbind.data.frame(x, y)},
-                       lapply(res, "[[" , "curve"))
+  if (summary.only) {
+    res2 <- Reduce(function(x, y) {rbind.data.frame(x, y)}, res)
+  } else {
+    res2 <- list()
+    res2$synergy <- Reduce(function(x, y) {rbind.data.frame(x, y)},
+                           lapply(res, "[[" , "synergy"))
+    res2$surface <- Reduce(function(x, y) {rbind.data.frame(x, y)},
+                           lapply(res, "[[" , "surface"))
+    res2$summary <- Reduce(function(x, y) {rbind.data.frame(x, y)},
+                           lapply(res, "[[" , "summary"))
+    res2$curve <- Reduce(function(x, y) {rbind.data.frame(x, y)},
+                         lapply(res, "[[" , "curve"))
+  }
+
 
   return(res2)
 }
