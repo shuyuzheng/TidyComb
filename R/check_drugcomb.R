@@ -148,6 +148,7 @@ CheckDisease <- function(test) {
 #'   \emph{have been archived} in DrugComb.
 #'   \item \strong{new} It lists out the CID of drugs that \emph{are not yet}
 #'   in DrugComb.
+#'   \item \strong{max_id} The max drug id in DrugComb now
 #' }
 #'
 #' @export
@@ -155,6 +156,7 @@ CheckDrug <- function(cids) {
   message("Checking drugs...")
   exist <- drugcomb$drug
   n <- nrow(exist)
+  m <- max(exist$id)
   old <- stats::na.omit(exist[match(cids, exist$cid), ])
   new <- cids[!cids %in% exist$cid]
   message("DrugComb has archived ", n, " drugs.\n",
@@ -164,5 +166,5 @@ CheckDrug <- function(cids) {
           ifelse(is.null(length(new)), 0, length(new)),
           " of checked drug(s) are/is not in DrugComb: ",
           paste0(new, collapse = ", "))
-  return(list(n = n, old = old, new = new))
+  return(list(n = n, old = old, new = new, max_id = m))
 }
