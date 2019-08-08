@@ -99,7 +99,7 @@ GenerateDrug <- function(cids) {
   drug$db_kegg_d[drug$db_kegg_d == ""] <- NA
 
   message("Generating drug ID...")
-  drug$id <- seq(check$n + 1, length.out = nrow(drug))
+  drug$id <- seq(check$max_id + 1, length.out = nrow(drug))
   drug <- dplyr::select(drug, name, id, inchikey, smiles, cid, chembl_id,
                         drugbank_id = "drugbank", kegg_c, kegg_d = "db_kegg_d",
                         molecular_formula, clinical_phase)
