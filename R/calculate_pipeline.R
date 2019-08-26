@@ -540,6 +540,10 @@ ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE) {
     return(result)
   }
 
+  # Stop the clusters
+  parallel::stopCluster(cl)
+
+  # Collecting the results
   if (summary.only) {
     res2 <- Reduce(function(x, y) {rbind.data.frame(x, y)}, res)
   } else {
@@ -553,7 +557,6 @@ ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE) {
     res2$curve <- Reduce(function(x, y) {rbind.data.frame(x, y)},
                          lapply(res, "[[" , "curve"))
   }
-
 
   return(res2)
 }
