@@ -94,12 +94,6 @@ The APIs used in those functions:
 
 Sensitivity is calculated by CSS [Malyutina et al., 2019][6] - drug combination sensitivity score is derived using relative IC50 values of compounds and the area under their dose-response curves. 
 
-For more detail about using **TidyComb** please check `vignette`. Invoke R and then type:
-
-```
-vignette('TidyComb')
-```
-
 ## Reference
 
 [1]: Zagidullin B., Aldahdooh J., Zheng S., Wang W., Wang Y., Saad J., Malyutina A., Jafari M., Tanoli Z., Pessia A., Tang J. (2019). DrugComb: an integrative cancer drug combination data portal, Nucleic Acids Research, 47(W1):W43-W51.
