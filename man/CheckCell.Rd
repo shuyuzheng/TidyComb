@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_drugcomb.R
 \name{CheckCell}
 \alias{CheckCell}
-\title{Check cells archive in DrugComb}
+\title{Check whether input cell lines are archived in DrugComb}
 \usage{
 CheckCell(test)
 }
@@ -13,11 +13,11 @@ of cell lines which would be checked.}
 \value{
 A list contains 3 elements:
 \itemize{
-  \item \strong{n} It indicates that there are totally n cell lines archived
+  \item \strong{n}: It indicates that there are totally n cell lines archived
   in DrugComb database.
-  \item \strong{old} It lists out the \emph{cellosaurus accessions} of cell
+  \item \strong{old}: It lists the \emph{cellosaurus accessions} of cell
   lines that \emph{have been archived} in DrugComb.
-  \item \strong{new} It lists out the \emph{cellosaurus accessions} of cell
+  \item \strong{new}: It lists the \emph{cellosaurus accessions} of cell
   lines that \emph{are not yet} in DrugComb.
 }
 }
@@ -27,4 +27,7 @@ Function \code{CheckCell} compares cellosaurus accessions passed to
 \code{\link{drugcomb}} R data). It will return the total number of cell lines
 have been archived in DrugComb as well as which cell lines are already or not
 yet archived in DrugComb.
+}
+\author{
+ShuyuZheng \email{shuyu.zheng@helsinki.fi}
 }

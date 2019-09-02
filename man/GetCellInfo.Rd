@@ -4,32 +4,35 @@
 \alias{GetCellInfo}
 \title{Extract cell line information}
 \usage{
-GetCellInfo(node, info = "accession")
+GetCellInfo(accessions, parsed_cell_file)
 }
 \arguments{
-\item{node}{An "XMLInternalElementNode" extracted from the Cellosaurus XML
-file by either \code{\link{GetAllCell}} or \code{\link{GetCell}}}
+\item{accessions}{A vector containing the Cellosaurus accessions for
+searching}
 
-\item{info}{A Character indicate about what kind of infomation you want to
-extract. Available values are:
-\itemize{
-  \item \strong{name} primary name and synonyms of cell lines.
-  \item \strong{name_in_one} Output all names (Primary and synonyms) of cell
-  line into one character.
-  \item \strong{accession} Cellosaurus Accession ID for cell lines.
-  \item \strong{disease} diseases that are associated with the cell lines and
-   corresponding NCI Thesaurus entry code.
-  \item \strong{tissue} Tissues that the cell line generated from. Following
-  the CCLE category.
-}}
+\item{parsed_cell_file}{An "XMLInternalElementNode" extracted from the
+Cellosaurus XML file by function \code{\link{GetAllCell}}}
 }
 \value{
-A data frame contains cell line information selected by \code{info}
+A data frame containing 6 columns:
+\itemize{
+  \item \strong{name} primary name of cell lines.
+  \item \strong{synonyms} the synonyms of cell lines.
+  \item \strong{cellosaurus_accession} Cellosaurus Accession for cell lines.
+  \item \strong{disease_name} diseases that are associated with the cell
+    lines
+  \item \strong{disease_id} NCI Thesaurus entry code of the diseases.
+  \item \strong{tissue} Tissues that the cell line generated from. Following
+  the CCLE category.
+}
+
+cell line information selected by \code{info}
 }
 \description{
 This function will extract the primary name, synonyms, Cellosausurs Accession
-ID, disease, disease_id) of the cell lines and Wrap them into one data frame.
-If you prefer some not all of these data, \code{\link{GetCellName}},
-\code{\link{GetCellNameInOne}}, \code{\link{GetDisease}}, or
-\code{\link{GetAccession}} are recommended.
+ID, disease, disease_id, tissue) of the inputted cell lines and wrap them
+into a data frame.
+}
+\author{
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }

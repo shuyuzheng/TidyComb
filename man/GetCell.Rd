@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_cellosaurus.R
 \name{GetCell}
 \alias{GetCell}
-\title{Find matching cell-lines}
+\title{Extract the nodes containing information of inputted cell lines}
 \usage{
 GetCell(node, ids, type = "name")
 }
@@ -24,4 +24,7 @@ cell line is matched, a NULL list will be return.
 This function searches the value of <name> tags in Cellosaurus XML document
 to find entries that matches the names provided in the \code{names}
 parameter.
+}
+\author{
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }

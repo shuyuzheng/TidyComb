@@ -1,14 +1,19 @@
 # TidyComb
 # Functions for checking current status of DrugComb
-# Copyright: Shuyu Zheng
 #
-# All functions in this section are based on an up-to-date csv files from
+# Fuctions on this page:
+# CheckCell: Check whether input cell lines are archived in DrugComb
+# CheckTissue: Check whether input tissues are archived in DrugComb
+# CheckDisease: Check whether input diseases are archived in DrugComb
+# CheckDrug: Check whether input drugs are archived in DrugComb
+#
+# All functions in this section are based on up-to-date csv files from
 # DrugComb database. It consists of :
 #
 # cell_line: cellosaurus_accession, id
 # drug: id, cid
-# tissue: id, name (*)
-# disease: name, id (*)
+# tissue: id, name
+# disease: name, id
 # study: id
 #
 # SQL command for querying data from DrugComb database:
@@ -16,7 +21,7 @@
 # select [variables] from [table] into outfile '/var/lib/mysql-files/dr.csv'
 # fields terminated by ',' enclosed by '"' lines terminated by '\n';
 
-#' Check cells archive in DrugComb
+#' Check whether input cell lines are archived in DrugComb
 #'
 #' Function \code{CheckCell} compares cellosaurus accessions passed to
 #' \code{test} argument with cell lines archived in DrugComb (extracted to
@@ -29,13 +34,15 @@
 #'
 #' @return A list contains 3 elements:
 #' \itemize{
-#'   \item \strong{n} It indicates that there are totally n cell lines archived
+#'   \item \strong{n}: It indicates that there are totally n cell lines archived
 #'   in DrugComb database.
-#'   \item \strong{old} It lists out the \emph{cellosaurus accessions} of cell
+#'   \item \strong{old}: It lists the \emph{cellosaurus accessions} of cell
 #'   lines that \emph{have been archived} in DrugComb.
-#'   \item \strong{new} It lists out the \emph{cellosaurus accessions} of cell
+#'   \item \strong{new}: It lists the \emph{cellosaurus accessions} of cell
 #'   lines that \emph{are not yet} in DrugComb.
 #' }
+#'
+#' @author ShuyuZheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 CheckCell <- function(test) {
@@ -46,15 +53,13 @@ CheckCell <- function(test) {
   new <- test[!test %in% exist$cellosaurus_accession]
   message("DrugComb has archived ", n, " cell lines.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
-          " of checked cell line(s) have/has been in DrugComb: ",
-          paste(old$cellosaurus_accession, collapse = ", "), "\n",
+          " inputted cell line(s) have/has been in DrugComb.\n",
           ifelse(is.null(length(new)), 0, length(new)),
-          " of checked cell line(s) are/is not in DrugComb:",
-          paste0(new, collapse = ", "))
+          " inputted cell line(s) are/is not in DrugComb.")
   return(list(n = n, old = old, new = new))
 }
 
-#' Check tissues archive in DrugComb
+#' Check whether input tissues are archived in DrugComb
 #'
 #' Function \code{CheckTissue} compares tissue names passed to \code{test}
 #' argument with tissues archived in DrugComb (extracted to
@@ -67,32 +72,40 @@ CheckCell <- function(test) {
 #'
 #' @return A list contains 3 elements:
 #' \itemize{
-#'   \item \strong{n} It indicates that there are totally n tissues archived
+#'   \item \strong{n}: It indicates that there are totally n tissues archived
 #'   in DrugComb database.
-#'   \item \strong{old} It lists out the names of tissues that
+#'   \item \strong{old}: It lists the names and IDs of tissues that
 #'   \emph{have been archived} in DrugComb.
-#'   \item \strong{new} It lists out the names of tissues that
+#'   \item \strong{new}: It lists the names of tissues that
 #'   \emph{are not yet} in DrugComb.
 #' }
+#'
+#' @author ShuyuZheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 CheckTissue <- function(test) {
   message("Checking tissues...")
+  if ("central_nervous_system" %in% test){
+    stop("Please check the cell lines from 'central_nevours_system' to specify
+         which of the following subtypes they are from: 'brain',
+         'nervous_system', or 'spinal_cord_or_other_CNS'.")
+  }
   exist <- drugcomb$tissue
   n <- nrow(exist)
-  old <- stats::na.omit(exist[match(test, exist$name), ])
-  new <- test[!test %in% exist$name]
+  old <- stats::na.omit(exist[match(test, exist$tname), ])
+  new <- test[!test %in% exist$tname]
+  new <- data.frame(id = seq(n + 1, length.out = length(new)),
+                    tname = new,
+                    stringsAsFactors = FALSE)
   message("DrugComb has archived ", n, " tissues.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
-          " of checked tissue(s) have/has been in DrugComb: ",
-          paste(old$name, collapse = ", "), "\n",
-          ifelse(is.null(length(new)), 0, length(new)),
-          " of checked tissue(s) are/is not in DrugComb: ",
-          paste0(new, collapse = ", "))
+          " inputted tissue(s) have/has been in DrugComb.\n",
+          ifelse(is.null(nrow(new)), 0, nrow(new)),
+          " inputted tissue(s) are/is not in DrugComb.")
   return(list(n = n, old = old, new = new))
 }
 
-#' Check diseases archive in DrugComb
+#' Check whether input diseases are archived in DrugComb
 #'
 #' Function \code{CheckDisease} compares disease IDs passed to \code{test}
 #' argument with diseases archived in DrugComb (extracted to
@@ -100,37 +113,40 @@ CheckTissue <- function(test) {
 #' have been archived in DrugComb as well as which diseases are already or not
 #' yet archived in DrugComb.
 #'
-#' @param test A character vector. It contains IDs of diseases which would
-#' be checked.
+#' @param disease_df A data frame . It contains tow columns:
+#'   \itemize{
+#'     \item \strong{id}: the NCIt ID of the disease.
+#'     \item \strong{name}: the name of the disease.
+#'   }
 #'
 #' @return A list contains 3 elements:
 #' \itemize{
-#'   \item \strong{n} It indicates that there are totally n diseases archived
+#'   \item \strong{n}: It indicates that there are totally n diseases archived
 #'   in DrugComb database.
-#'   \item \strong{old} It lists out the ID of diseases that
+#'   \item \strong{old}: It lists the names and IDs of diseases that
 #'   \emph{have been archived} in DrugComb.
-#'   \item \strong{new} It lists out the ID of diseases that \emph{are not yet}
-#'   in DrugComb.
+#'   \item \strong{new}: It lists the names and IDs of diseases that
+#'   \emph{are not yet} in DrugComb.
 #' }
 #'
+#' @author ShuyuZheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @export
-CheckDisease <- function(test) {
+CheckDisease <- function(disease_df) {
   message("Checking  diseases...")
   exist <- drugcomb$disease
   n <- nrow(exist)
-  old <- stats::na.omit(exist[match(test, exist$id), ])
-  new <- test[!test %in% exist$id]
+  old <- unique(stats::na.omit(exist[match(disease_df$id, exist$id), ]))
+  new <- unique(stats::na.omit(disease_df[!disease_df$id %in% exist$id, ]))
   message("DrugComb has archived ", n, " diseases.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
-          " of checked disease(s) have/has been in DrugComb: ",
-          paste(old$name, collapse = ", "), "\n",
-          ifelse(is.null(length(new)), 0, length(new)),
-          " of checked disease(s) are/is not in DrugComb: ",
-          paste0(new, collapse = ", "))
+          " inputted disease(s) have/has been in DrugComb.\n",
+          ifelse(is.null(nrow(new)), 0, nrow(new)),
+          " inputted disease(s) are/is not in DrugComb.")
   return(list(n = n, old = old, new = new))
 }
 
-#' Check drug archives in DrugComb
+#' Check whether input drugs are archived in DrugComb
 #'
 #' Function \code{CheckDrug} compares drug CIDs passed to \code{cids} argument
 #' with CIDs archived in DrugComb (extracted to \code{\link{drugcomb}} R data).
@@ -142,14 +158,15 @@ CheckDisease <- function(test) {
 #'
 #' @return A list contains 3 elements:
 #' \itemize{
-#'   \item \strong{n} It indicates that there are totally n drugs archived in
+#'   \item \strong{n}: It indicates that there are totally n drugs archived in
 #'   DrugComb database.
-#'   \item \strong{old} It lists out the CID of drugs that
+#'   \item \strong{old}: It lists the CIDs of drugs that
 #'   \emph{have been archived} in DrugComb.
-#'   \item \strong{new} It lists out the CID of drugs that \emph{are not yet}
+#'   \item \strong{new}: It lists the CIDs of drugs that \emph{are not yet}
 #'   in DrugComb.
-#'   \item \strong{max_id} The max drug id in DrugComb now
 #' }
+#'
+#' @author ShuyuZheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 CheckDrug <- function(cids) {
@@ -161,10 +178,8 @@ CheckDrug <- function(cids) {
   new <- cids[!cids %in% exist$cid]
   message("DrugComb has archived ", n, " drugs.\n",
           ifelse(is.null(nrow(old)), 0, nrow(old)),
-          " of checked drug(s) have/has been in DrugComb: ",
-          paste(old$cid, collapse = ", "), "\n",
+          " inputted drug(s) have/has been in DrugComb.\n",
           ifelse(is.null(length(new)), 0, length(new)),
-          " of checked drug(s) are/is not in DrugComb: ",
-          paste0(new, collapse = ", "))
+          " inputted drug(s) are/is not in DrugComb.")
   return(list(n = n, old = old, new = new, max_id = m))
 }

@@ -1,13 +1,15 @@
 # TidyComb
 # Function for generate "drug" table which will be uploaded to DrugComb
-# Copyright: Shuyu Zheng
+#
+# Functions on this page
+# GenerateDrug: Generate drug table for DrugComb.
 
 #' Generate drug table and drug id index table
 #'
 #' @param cids A vector of characters contains interested drugs
 #'
 #' @return A list contains 2 data frame: one contains new drug's information,
-#'  another one is drug id cid index table.
+#'  another one is drug ID and CID index table.
 #' @export
 #'
 #' @importFrom magrittr %>%

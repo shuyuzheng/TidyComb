@@ -11,7 +11,7 @@ GenerateDrug(cids)
 }
 \value{
 A list contains 2 data frame: one contains new drug's information,
- another one is drug id cid index table.
+ another one is drug ID and CID index table.
 }
 \description{
 Generate drug table and drug id index table

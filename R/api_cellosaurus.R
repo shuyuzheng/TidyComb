@@ -1,6 +1,18 @@
 # TidyComb
 # Functions for retrieving or updating celline information from Cellosaurus.
-# Copyright: Shuyu Zheng
+#
+# Functions on this page:
+# CellVersion: Check the Cellosaurus data version.
+# UpdateCell: Update the local Cellosauruse XML file version.
+# GetCellInfo: Get information of input cell lines from Cellosaurus.
+#
+# Internal functions:
+# ParseCell: Parse the Cellosaurus XML file.
+# GetCell: Extract the nodes containing information of inputted cell lines
+# GetCellName: Extract cell lines' names and synonyms
+# GetDisease: Extract diseases where cell lines are derived
+# GetTissue: Extract tissues where cell lines are derived
+# GetAccession: Extract Cellosaurus Accession for cell lines
 
 
 #' Check Cellosaurus XML file version.
@@ -19,6 +31,8 @@
 #'
 #' @return A named character vector. It contains: version, date of update,
 #' number of archived cell lines and number of archived publications.
+#'
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 CellVersion <- function(
@@ -64,6 +78,8 @@ CellVersion <- function(
 #' \strong{not} up-to-date, the local file will be updated with online
 #' Cellosaurus data.
 #'
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @export
 UpdateCell <- function(file) {
   version.local <- as.numeric(CellVersion(file)["version"])
@@ -84,7 +100,7 @@ UpdateCell <- function(file) {
   }
 }
 
-#' Loading a Cellosaurus XML dataset
+#' Parse the Cellosaurus XML file
 #'
 #' \code{GetAllCell} will parse the Cellosaurus XML file and extract all content
 #' in "cell-line-list" node as a \code{XML document} object.
@@ -107,14 +123,15 @@ UpdateCell <- function(file) {
 #' @return An XMLNode containing all cell lines' information archieved in
 #' Cellosaurus dataset.
 #'
-#' @export
-GetAllCell <- function(file) {
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+
+ParseCell <- function(file) {
   doc <- XML::xmlInternalTreeParse(file)
   all.cell <- XML::xmlRoot(doc)[[2]]
   return(all.cell)
 }
 
-#' Find matching cell-lines
+#' Extract the nodes containing information of inputted cell lines
 #'
 #' This function searches the value of <name> tags in Cellosaurus XML document
 #' to find entries that matches the names provided in the \code{names}
@@ -132,7 +149,8 @@ GetAllCell <- function(file) {
 #' @return An XMLNodeSet containing matched cell lines in the dataset. If no
 #' cell line is matched, a NULL list will be return.
 #'
-#' @export
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+
 GetCell <- function(node, ids, type = "name"){
   if(type == "name"){
 
@@ -171,42 +189,25 @@ GetCell <- function(node, ids, type = "name"){
 #'   \item \code{name} the primary name of cell line.
 #'   \item \code{synonyms} synonyms of the cell line separated by semicolons.
 #' }
+#'
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 
 GetCellName <- function(node) {
-  name.list <- XML::xmlToDataFrame(XML::xmlChildren(node)$'name-list',
-                                   stringsAsFactors = FALSE)
-  name <- name.list[1,]
-  synonyms <- sapply(name.list,
-                     function(x) {
-                       paste(x, collapse = "; ")
-                     })
-  names <- cbind(name = name, synonyms = synonyms)
-  return(names)
-}
+  tryCatch({
+    name.list <- XML::xmlToDataFrame(XML::xmlChildren(node)$'name-list',
+                                     stringsAsFactors = FALSE)
+    name <- name.list[1,]
+    synonyms <- sapply(name.list,
+                       function(x) {
+                         paste(x, collapse = "; ")
+                       })
+  }, error = function(e){
+    name <<- NA
+    synonyms <<- NA
+  })
+    names <- data.frame(name = name, synonyms = synonyms,
+                        stringsAsFactors = FALSE)
 
-#' Extract primary name and synonyms of one cell line into one character.
-#'
-#' \code{GetCellNameInOne} extract primary name and synonyms from only one
-#' \emph{cell-line-list} node in Cellosaurus xml file and paste them into one
-#' character.
-#'
-#' This function extracts all names(primary name and synonyms) of an
-#' \code{XMLIntervalElementNode} object containing one \emph{cell-line-list}
-#' node extracted from Cellosaurus xml file. Then paste them into one character.
-#'
-#' If you'd like to extract information from multiple \emph{cell-line-list}
-#' nodes, combining this function with \code{xpathSapply} or \code{sapply} is
-#' recommanded.
-#'
-#' @param node An \code{XMLInternalElementNode} with only one
-#' \emph{cell-line-list} node extracted from \emph{Cellosaurus xml file}.
-#'
-#' @return A character contains all names (Primary and synonyms) of cell line.
-
-GetCellNameInOne <- function(node) {
-  name.list <- XML::xmlToDataFrame(XML::xmlChildren(node)$'name-list',
-                                   stringsAsFactors = FALSE)
-  names <- sapply(name.list, paste, collapse = "; ")
   return(names)
 }
 
@@ -225,14 +226,25 @@ GetCellNameInOne <- function(node) {
 #' @param node An XMLInternalElementNode with only one cell line's information
 #' which was extracted from Cellosaurus xml file.
 #'
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @return A data frame contains two variables:
 #' \item{disease}{name of the cell line associated disease.}
 #' \item{disease_id}{NCI Thesaurus entry code of the associated disease.}
+
 GetDisease <- function(node){
-  disease.list <- XML::xmlChildren(node)$'disease-list'
-  disease <- XML::xmlValue(disease.list)
-  disease.id <- sapply(XML::xmlChildren(disease.list), XML::xmlAttrs)[2]
-  diseases <- cbind(disease, disease.id)
+  tryCatch({
+    disease.list <- XML::xmlChildren(node)$'disease-list'
+    disease <- XML::xmlValue(disease.list)
+    disease.id <- sapply(XML::xmlChildren(disease.list), XML::xmlAttrs)[2]
+  }, error = function(e){
+    disease <<- NA
+    disease.id <<- NA
+  })
+
+  diseases <- data.frame(disease_name = disease,
+                         disease_id = disease.id,
+                         stringsAsFactors = FALSE)
   return(diseases)
 }
 
@@ -246,12 +258,24 @@ GetDisease <- function(node){
 #' @param node An XMLInternalElementNode with only one cell line's information
 #' which was extracted from Cellosaurus xml file.
 #'
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @return A character. The tissue name of cell line according to CClE category.
 GetTissue <- function(node){
-  ref.list <- XML::xmlChildren(node)$`xref-list`
-  ref <- sapply(XML::xmlChildren(ref.list), XML::xmlAttrs)
-  ccle <- ref[3, which(ref[1,] == "CCLE")]
-  tissue <- tolower(gsub("^[^_]+(?=_)_", "",ccle, perl = TRUE))
+  tryCatch({
+    ref.list <- XML::xmlChildren(node)$`xref-list`
+    ref <- sapply(XML::xmlChildren(ref.list), XML::xmlAttrs)
+    ccle <- ref[3, which(ref[1,] == "CCLE")]
+    tissue <- tolower(gsub("^[^_]+(?=_)_", "",ccle, perl = TRUE))
+    if (length(tissue) == 0){
+      tissue <- NA
+    } else if (length(tissue) >1){
+      tissue <- paste(unique(tissue), collapse = "; ")
+    }
+  }, error = function(e){
+    tissue <<- NA
+  })
+  return(tissue)
 }
 
 #' Extract the Cellosaurus accession ID of one cell line.
@@ -266,82 +290,95 @@ GetTissue <- function(node){
 #'
 #' @return A character. The Cellosaurus accession ID of cell line
 #'
-#' @export
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+
 GetAccession <- function(node){
-  accession <- XML::xpathSApply(node,
-                                './accession-list/accession[@type="primary"]',
-                                XML::xmlValue)
+  tryCatch({
+    accession <- XML::xpathSApply(node,
+                                  './accession-list/accession[@type="primary"]',
+                                  XML::xmlValue)
+  }, error = function(e){
+    accession <<- NA
+  })
+
+  return(accession)
 }
 
 #' Extract cell line information
 #'
 #' This function will extract the primary name, synonyms, Cellosausurs Accession
-#' ID, disease, disease_id) of the cell lines and Wrap them into one data frame.
-#' If you prefer some not all of these data, \code{\link{GetCellName}},
-#' \code{\link{GetCellNameInOne}}, \code{\link{GetDisease}}, or
-#' \code{\link{GetAccession}} are recommended.
+#' ID, disease, disease_id, tissue) of the inputted cell lines and wrap them
+#' into a data frame.
 #'
-#' @param node An "XMLInternalElementNode" extracted from the Cellosaurus XML
-#' file by either \code{\link{GetAllCell}} or \code{\link{GetCell}}
+#' @param parsed_cell_file An "XMLInternalElementNode" extracted from the
+#' Cellosaurus XML file by function \code{\link{GetAllCell}}
 #'
-#' @param info A Character indicate about what kind of infomation you want to
-#' extract. Available values are:
+#' @param accessions A vector containing the Cellosaurus accessions for
+#' searching
+#'
+#' @return A data frame containing 6 columns:
 #' \itemize{
-#'   \item \strong{name} primary name and synonyms of cell lines.
-#'   \item \strong{name_in_one} Output all names (Primary and synonyms) of cell
-#'   line into one character.
-#'   \item \strong{accession} Cellosaurus Accession ID for cell lines.
-#'   \item \strong{disease} diseases that are associated with the cell lines and
-#'    corresponding NCI Thesaurus entry code.
+#'   \item \strong{name} primary name of cell lines.
+#'   \item \strong{synonyms} the synonyms of cell lines.
+#'   \item \strong{cellosaurus_accession} Cellosaurus Accession for cell lines.
+#'   \item \strong{disease_name} diseases that are associated with the cell
+#'     lines
+#'   \item \strong{disease_id} NCI Thesaurus entry code of the diseases.
 #'   \item \strong{tissue} Tissues that the cell line generated from. Following
 #'   the CCLE category.
 #'}
 #'
-#' @return A data frame contains cell line information selected by \code{info}
+#' @return  cell line information selected by \code{info}
+#'
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
-GetCellInfo <- function(node, info = "accession") {
 
-  if (info == "name") {
-    fun <- function(x) {GetCellName(x)}
-    colname <- c("name", "synonyms")
-  } else if (info == "name_in_one") {
-    fun <- function(x) {GetCellNameInOne(x)}
-    colname <- c("all_names")
-  } else if (info == "accession") {
-    fun <- function(x) {GetAccession(x)}
-    colname <- c("cellosaurus_accession")
-  } else if (info == "disease") {
-    fun <- function(x) {GetDisease(x)}
-    colname <- c("disease_name", "disease_id")
-  } else if (info == "tissue") {
-    fun <- function(x) {GetTissue(x)}
-    colname <- c("tissue_name")
-  } else {
-    stop("Info ", info, ' is not allowed. Available values are: "name",',
-         '"accession", "disease", "tissue", and "name_in_one".')
-  }
+GetCellInfo <- function(accessions, parsed_cell_file) {
 
   temp <- NULL
   mat <- NULL
 
   stepi <- 1
-  n <- length(node)
-  for (i in 1:n) {
+  n <- length(accessions)
+
+  cells <- GetCell(parsed_cell_file, accessions, type = "accession")
+
+  for (cell in cells) {
     message(round(stepi/n * 100), "%", "\r", appendLF = FALSE)
     utils::flush.console()
 
-    temp <- fun(node[[i]])
-    if (length(temp) == 0) {
-      temp <- rep(NA, length(colname))
-    }
-    mat <- rbind(mat, temp)
+    accession <- GetAccession(cell)
+
+    tryCatch({
+      # Get cell name
+      names <- GetCellName(cell)
+      # Get disease
+      diseases <- GetDisease(cell)
+      # Assamble the result
+      temp <- cbind.data.frame(names, diseases)
+      # Get Accession
+      temp$cellosaurus_accession <- accession
+      # Get tissue
+      temp$tissue <- GetTissue(cell)
+
+    }, error = function(e){
+      print(accession)
+      print(e)
+      temp <<- data.frame(name = NA,
+                         synonyms = NA,
+                         disease_name = NA,
+                         disease_id = NA,
+                         tissue = NA,
+                         cellosaurus_accession = accession,
+                         stringsAsFactors = FALSE)
+    })
+
+    mat <- rbind.data.frame(mat, temp)
     temp <- NULL
 
     stepi <- stepi + 1
   }
 
-  colnames(mat) <- colname
   return(mat)
 }
-

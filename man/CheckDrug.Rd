@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_drugcomb.R
 \name{CheckDrug}
 \alias{CheckDrug}
-\title{Check drug archives in DrugComb}
+\title{Check whether input drugs are archived in DrugComb}
 \usage{
 CheckDrug(cids)
 }
@@ -13,11 +13,11 @@ checked.}
 \value{
 A list contains 3 elements:
 \itemize{
-  \item \strong{n} It indicates that there are totally n drugs archived in
+  \item \strong{n}: It indicates that there are totally n drugs archived in
   DrugComb database.
-  \item \strong{old} It lists out the CID of drugs that
+  \item \strong{old}: It lists the CIDs of drugs that
   \emph{have been archived} in DrugComb.
-  \item \strong{new} It lists out the CID of drugs that \emph{are not yet}
+  \item \strong{new}: It lists the CIDs of drugs that \emph{are not yet}
   in DrugComb.
 }
 }
@@ -26,4 +26,7 @@ Function \code{CheckDrug} compares drug CIDs passed to \code{cids} argument
 with CIDs archived in DrugComb (extracted to \code{\link{drugcomb}} R data).
 It will return the total number of drugs have been archived in DrugComb as
 well as which drugs are already or not yet archived in DrugComb.
+}
+\author{
+ShuyuZheng \email{shuyu.zheng@helsinki.fi}
 }
