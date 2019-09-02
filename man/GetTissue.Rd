@@ -19,3 +19,6 @@ from an XMLIntervalElementNode object extracted from Cellosaurus xml file.
 Combining it with \code{apply} or \code{sapply} can extract tissue from an
 XMLNodeSet object.
 }
+\author{
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

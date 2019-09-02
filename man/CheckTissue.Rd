@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_drugcomb.R
 \name{CheckTissue}
 \alias{CheckTissue}
-\title{Check tissues archive in DrugComb}
+\title{Check whether input tissues are archived in DrugComb}
 \usage{
 CheckTissue(test)
 }
@@ -13,11 +13,11 @@ checked.}
 \value{
 A list contains 3 elements:
 \itemize{
-  \item \strong{n} It indicates that there are totally n tissues archived
+  \item \strong{n}: It indicates that there are totally n tissues archived
   in DrugComb database.
-  \item \strong{old} It lists out the names of tissues that
+  \item \strong{old}: It lists the names and IDs of tissues that
   \emph{have been archived} in DrugComb.
-  \item \strong{new} It lists out the names of tissues that
+  \item \strong{new}: It lists the names of tissues that
   \emph{are not yet} in DrugComb.
 }
 }
@@ -27,4 +27,7 @@ argument with tissues archived in DrugComb (extracted to
 \code{\link{drugcomb}} R data). It will return the total number of tissues
 have been archived in DrugComb as well as which tissues are already or not
 yet archived in DrugComb.
+}
+\author{
+ShuyuZheng \email{shuyu.zheng@helsinki.fi}
 }

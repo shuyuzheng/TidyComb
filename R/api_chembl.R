@@ -1,6 +1,10 @@
 # TidyComb
 # Functions for retrieving or updating drug information from ChEMBL database.
-# Copyright Shuyu Zheng
+#
+# Functions on this page
+# ChembelVersion: Check the version of ChEMBL databse
+# GetChembl: Get informateion of drugs from ChEMBL
+# GetChemblPhase: Get clinical trial phase of drugs from ChEMBL
 
 #' Check version of ChEMBL database
 #'

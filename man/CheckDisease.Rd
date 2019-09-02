@@ -2,23 +2,26 @@
 % Please edit documentation in R/check_drugcomb.R
 \name{CheckDisease}
 \alias{CheckDisease}
-\title{Check diseases archive in DrugComb}
+\title{Check whether input diseases are archived in DrugComb}
 \usage{
-CheckDisease(test)
+CheckDisease(disease_df)
 }
 \arguments{
-\item{test}{A character vector. It contains IDs of diseases which would
-be checked.}
+\item{disease_df}{A data frame . It contains tow columns:
+\itemize{
+  \item \strong{id}: the NCIt ID of the disease.
+  \item \strong{name}: the name of the disease.
+}}
 }
 \value{
 A list contains 3 elements:
 \itemize{
-  \item \strong{n} It indicates that there are totally n diseases archived
+  \item \strong{n}: It indicates that there are totally n diseases archived
   in DrugComb database.
-  \item \strong{old} It lists out the ID of diseases that
+  \item \strong{old}: It lists the names and IDs of diseases that
   \emph{have been archived} in DrugComb.
-  \item \strong{new} It lists out the ID of diseases that \emph{are not yet}
-  in DrugComb.
+  \item \strong{new}: It lists the names and IDs of diseases that
+  \emph{are not yet} in DrugComb.
 }
 }
 \description{
@@ -27,4 +30,7 @@ argument with diseases archived in DrugComb (extracted to
 \code{\link{drugcomb}} R data). It will return the total number of diseases
 have been archived in DrugComb as well as which diseases are already or not
 yet archived in DrugComb.
+}
+\author{
+ShuyuZheng \email{shuyu.zheng@helsinki.fi}
 }

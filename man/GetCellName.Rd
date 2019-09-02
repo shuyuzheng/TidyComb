@@ -30,3 +30,6 @@ If you'd like to extract information from multiple \emph{cell-line-list}
 nodes, combining this function with \code{xpathSapply} or
 \code{sapply} is recommanded.
 }
+\author{
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}
