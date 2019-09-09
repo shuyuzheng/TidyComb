@@ -54,8 +54,7 @@ ChemblVersion <- function(){
 GetChembl <- function(ids, quiet = TRUE) {
   message("Getting information from ChEMBL...")
   curlHandle <- RCurl::getCurlHandle()
-  out <- data.frame(stringsAsFactors = FALSE)
-
+  out <- NULL
 
   stepi <- 1
   n <- length(ids)
@@ -65,9 +64,7 @@ GetChembl <- function(ids, quiet = TRUE) {
     utils::flush.console()
 
     tryCatch({
-      new_item <- NA
-      chembl_phase <- NA
-      chembl_id <- NA
+      df <- NULL
       res <- RCurl::dynCurlReader()
 
       url <- paste0("https://www.ebi.ac.uk/chembl/api/data/molecule/", id)
@@ -76,21 +73,19 @@ GetChembl <- function(ids, quiet = TRUE) {
       doc <- XML::xmlInternalTreeParse(res$value())
 
       # clinical phase
-      new_item <- XML::xpathApply(doc, "//max_phase", XML::xmlValue)
-      new_item <- as.integer(unlist(new_item))
-      if (is.na(new_item)) {
-        new_item <- 0
+      chembl_phase <- XML::xpathApply(doc, "//max_phase", XML::xmlValue)
+      chembl_phase <- as.integer(unlist(chembl_phase))
+      if (is.na(chembl_phase)) {
+        chembl_phase <- 0
       }
-      chembl_phase <- c(chembl_phase, new_item)
 
       # Chembl ID
-      new_item <- XML::xpathApply(doc, "//molecule/molecule_chembl_id",
+      chembl_id <- XML::xpathApply(doc, "//molecule/molecule_chembl_id",
                                   XML::xmlValue)
-      new_item <- unlist(new_item)
-      if (is.null(new_item)) {
-        new_item <- NA
+      chembl_id <- unlist(chembl_id)
+      if (is.null(chembl_id)) {
+        chembl_id <- NA
       }
-      chembl_id <- c(chembl_id, new_item)
     },
     error = function(e) {
       chembl_id <<- NA
@@ -98,11 +93,10 @@ GetChembl <- function(ids, quiet = TRUE) {
       if (!quiet) {
         print(e)
       }
-    }
-    )
+    })
     df <- data.frame(inchikey = id, chembl_id = chembl_id,
                      chembl_phase = chembl_phase,
-                     stringsAsFactors = F)
+                     stringsAsFactors = FALSE)
     out <- rbind.data.frame(out, df)
     stepi <- stepi + 1
   }
