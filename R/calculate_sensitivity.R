@@ -1,6 +1,5 @@
 # TidyComb
 # Functions for calculating cell line's sensitivity to drugs or drug combination
-# Copyright Shuyu Zheng
 #
 # Functions on this page:
 #
@@ -35,6 +34,10 @@
 #'
 #' @return A number. The sensitivity score calculated from input dose-response
 #' data
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 #'
@@ -178,6 +181,10 @@ own_log2 = function(x)
 #' of certein drug. It could be directly passed to function
 #' \code{CalculateSens} for scoring.
 #'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @export
 ImputeIC50 <- function(response.mat, col.ic50, row.ic50) {
 
@@ -254,7 +261,7 @@ CalculateIC50 <- function(coef, type, max.conc){
 #' @return A numeric value. It is the response value of cell line to the drug at
 #' inputted dose.
 #'
-#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
+#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 PredictResponse <- function(df, dose) {

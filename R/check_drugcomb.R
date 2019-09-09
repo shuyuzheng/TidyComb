@@ -49,6 +49,7 @@ CheckCell <- function(test) {
   message("Checking Cell lines...")
   exist <- drugcomb$cell_line
   n <- nrow(exist)
+  test <- stats::na.omit(test)
   old <- stats::na.omit(exist[match(test, exist$cellosaurus_accession), ])
   new <- test[!test %in% exist$cellosaurus_accession]
   message("DrugComb has archived ", n, " cell lines.\n",
@@ -92,6 +93,7 @@ CheckTissue <- function(test) {
   }
   exist <- drugcomb$tissue
   n <- nrow(exist)
+  test <- stats::na.omit(test)
   old <- stats::na.omit(exist[match(test, exist$tname), ])
   new <- test[!test %in% exist$tname]
   new <- data.frame(id = seq(n + 1, length.out = length(new)),
@@ -174,6 +176,7 @@ CheckDrug <- function(cids) {
   exist <- drugcomb$drug
   n <- nrow(exist)
   m <- max(exist$id)
+  test <- stats::na.omit(cids)
   old <- stats::na.omit(exist[match(cids, exist$cid), ])
   new <- cids[!cids %in% exist$cid]
   message("DrugComb has archived ", n, " drugs.\n",
