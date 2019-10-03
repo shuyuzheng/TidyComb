@@ -46,21 +46,24 @@
 #'                  response = c(2.95, 3.76, 18.13, 28.69, 46.66, 58.82))
 #' sensitivity <- CalculateSens(df)
 
-CalculateSens <- function(df) {
+CalculateSens <- function(df, sd = FALSE) {
   #options(show.error.messages = FALSE)
   df <- df[which(df$dose != 0),]
   if (nrow(df) == 1) {
     score <- df$response[1]
+    res <- score
   } else {
-    score <- tryCatch({
+    res <- NULL
+    tryCatch({
       # Skip zero conc, drc::LL.4()
       # fitcoefs <- drc::drm(formula = as.numeric(df[2:nrow(df),1]) ~
       #                       as.numeric(rownames(df)[2:nrow(df)]),
       #                     fct = drc::LL.4())$coefficients
       # If fit works, call scoreCurve()
-      fitcoefs <- drc::drm(response ~ dose, data = df, fct = drc::LL.4(),
+      model <- drc::drm(response ~ dose, data = df, fct = drc::LL.4(),
                            control = drc::drmc(errorm = FALSE, noMessage = TRUE,
-                                               otrace = TRUE))$coefficients
+                                               otrace = TRUE))
+      fitcoefs <- model$coefficients
       score <- round(scoreCurve(d = fitcoefs[3] / 100,
                                 c = fitcoefs[2] / 100,
                                 b = fitcoefs[1],
@@ -68,12 +71,21 @@ CalculateSens <- function(df) {
                                 c1 = log10(min(df$dose)),
                                 c2 = log10(max(df$dose)),
                                 t = 0), 3)
+      res <- score
+      # # output standard deviation of each prediction values
+      # if (!score.only){
+      #   pred <- data.frame(predict(model, data.frame(dose = df$dose), interval = "prediction"))
+      #   pred$sd <- (pred[,"Upper"] - pred[,"Prediction"])/1.96
+      #   pred$sd[is.na(pred$sd)] <- sqrt(100 - pred$Prediction[is.na(pred$sd)])
+      #   res <- list(score, pred)
+      # }
     }, error = function(e) {
       # Skip zero conc, log, drc::L.4()
       # message(e)
-      fitcoefs <- drc::drm(response ~ log10(dose), data = df, fct = drc::L.4(),
+      model <- drc::drm(response ~ log10(dose), data = df, fct = drc::L.4(),
                            control = drc::drmc(errorm = FALSE, noMessage = TRUE,
-                                               otrace = FALSE))$coefficients
+                                               otrace = FALSE))
+      fitcoefs <- model$coefficients
       score <- round(scoreCurve.L4(d = fitcoefs[3] / 100,
                                    c = fitcoefs[2] / 100,
                                    b = fitcoefs[1],
@@ -81,11 +93,17 @@ CalculateSens <- function(df) {
                                    c1 = log10(min(df$dose)),
                                    c2 = log10(max(df$dose)),
                                    t = 0), 3)
-    }
-    )
+      res <<- score
+      # if (!score.only){
+      #   pred <- data.frame(predict(model, data.frame(dose = log(df$dose)), interval = "prediction"))
+      #   pred$sd <- (pred[,"Upper"] - pred[,"Prediction"])/1.96
+      #   pred$sd[is.na(pred$sd)] <- sqrt(100 - pred$Prediction[is.na(pred$sd)])
+      #   res <<- list(score, pred)
+      # }
+    })
   }
   #options(show.error.messages = TRUE)
-  return (score)
+  return(res)
 
   #Clean up
   gc()
