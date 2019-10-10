@@ -31,5 +31,5 @@ response model and generate the predict response value at the given dose.
 plesase set the random seed before calling this function.
 }
 \author{
-Shuyu Zheng{shuyu.zheng@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }
