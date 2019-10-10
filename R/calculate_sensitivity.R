@@ -14,14 +14,14 @@
 # own_log/own_log2: facility functions for CalculateSens
 # CalculateIC50: Transform IC50 from coefficients from fitted dose-response model
 
-#' Calculate sensitivity score (relative inhibition)
+#' Calculate relative inhibition (RI) for dose-response curve
 #'
 #' Function \code{CalculateSens} calculates cell line sensitivity to a drug or a
 #' combination of drugs from dose response curve.
 #'
 #' This function measures the sensitivity by calculating the Area Under Curve
-#' (AUC) according to certurn dose response curve. The lower bouder is chosen at
-#' the first non-zero concentration in the dose response data.
+#' (AUC) according to the dose response curve. The lower bouder is chosen as
+#' lowest non-zero concentration in the dose response data.
 #'
 #' @param df A data frame. It contains two variables:
 #' \itemize{
@@ -29,11 +29,19 @@
 #'   \item \strong{response} the response of cell lines at crresponding doses.
 #'   We use inhibition rate of cell line growth to measure the response.
 #' }
+#' @param pred A logical value. If it is \code{TRUE}, the function will
+#' return one more table in the result. It contains the predicted response value
+#' at input doses (according to fitted dose-response model) and corresponding
+#' standard deviation. This table could be used in \code{TRUE}.
+#'
 #' \strong{Note}: The input data frame must be sorted by "dose" with ascending
 #' order.
 #'
-#' @return A number. The sensitivity score calculated from input dose-response
-#' data
+#' @return If \code{pred} is \code{FALSE}, only the RI value will be return. If
+#' \code{pred} is set to be \code{TRUE}, one more data frame which contains
+#' predicted resposne values and corresponding standard deviations will be
+#' return. It could be used to \code{\link{RIConfidenceInterval}} for confidence
+#' interval calculation.
 #'
 #' @author
 #' Jing Tang \email{jing.tang@helsinki.fi}
@@ -42,28 +50,31 @@
 #' @export
 #'
 #' @examples
+#' # LL.4
 #' df <- data.frame(dose = c(0, 0.1954, 0.7812, 3.125, 12.5, 50),
 #'                  response = c(2.95, 3.76, 18.13, 28.69, 46.66, 58.82))
-#' sensitivity <- CalculateSens(df)
+#' RI <- CalculateSens(df)
+#'
+#' RI_with_pred <- CalculateSens(df, pred = TRUE)
 
-CalculateSens <- function(df, sd = FALSE) {
+CalculateSens <- function(df, pred = FALSE) {
   #options(show.error.messages = FALSE)
   df <- df[which(df$dose != 0),]
   if (nrow(df) == 1) {
     score <- df$response[1]
+    if (pred) {
+      warning("Standard deviation of relative inhibition (RI) score can not be",
+      "calculated with data which contains only one dose.")
+    }
     res <- score
   } else {
-    res <- NULL
     tryCatch({
-      # Skip zero conc, drc::LL.4()
-      # fitcoefs <- drc::drm(formula = as.numeric(df[2:nrow(df),1]) ~
-      #                       as.numeric(rownames(df)[2:nrow(df)]),
-      #                     fct = drc::LL.4())$coefficients
-      # If fit works, call scoreCurve()
       model <- drc::drm(response ~ dose, data = df, fct = drc::LL.4(),
                            control = drc::drmc(errorm = FALSE, noMessage = TRUE,
                                                otrace = TRUE))
       fitcoefs <- model$coefficients
+      names(fitcoefs) <- NULL
+      # Calculate DSS
       score <- round(scoreCurve(d = fitcoefs[3] / 100,
                                 c = fitcoefs[2] / 100,
                                 b = fitcoefs[1],
@@ -71,40 +82,35 @@ CalculateSens <- function(df, sd = FALSE) {
                                 c1 = log10(min(df$dose)),
                                 c2 = log10(max(df$dose)),
                                 t = 0), 3)
-      res <- score
-      # # output standard deviation of each prediction values
-      # if (!score.only){
-      #   pred <- data.frame(predict(model, data.frame(dose = df$dose), interval = "prediction"))
-      #   pred$sd <- (pred[,"Upper"] - pred[,"Prediction"])/1.96
-      #   pred$sd[is.na(pred$sd)] <- sqrt(100 - pred$Prediction[is.na(pred$sd)])
-      #   res <- list(score, pred)
-      # }
     }, error = function(e) {
       # Skip zero conc, log, drc::L.4()
       # message(e)
-      model <- drc::drm(response ~ log10(dose), data = df, fct = drc::L.4(),
+      model <<- drc::drm(response ~ log10(dose), data = df, fct = drc::L.4(),
                            control = drc::drmc(errorm = FALSE, noMessage = TRUE,
                                                otrace = FALSE))
       fitcoefs <- model$coefficients
-      score <- round(scoreCurve.L4(d = fitcoefs[3] / 100,
+      names(fitcoefs) <- NULL
+      score <<- round(scoreCurve.L4(d = fitcoefs[3] / 100,
                                    c = fitcoefs[2] / 100,
                                    b = fitcoefs[1],
                                    e = fitcoefs[4],
                                    c1 = log10(min(df$dose)),
                                    c2 = log10(max(df$dose)),
                                    t = 0), 3)
-      res <<- score
-      # if (!score.only){
-      #   pred <- data.frame(predict(model, data.frame(dose = log(df$dose)), interval = "prediction"))
-      #   pred$sd <- (pred[,"Upper"] - pred[,"Prediction"])/1.96
-      #   pred$sd[is.na(pred$sd)] <- sqrt(100 - pred$Prediction[is.na(pred$sd)])
-      #   res <<- list(score, pred)
-      # }
     })
-  }
-  #options(show.error.messages = TRUE)
-  return(res)
 
+    if (pred) {
+      # Calculate SD for DSS
+      pred <- suppressWarnings(predict(model, model$data, interval="prediction"))
+      pred <- cbind(model$data[,1:2], as.data.frame(pred))
+      pred$sd <- (pred[,"Upper"] - pred[,"Prediction"])/(2*1.96)
+      pred$sd[is.na(pred$sd)] <- sqrt(100 - pred$Prediction[is.na(pred$sd)]) # problematic?
+      res <- list(RI = score, pred = pred[, c(1:3, 6)])
+    } else {
+      res <- score
+    }
+    return(res)
+  }
   #Clean up
   gc()
 }
@@ -175,6 +181,79 @@ own_log2 = function(x)
   return(res)
 }
 
+#' Calculate Confidence Interval of RI
+#'
+#' Function \code{RIConfidenceInterval} is used to calculate The confidence
+#' interval of RI (Relitave Inhibition) score for cell sensitivity to certain
+#' drug.
+#'
+#' @details \code{RIConfidenceInterval} takes the prediction results from
+#' \code{\link{CalculateSens}} to generate simmulated dose respons data. The
+#' number of iteration is controlled by parameter \code{iter}. The RIs will
+#' be computated for all the simulated data. Finally, the function will return:
+#' Simulated RI (Median), and two boundaries of RI's confidence interval.
+#'
+#' @param pred A data frame. It must contain:
+#'   \itemize{
+#'     \item \strong{dose} The concentration of drugs used for model fitting
+#'     and prediction.
+#'     \item \strong{prediction} The predicted response value at certain
+#'     doses.
+#'     \item \strong{sd} The standard deviation of predicted response value.
+#'   }
+#' It can be generated by calling \code{\link{CalculateSens}(df, pred = TRUE)}.
+#' @param iter A numeric value. It indicates the number of iterations for
+#' simulation.
+#'
+#' @return A named numeric vector. It contains simulated RI, two boundaries of
+#' the RI's confidence interval
+#'
+#' @author
+#' \item Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' \item Jing Tang \email{jing.tang@helsinki.fi}
+#'
+#' @export
+#'
+#' @examples
+#' df <- data.frame(dose = c(0, 0.1954, 0.7812, 3.125, 12.5, 50),
+#'                  response = c(2.95, 3.76, 18.13, 28.69, 46.66, 58.82))
+#'
+#' RI_with_pred <- CalculateSens(df, pred = TRUE)
+#'
+RIConfidenceInterval <- function(pred, iter = 100){
+  dose <- sort(pred$dose)
+  n <- length(dose)
+  score.simulated <- c()
+
+  # Generate simmulated responses at certain doses.
+  response_sim <- sapply(1:iter, function(x){
+    set.seed(x)
+    rnorm(n, mean = pred$Prediction, sd = pred$sd)
+  })
+
+  # Calculate RI for simmulated dose-response data frames.
+  score_sim <- apply(response_sim, 2, function(x){
+    df <- data.frame(dose = dose, response = x)
+    tryCatch(
+      score <- suppressWarnings(CalculateSens(df, pred = FALSE)),
+      error = function(e){
+        print(e)
+        score <<- NA
+      },
+      finally = return(score)
+    )
+
+  })
+
+  # confidence interval
+  res <- c(simulated_RI = median(score_sim, na.rm = TRUE),
+             lower = quantile(score_sim, probs = 0.025,
+                              names = FALSE, na.rm = TRUE),
+             upper = quantile(score_sim, probs = 0.975,
+                              names = FALSE, na.rm = TRUE))
+
+  return (res)
+}
 #' Impute missing value at IC50 concentration of drug
 #'
 #' \code{ImputeIC50} uses the particular experiment's values to predict the

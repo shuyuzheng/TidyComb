@@ -31,3 +31,7 @@ function) by fixing the concentrations of the
 \strong{other} drug successively, and uses each fit to predict the missing
 value at the combination (missing IC50, fixed conc).
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}
