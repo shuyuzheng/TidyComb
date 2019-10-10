@@ -1,8 +1,8 @@
 Package: TidyComb
 Type: Package
 Title: Preparing drug combination data for DrugComb 
-Version: 0.0.4
-Date: 2019-10-03
+Version: 0.0.5
+Date: 2019-10-10
 Authors: person("Shuyu", "Zheng", email = "shuyu.zheng@helsinki.fi",
     role = c("aut", "cre")) 
      person("Jing", "Tang", email = "jing.tang@helsinki.fi",
