@@ -62,7 +62,7 @@ library(devtools)
 2. To install **TidyComb** from [GitHub](https://github.com/), you'd type:
 
 ```
-install_github("shuyuzheng/TidyComb")
+install_github("DrugComb/TidyComb")
 ```
 
 ## Usage
