@@ -11,7 +11,7 @@ GetCellInfo(accessions, parsed_cell_file)
 searching}
 
 \item{parsed_cell_file}{An "XMLInternalElementNode" extracted from the
-Cellosaurus XML file by function \code{\link{GetAllCell}}}
+Cellosaurus XML file by function \code{\link{ParseCell}}}
 }
 \value{
 A data frame containing 6 columns:

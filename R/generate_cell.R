@@ -7,7 +7,7 @@
 
 #' Match cell line name with cellosaurus accession
 #'
-#' @param name A vector of charactors contains names of interested cell lines
+#' @param names A vector of charactors contains names of interested cell lines
 #'
 #' @param file The path to Cellosaurus XML file which was posted on
 #' \url{https://web.expasy.org/cellosaurus/}

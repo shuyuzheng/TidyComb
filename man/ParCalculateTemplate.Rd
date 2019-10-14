@@ -47,7 +47,7 @@ Parallel Calculate Drug Combination data in template format
 \examples{
 data <- read.csv(system.file("template.csv", package = "TidyComb"),
                  stringsAsFactors = FALSE)
-res <- ParCalculateTemplate(data, cores = 4)
+res <- ParCalculateTemplate(data)
 }
 \author{
 Shuyu Zheng{shuyu.zheng@helsinki.fi}

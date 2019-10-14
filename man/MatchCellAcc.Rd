@@ -7,10 +7,10 @@
 MatchCellAcc(names, file)
 }
 \arguments{
+\item{names}{A vector of charactors contains names of interested cell lines}
+
 \item{file}{The path to Cellosaurus XML file which was posted on
 \url{https://web.expasy.org/cellosaurus/}}
-
-\item{name}{A vector of charactors contains names of interested cell lines}
 }
 \value{
 A data frame contains:

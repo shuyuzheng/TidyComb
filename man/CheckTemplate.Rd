@@ -26,10 +26,9 @@ data <- read.csv(system.file("template.csv", package = "TidyComb"),
                  stringsAsFactors = FALSE)
 CheckTemplate(data)
 
-# Make some messy to data
-
-data_m <- data[, -2]
-CheckTemplate(data_m)
+# Check some messy to data
+# data_m <- data[, -2]
+# CheckTemplate(data_m)
 
 }
 \author{

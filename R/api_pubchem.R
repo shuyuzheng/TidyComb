@@ -106,6 +106,8 @@ GetCid <- function(ids, type , quiet = TRUE) {
 #'
 #' @param cids A vector of characters or integers containing CID of drugs for
 #' searching.
+#' @param quiet A logical value. If it is \code{TRUE} the message for function
+#' progress will be shutted down.
 #'
 #' @return A Data frame contains:
 #' \itemize{
@@ -298,7 +300,7 @@ GetPubPhase <- function(cids, quiet = TRUE) {
 #'
 #' @examples
 #' names <- c("Aspirin", "5-FU")
-#' synonyms <- GetDrugNames(names)
+#' synonyms <- GetPubNames(names)
 #'
 
 GetPubSynonymFromName <- function(names) {

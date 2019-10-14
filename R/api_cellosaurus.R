@@ -137,7 +137,7 @@ ParseCell <- function(file) {
 #' to find entries that matches the names provided in the \code{names}
 #' parameter.
 #'
-#' @param node An XMLNodelist. It is the output of \code{\link{GetAllCell}}
+#' @param node An XMLNodelist. It is the output of \code{\link{ParseCell}}
 #' function which contains all cell lines' information in Cellosaurus dataset.
 #'
 #' @param ids A vector of characters. It is the name or Cellosaurus accession of
@@ -311,7 +311,7 @@ GetAccession <- function(node){
 #' into a data frame.
 #'
 #' @param parsed_cell_file An "XMLInternalElementNode" extracted from the
-#' Cellosaurus XML file by function \code{\link{GetAllCell}}
+#' Cellosaurus XML file by function \code{\link{ParseCell}}
 #'
 #' @param accessions A vector containing the Cellosaurus accessions for
 #' searching

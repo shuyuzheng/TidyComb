@@ -9,6 +9,9 @@ GetPubNames(cids, quiet = TRUE)
 \arguments{
 \item{cids}{A vector of characters or integers containing CID of drugs for
 searching.}
+
+\item{quiet}{A logical value. If it is \code{TRUE} the message for function
+progress will be shutted down.}
 }
 \value{
 A Data frame contains:

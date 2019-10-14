@@ -20,7 +20,7 @@
 #' @export
 #'
 #' @examples
-#' print(ChemblVersion())
+#' # print(ChemblVersion())
 ChemblVersion <- function(){
   url <- "https://www.ebi.ac.uk/chembl/api/data/status?format=json"
   res <- jsonlite::fromJSON(url, flatten = TRUE)

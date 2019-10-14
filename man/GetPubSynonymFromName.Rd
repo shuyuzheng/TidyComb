@@ -24,6 +24,6 @@ retrieves synonyms of drugs.
 }
 \examples{
 names <- c("Aspirin", "5-FU")
-synonyms <- GetDrugNames(names)
+synonyms <- GetPubNames(names)
 
 }

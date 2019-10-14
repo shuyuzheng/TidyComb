@@ -2,3 +2,5 @@
 ^data-raw$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.git.*$
+^CHANGELOG.md$

@@ -44,6 +44,6 @@ RI_with_pred <- CalculateSens(df, pred = TRUE)
 
 }
 \author{
-\item Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
-\item Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+Jing Tang \email{jing.tang@helsinki.fi}
 }

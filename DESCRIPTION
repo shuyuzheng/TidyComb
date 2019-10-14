@@ -3,10 +3,11 @@ Type: Package
 Title: Preparing drug combination data for DrugComb 
 Version: 0.0.5
 Date: 2019-10-10
-Authors: person("Shuyu", "Zheng", email = "shuyu.zheng@helsinki.fi",
+Author: person("Shuyu", "Zheng", email = "shuyu.zheng@helsinki.fi",
     role = c("aut", "cre")) 
      person("Jing", "Tang", email = "jing.tang@helsinki.fi",
     role = c("aut", "cre")) 
+Maintainer: Shuyu Zheng <shuyu.zheng@helsinki.fi>
 Description: This package wrapped the functions that could be used to tidy drug
     combination data from various sources into the format that is required by 
     uploading to DrugComb database. It includes functions for retrieving drug 
@@ -15,7 +16,7 @@ Description: This package wrapped the functions that could be used to tidy drug
     scores, etc.
 Depends: 
     R (>= 3.5)
-License: Mozilla Public License 2.0 + file LICENSE
+License: Mozilla Public License 2.0
 Encoding: UTF-8
 Imports: 
     XML, RCurl, jsonlite, dplyr, plyr, reshape2, drc, nleqslv, gplots,
