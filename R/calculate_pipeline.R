@@ -265,7 +265,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
 #' arguments are:
 #'  \itemize{
 #'    \item \code{correction} and \code{noise} inherited from function
-#'          \code{\link{alculateMat}};
+#'          \code{\link{CalculateMat}};
 #'    \item \code{Emin} and \code{Emax} inherited from function
 #'          \code{\link{FitDoseResponse}}.
 #' }
@@ -461,7 +461,7 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #' @examples
 #' data <- read.csv(system.file("template.csv", package = "TidyComb"),
 #'                  stringsAsFactors = FALSE)
-#' res <- ParCalculateTemplate(data, cores = 4)
+#' res <- ParCalculateTemplate(data)
 ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE) {
   CheckTemplate(template)
   blocks <- unique(template$block_id)

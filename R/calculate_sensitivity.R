@@ -109,8 +109,8 @@ CalculateSens <- function(df, pred = FALSE) {
     } else {
       res <- score
     }
-    return(res)
   }
+  return(res)
   #Clean up
   gc()
 }
@@ -209,8 +209,8 @@ own_log2 = function(x)
 #' the RI's confidence interval
 #'
 #' @author
-#' \item Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
-#' \item Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' Jing Tang \email{jing.tang@helsinki.fi}
 #'
 #' @export
 #'

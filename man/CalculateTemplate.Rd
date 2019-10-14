@@ -43,7 +43,7 @@ Default setting is \code{FALSE}.}
 arguments are:
  \itemize{
    \item \code{correction} and \code{noise} inherited from function
-         \code{\link{alculateMat}};
+         \code{\link{CalculateMat}};
    \item \code{Emin} and \code{Emax} inherited from function
          \code{\link{FitDoseResponse}}.
 }}

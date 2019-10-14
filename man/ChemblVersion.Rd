@@ -19,5 +19,5 @@ the current version ChEMBL database.
 \href{https://www.ebi.ac.uk/chembl/ws}{ChEMBL Web Services}.
 }
 \examples{
-print(ChemblVersion())
+# print(ChemblVersion())
 }

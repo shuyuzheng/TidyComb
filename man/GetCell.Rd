@@ -7,7 +7,7 @@
 GetCell(node, ids, type = "name")
 }
 \arguments{
-\item{node}{An XMLNodelist. It is the output of \code{\link{GetAllCell}}
+\item{node}{An XMLNodelist. It is the output of \code{\link{ParseCell}}
 function which contains all cell lines' information in Cellosaurus dataset.}
 
 \item{ids}{A vector of characters. It is the name or Cellosaurus accession of
