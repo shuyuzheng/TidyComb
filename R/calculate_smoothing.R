@@ -12,7 +12,7 @@ smoothing <-  function (scores.mat, len = 2) {
 
   # missing value imputation
   while (sum(is.na(scores.mat))) {
-    scores.mat <- ImputeNear(scores.mat)
+    scores.mat <- synergyfinder::ImputeNA(scores.mat)
   }
   ext.row.len <- (nr - 1) * (len + 2) - (nr - 2)
   ext.col.len <- (nc - 1) * (len + 2) - (nc - 2)
