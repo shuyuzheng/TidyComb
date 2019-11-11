@@ -26,5 +26,5 @@ from PubChem database via
 accordint to CIDs.
 }
 \examples{
-clinical.phase <- GetPubPhase(c(1,2,3,4))
+clinical.phase <- GetPubPhase(c(1,2,3,4, 2244))
 }
