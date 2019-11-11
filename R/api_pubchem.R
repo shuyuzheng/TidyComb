@@ -222,11 +222,13 @@ GetPubchemPro <- function(cids) {
 #' @export
 #'
 #' @examples
-#' clinical.phase <- GetPubPhase(c(1,2,3,4))
+#' clinical.phase <- GetPubPhase(c(1,2,3,4, 2244))
 GetPubPhase <- function(cids, quiet = TRUE) {
   message("Getting clinical phases from PubChem...")
   # build container
-  clinical_phase <- NULL
+  clinical_phase <- data.frame(cid = integer(),
+                               phase = integer(),
+                               stringsAsFactors = FALSE)
   # set indicator
   i <- 1
   n <- length(cids)
@@ -245,39 +247,48 @@ GetPubPhase <- function(cids, quiet = TRUE) {
                     '"start":1,"limit":10000}')
       res <- jsonlite::fromJSON(url)
       status <- res$SDQOutputSet[[1]][[1]]
-      temp <- matrix(c(compound, 0), nrow = 1)
-      colnames(temp) <- c("cid", "phase")
 
       if (status == 0) {
         # extract max clinical phase
-        phase <- res$SDQOutputSet[[5]][[1]]
+        phase <- res$SDQOutputSet[[5]][[1]]$phase
         if (length(phase) != 0) {
-          temp <- res$SDQOutputSet[[5]][[1]][1,]
+          phase <- phase[1]
+          phase <- as.integer(substr(phase, nchar(phase), nchar(phase)))
+          temp <- data.frame(cid = compound,
+                             phase = phase,
+                             stringsAsFactors = FALSE)
+        } else {
+          temp <- data.frame(cid = compound,
+                             phase = 0,
+                             stringsAsFactors = FALSE)
         }
-      } else if (status != 0) {
+      } else {
         error <- res$SDQOutputSet[[1]][[2]]
-        temp <- matrix(c(compound, 0), nrow = 1)
+        temp <- data.frame(cid = compound,
+                           phase = 0,
+                           stringsAsFactors = FALSE)
         if (!quiet) {
           print( strsplit(error, ". ", fixed = T)[[1]][1] )
         }
       }
     }, error = function(e){
-      temp <- matrix(c(compound, 0), nrow = 1)
+      temp <- data.frame(cid = compound,
+                         phase = 0,
+                         stringsAsFactors = FALSE)
       if (!quiet) {
         print(e)
       }
     }, finally = Sys.sleep(0.2)
     )
 
-    clinical_phase <- rbind(clinical_phase, temp)
+    clinical_phase <- rbind.data.frame(clinical_phase, temp)
     i <- i + 1
+    temp <- NULL
   }
 
   # clean
   gc()
-  clinical_phase <- as.data.frame(clinical_phase)
-  clinical_phase$cid <- as.integer(clinical_phase$cid)
-  clinical_phase$phase <- as.integer(clinical_phase$phase)
+
   return(clinical_phase)
 }
 

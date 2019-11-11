@@ -7,3 +7,4 @@
 ### Changed
 
 - Enable "CalculateSens" function to output "pred" table which contains predicted response, standard deviation from fitted model.
+- Fix bug in "PredictResponse", "GetPubPhase" and "smooting"
