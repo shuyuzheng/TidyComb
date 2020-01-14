@@ -23,6 +23,12 @@
 #'
 CheckTemplate <- function(template){
 
+  # Remove empty lines
+  if (!all(rowSums(is.na(template)) != ncol(template))) {
+    message("Some empty rows were deleted from the uploaded file.")
+    template <- template[rowSums(is.na(template)) != ncol(template),]
+  }
+
   # Column names
   missing_col <- setdiff(c("block_id", "drug_row", "drug_col", "inhibition",
                            "conc_r", "conc_c", "conc_r_unit", "conc_c_unit",
@@ -41,10 +47,12 @@ CheckTemplate <- function(template){
          "' must be 'numeric', 'integer'. Please check and re-upload ",
          "your file.")
   }
-  # NA values is inavailable in columns Conc_r and Conc_c
-  na <- apply(template[, c("conc_r", "conc_c")], 2, function(x) sum(is.na(x)))
+
+  # NA values is inavailable in columns block_id, Conc_r and Conc_c
+  na <- apply(template[, c("block_id", "conc_r", "conc_c")], 2,
+              function(x) sum(is.na(x)))
   if (sum(na) != 0) {
-    m <- c("conc_r", "conc_c")[as.logical(na)]
+    m <- c("block_id","conc_r", "conc_c")[as.logical(na)]
     stop("There are missing values in column '", paste(m, collapse = "', '"),
          "'. Please check and re-upload file.")
   }
@@ -64,7 +72,7 @@ CheckTemplate <- function(template){
     message <- apply(m, 1, function(x){
       comb <- colnames(m)[as.logical(c(x[1:5], FALSE))]
       if (length(comb) != 0){
-        return(paste(paste(comb, collapse = ", "), "in block", x[6]))
+        return(paste0("'", paste(comb, collapse = "', '"), "' of block ", x[6]))
       } else {
         return(NULL)
       }
@@ -72,7 +80,10 @@ CheckTemplate <- function(template){
     if (is.list(message)) {
       message <- do.call(cbind, message)
     }
-    stop(paste(message, collapse = "; "), " contain more than one values. ",
+    stop("The columns 'drug_row', 'drug_col', 'cell_line_name', 'conc_c_unite',",
+         " and 'conc_r_unite' can only have one value in one block. There are",
+         " more than one values in:\n",
+         paste0("colume(s) ", message, collapse = "; "), "\n",
          "Please check and re-upload the file.")
   }
 
