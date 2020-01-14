@@ -24,9 +24,10 @@
 CheckTemplate <- function(template){
 
   # Remove empty lines
-  if (!all(rowSums(is.na(template)) != ncol(template))) {
+  n_na <- (rowSums(is.na(template)) + rowSums(template == "", na.rm = TRUE))
+  if (!all(n_na != ncol(template))) {
     message("Some empty rows were deleted from the uploaded file.")
-    template <- template[rowSums(is.na(template)) != ncol(template),]
+    template <- template[n_na != ncol(template),]
   }
 
   # Column names
@@ -60,11 +61,11 @@ CheckTemplate <- function(template){
   # Duplicate drug_row, drug_col or cell line
   n <- template %>%
     dplyr::group_by(block_id) %>%
-    dplyr::summarise(drug_row = n_distinct(drug_row),
-              drug_col = n_distinct(drug_col),
-              cell_line_name = n_distinct(cell_line_name),
-              conc_c_unit = n_distinct(conc_c_unit),
-              conc_r_unit = n_distinct(conc_r_unit))
+    dplyr::summarise(drug_row = dplyr::n_distinct(drug_row),
+              drug_col = dplyr::n_distinct(drug_col),
+              cell_line_name = dplyr::n_distinct(cell_line_name),
+              conc_c_unit = dplyr::n_distinct(conc_c_unit),
+              conc_r_unit = dplyr::n_distinct(conc_r_unit))
   m <- as.data.frame(n[, -1] > 1)
   m$block_id <-  as.character(n$block_id)
   rows <- m[apply(m[, -6], 1, sum) > 0, ]
@@ -97,5 +98,5 @@ CheckTemplate <- function(template){
   }
 
   gc()
-  return(NULL)
+  return(template)
 }
