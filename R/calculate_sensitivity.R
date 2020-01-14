@@ -368,8 +368,10 @@ PredictResponse <- function(df, dose) {
     model <- synergyfinder::FitDoseResponse(df)
     if (model$call$fct[[1]][[3]] == "LL.4") {
       pred <- stats::predict(model, data.frame(dose = dose))
-    } else {
+    } else if(model$call$fct[[1]][[3]] == "L.4") {
       pred <- stats::predict(model, data.frame(dose = log(dose)))# NB! use log
+    } else {
+      stop("Fitted model should be LL.4 or L.4.")
     }
 
     if (pred > 100) {
