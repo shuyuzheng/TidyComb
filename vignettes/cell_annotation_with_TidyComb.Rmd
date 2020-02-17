@@ -1,0 +1,55 @@
+---
+title: "Cell Annotation with TidyComb"
+author: "Shuyu Zheng"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Cell Annotation with TidyComb}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(TidyComb)
+```
+
+TidyComb uses information from [ExpasyCellosaurus](https://web.expasy.org/cellosaurus) to generate cell line annotations. As Cellosaurus doesn't provide API, TidyComb embeded whole Cellosaurus data from [Cellosaurus](ftp://ftp.expasy.org/databases/cellosaurus) in the package.
+
+# 1. Check Cellosaurus database version
+
+By defaut, function `CellVersion()` will check the current online Cellosaurus data version
+
+```{r}
+CellVersion()
+```
+
+Version of the Cellosaurus data embedded by TidyComb can be shown wih:
+
+```{r}
+CellVersion(file = system.file("cellosaurus.xml", package = "TidyComb"))
+```
+
+**Note**: If you find the embedded Cellosaurus data is too old. You can download newest data from ftp://ftp.expasy.org/databases/cellosaurus and save it in your work directory and use this file in the following functions.
+
+# 2. Get cellosaurus accession with cell line name
+
+**Cellosaurus accession** is the unique identifier used by Cellosaurus to archive cell lines
+
+```{r}
+cell_name <- c("U87", "HSTS", "LNCAP")
+MatchCellAcc(cell_name, file = system.file("cellosaurus.xml", package = "TidyComb")) # I'm using the embedded data. You can change is into the file downloaded by yourself
+```
+
+# 3. Get cell line information with cellosaurus accession
+
+```{r}
+doc <- ParseCell(file = system.file("cellosaurus.xml", package = "TidyComb")) # I'm using the embedded data. You can change is into the file downloaded by yourself
+GetCellInfo(c("CVCL_0022", "CVCL_0395"), doc)
+```
+

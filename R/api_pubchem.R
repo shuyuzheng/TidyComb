@@ -7,9 +7,9 @@
 #' \code{GetCid} matches CID of drugs according to user-provided identifiers.
 #'
 #' \code{GetCid} queries PubChem database via
-#' (\href{https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html}{PUG REST}
+#' \href{https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html}{PUG REST}
 #' to search matched CIDs of drugs according to other identifiers. Available
-#' identifiers are: name, SID, SMILES, InChI, SDF, InChIKey, molecula formula.
+#' identifiers are: name, SMILES, InChIKey.
 #'
 #' Following is the \strong{"API USAGE POLICY"}:
 #' Please note that PUG REST is not designed for very large volumes (millions)
@@ -27,12 +27,9 @@
 #'   \itemize{
 #'   \item \strong{smiles} Identifiers of drugs in the simplified molecular-input
 #'   line-entry system (SMILES).
-#'   \item \strong{inchi} The IUPAC International Chemical Identifier (InChI).
 #'   \item \strong{inchikey} Standard InChIKey of the drugs.
-#'   \item \strong{formula} Molecule formula of the drugs.
 #'   \item \strong{name} Name for drugs. This type could be used for searching
 #'   synonyms, NCGC IDs, Chembl IDs, CAS or any other kind of identifiers.
-#'   \item \strong{sdf} The SDF
 #'   }
 #'
 #' @param quiet A logical value. If it is \code{TRUE}, the error message
@@ -50,10 +47,11 @@
 #' GetCid("aspirin", "name", quiet = TRUE)
 GetCid <- function(ids, type , quiet = TRUE) {
   message("Getting CIDs from PubChem...")
-  types <- c("name", "smiles", "inchi", "sdf", "inchikey", "formula")
+  types <- c("name", "smiles", "inchikey")
 
   if (!(type %in% types)) {
-    stop("Invalid idtype specified, valiable idtypes are: ", types)
+    stop("Invalid idtype specified, valiable idtypes are: ",
+         paste(types, collapse = ", "))
   }
 
   cid <- integer()
@@ -311,7 +309,7 @@ GetPubPhase <- function(cids, quiet = TRUE) {
 #'
 #' @examples
 #' names <- c("Aspirin", "5-FU")
-#' synonyms <- GetPubNames(names)
+#' synonyms <- GetPubSynonymFromName(names)
 #'
 
 GetPubSynonymFromName <- function(names) {

@@ -3,7 +3,6 @@
 \docType{package}
 \name{TidyComb}
 \alias{TidyComb}
-\alias{TidyComb-package}
 \title{TidyComb: Preparing drug combination data for DrugComb}
 \description{
 This package wrapped the functions that could be used to tidy drug

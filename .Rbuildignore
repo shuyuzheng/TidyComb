@@ -4,3 +4,5 @@
 ^\.Rproj\.user$
 ^\.git.*$
 ^CHANGELOG.md$
+^doc$
+^Meta$

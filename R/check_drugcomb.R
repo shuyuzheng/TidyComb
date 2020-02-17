@@ -86,10 +86,17 @@ CheckCell <- function(test) {
 #' @export
 CheckTissue <- function(test) {
   message("Checking tissues...")
+  if (sum(is.na(test)) > 0) {
+    message("There are missing values in input data. Please check the ",
+    "'cell_line' table and  manually fix missing tissues or remove missin",
+    "values from input data with function 'na.omit'.")
+    return(NULL)
+  }
   if ("central_nervous_system" %in% test){
-    stop("Please check the cell lines from 'central_nevours_system' to specify
+    message("Please check the cell lines from 'central_nevours_system' to specify
          which of the following subtypes they are from: 'brain',
-         'nervous_system', or 'spinal_cord_or_other_CNS'.")
+         'nervours_system', or 'spinal_cord_or_other_CNS'.")
+    return(NULL)
   }
   exist <- drugcomb$tissue
   n <- nrow(exist)
@@ -136,6 +143,9 @@ CheckTissue <- function(test) {
 #' @export
 CheckDisease <- function(disease_df) {
   message("Checking  diseases...")
+  if (!all(c("id", "dname") %in% colnames(disease_df))){
+    stop("The input data frame must contain columns: 'id' and 'dname'")
+  }
   exist <- drugcomb$disease
   n <- nrow(exist)
   old <- unique(stats::na.omit(exist[match(disease_df$id, exist$id), ]))

@@ -20,9 +20,9 @@ License: Mozilla Public License 2.0
 Encoding: UTF-8
 Imports: 
     XML, RCurl, jsonlite, dplyr, plyr, reshape2, drc, nleqslv, gplots,
-    SpatialExtremes, magrittr, stats, utils, foreach, doParallel, rlang, adabag,
+    magrittr, stats, utils, foreach, doParallel, rlang, adabag,
     ape, synergyfinder (>= 2.0.1)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Suggests: 
     testthat, knitr, rmarkdown
 VignetteBuilder: knitr

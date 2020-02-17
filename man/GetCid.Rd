@@ -15,12 +15,9 @@ argument. Available types are:
 \itemize{
 \item \strong{smiles} Identifiers of drugs in the simplified molecular-input
 line-entry system (SMILES).
-\item \strong{inchi} The IUPAC International Chemical Identifier (InChI).
 \item \strong{inchikey} Standard InChIKey of the drugs.
-\item \strong{formula} Molecule formula of the drugs.
 \item \strong{name} Name for drugs. This type could be used for searching
 synonyms, NCGC IDs, Chembl IDs, CAS or any other kind of identifiers.
-\item \strong{sdf} The SDF
 }}
 
 \item{quiet}{A logical value. If it is \code{TRUE}, the error message
@@ -38,9 +35,9 @@ A data frame contains two columns:
 }
 \details{
 \code{GetCid} queries PubChem database via
-(\href{https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html}{PUG REST}
+\href{https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html}{PUG REST}
 to search matched CIDs of drugs according to other identifiers. Available
-identifiers are: name, SID, SMILES, InChI, SDF, InChIKey, molecula formula.
+identifiers are: name, SMILES, InChIKey.
 
 Following is the \strong{"API USAGE POLICY"}:
 Please note that PUG REST is not designed for very large volumes (millions)

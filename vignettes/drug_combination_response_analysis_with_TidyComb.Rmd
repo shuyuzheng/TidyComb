@@ -1,0 +1,123 @@
+---
+title: "Drug Combination Response Analysis"
+author: "Shuyu Zheng"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Drug Combination Response Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(TidyComb)
+library(reshape2)
+library(dplyr)
+```
+
+## 1. Relative Inhibition (RI) for single drug
+
+The **Relative Inhibition (RI)** score is the proportion of the area under the log10-scaled dose-response curve, to the maximum area or the maximum possible inhibition that one drug can achieve at the same dose range.
+$$
+AUC = \int_{c_1}^{c_2} y_{min} + \frac{y_{max} - y_{min}}{1 + 10 ^ {\lambda(log_{10}{IC_{50} - x'}dx')}} \\
+RI = 100 \times \frac{AUC-inh_{min}(c_2 - c_1)}{(1-inh_{min}){c_2 - c_1}}
+$$
+
+, where $x' = log_{10}x$; $[c_1,c_2]$ is the concentration range in which the drug was tested; $inh_{min}$ is the minimum inhibition rate the drug can achieve at the dose range [c~1~, c~2~]. (0 is set by default in function)
+
+Input data should be a data frame which contains two columns:
+
+* **dose**: concentration at which drug was tested.
+* **response**: percentage inhibition of cell growth at each drug concentrations.
+
+```{r message=FALSE, warning=FALSE}
+df <- data.frame(dose = c(0, 0.1954, 0.7812, 3.125, 12.5, 50),
+                response = c(2.95, 3.76, 18.13, 28.69, 46.66, 58.82))
+sens <- CalculateSens(df)
+print(sens)
+```
+
+Calculate 95% confidence interval of RI by simulation. The iteration is set as 100 times by default
+
+```{r message=FALSE, warning=FALSE}
+pred <- CalculateSens(df, pred = TRUE)$pred
+RIConfidenceInterval(pred)
+```
+
+# 2. Drug combination analysis
+
+# 1. Function for single drug response matrix
+
+The input data is a matrix which contains the drug combination reaponse value. Its column names are doses of drug added along columns. Its row name are doses of drug added along rows. 
+
+**Note**: the matrix should be sorted by: 
+  
+1. The concentrations along the column increase _from left to right_;
+2. The concentrations along the row increase _from top to bottom_.
+
+```{r}
+data <- read.csv(system.file("template.csv", package = "TidyComb"),
+                 stringsAsFactors = FALSE)
+response.mat <- reshape2::acast(conc_r~conc_c, value.var = "inhibition",
+                               data = data[data$block_id == 1, ])
+response.mat
+```
+
+The `CalculateMat` function with `summary.only = TRUE` setting will return a data frame which contains: 
+
+1. synergy scores calculated with model: ZIP, Bliss, Loewe, HSA
+2. Relative IC50 and RI for two drugs added in the combination block.
+3. CSS and S score for drug combination sensitivity and synergy, respectively.
+
+```{r message=FALSE, warning=FALSE}
+CalculateMat(response.mat, summary.only = TRUE)
+```
+
+By setting `summary.only = FALSE`, you can get 3 more tables: 
+* **synergy**: percentage inhibitions and synergy scores for each wells in the matrix 
+* **surface**: smoothed response or synergy surface for the combination
+* **curve**: model used to fit two single drug dose response curves and fitted parameters.
+
+```{r message=FALSE, warning=FALSE}
+res <- CalculateMat(response.mat)
+res
+```
+
+# 2. Function for multiple drug combinations
+
+The input data must be a data frame which contains following columns:
+
+* **block_id**: It is the unique identifier for each drug response (or combination) block.
+* **drug_row**: It is the name (or ID) of the drug which was added along the rows of drug combination testing matrix.
+* **drug_col**: It is the name (or ID) of the drug which was added along the columns of drug combination testing matrix.
+* **cell_line_name**: It is the name (or ID) of cell line on which drug combination response was tested.
+* **conc_r_unit**: The unit of concentrations used when adding *drug_row*. For example "uM".
+* **conc_c_unit**: The unit of concentrations used when adding *drug_col*. For example "nM".
+* **conc_r**: The concentrations of *drug_row* was added in the drug combination test.
+* **conc_c**: The concentrations of *drug_col* was added in the drug combination test.
+* **inhibition**: The percentage cell growth inhibition at each combinations.
+
+```{r}
+data
+```
+
+```{r message=FALSE}
+CalculateTemplate(data, summary.only = TRUE)
+```
+
+# 3. Function for parallel calculation
+
+Function `ParCalculateTemplate` allows you to do the calculation parallelly on multiple cores.
+
+```{r}
+res <- ParCalculateTemplate(data, cores = 4)
+res
+```
+

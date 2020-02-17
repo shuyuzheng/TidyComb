@@ -89,6 +89,8 @@ GenerateCell <- function(acc, file){
                             cellosaurus_accession = NA,
                             id = NA,
                             stringsAsFactors = FALSE)
+    tissue <- data.frame(id = NA, tname = NA)
+    disease <- data.frame(id = NA, name = NA)
   } else {
     # 1. get cell line information
     cell_info <- GetCellInfo(exist.cell$new, doc)

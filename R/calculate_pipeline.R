@@ -51,9 +51,9 @@
 #'     }
 #'   \item Summarize and generate surface
 #' }
-#' @param response.mat A matrix contain the drug combination reaponse value.
-#' Its column names are doses of drug added along columns. Its row name are
-#' doses of drug added along rows. \cr
+#' @param response.mat A matrix which contains the drug combination reaponse
+#' value. Its column names are doses of drug added along columns. Its row name
+#' are doses of drug added along rows. \cr
 #' \strong{Note}: the matrix should be sorted by: 1. The concentrations along
 #' the column increase \emph{from left to right}; 2. The concentrations along
 #' the row increase \emph{from top to bottom}.
@@ -293,7 +293,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
 #'                  stringsAsFactors = FALSE)
 #' res <- CalculateTemplate(data)
 CalculateTemplate <- function(template, summary.only=FALSE) {
-  CheckTemplate(template)
+  template <- CheckTemplate(template)
 
   blocks <- unique(template$block_id)
 

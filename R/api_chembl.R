@@ -25,6 +25,7 @@ ChemblVersion <- function(){
   url <- "https://www.ebi.ac.uk/chembl/api/data/status?format=json"
   res <- jsonlite::fromJSON(url, flatten = TRUE)
   res <- unlist(res)
+  return(res)
 }
 
 #' Get information from ChEMBL

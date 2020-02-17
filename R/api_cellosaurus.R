@@ -122,7 +122,7 @@ UpdateCell <- function(file) {
 #'
 #' @return An XMLNode containing all cell lines' information archieved in
 #' Cellosaurus dataset.
-#'
+#' @export
 #' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 
 ParseCell <- function(file) {
@@ -149,6 +149,7 @@ ParseCell <- function(file) {
 #' @return An XMLNodeSet containing matched cell lines in the dataset. If no
 #' cell line is matched, a NULL list will be return.
 #'
+#' @export
 #' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 
 GetCell <- function(node, ids, type = "name"){

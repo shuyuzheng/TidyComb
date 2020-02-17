@@ -4,9 +4,10 @@
 \alias{CellVersion}
 \title{Check Cellosaurus XML file version.}
 \usage{
-
-  CellVersion(file = "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml",
-  ...)
+CellVersion(
+  file = "ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml",
+  ...
+)
 }
 \arguments{
 \item{file}{File path to an XML file contains the Cellosaurus dataset.}

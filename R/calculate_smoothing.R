@@ -4,6 +4,7 @@
 #
 # Functions on this page:
 # smoothing
+
 smoothing <-  function (scores.mat, len = 2) {
 
   options(scipen = 999)
@@ -22,7 +23,7 @@ smoothing <-  function (scores.mat, len = 2) {
 
   krig.coord <- cbind(rep(extended.row.idx, each = ext.col.len),
                       rep(extended.col.idx, times = ext.row.len))
-  extended.scores <- SpatialExtremes::kriging(data = c(scores.mat),
+  extended.scores <- synergyfinder::kriging(data = c(scores.mat),
                                       data.coord = cbind(rep(1:nr, nc),
                                                          rep(1:nc, each = nr)),
                                       krig.coord = krig.coord,
@@ -60,36 +61,3 @@ smoothing <-  function (scores.mat, len = 2) {
   # Clean up
   gc()
 }
-
-# col.dose <- as.numeric(rownames(scores.mat))
-# row.dose <- as.numeric(colnames(scores.mat))
-#
-# extend.row.dose <- mapply(function(x, y){seq(from = x, to = y,
-#                                              length.out = len + 2)},
-#                           row.dose[-nr], row.dose[-1])
-# extend.row.dose <- unique(round(c(extend.row.dose), 7))
-#
-# extend.col.dose <- mapply(function(x, y){seq(from = x, to = y,
-#                                              length.out = len + 2)},
-#                           col.dose[-nc], col.dose[-1])
-# extend.col.dose <- unique(round(c(extend.col.dose), 7))
-#
-# len.col <- length(extend.row.dose)
-# len.row <- length(extend.col.dose)
-# melt.mat <- reshape2::melt(scores.mat)
-# test <- SpatialExtremes::kriging(data = melt.mat[, 3],
-#                                 data.coord = as.matrix(melt.mat[, 1:2]),
-#                                 krig.coord = cbind(rep(extend.col.dose,
-#                                                        times = len.row),
-#                                                    rep(extend.row.dose,
-#                                                        each = len.col)),
-#                                 cov.mod = "whitmat",
-#                                 grid = FALSE,
-#                                 sill = 1, range = 10,
-#                                 smooth = 0.8)$krig.est
-#
-# test <- t(matrix(test, nrow = len.row,
-#                ncol = len.col, byrow = TRUE))
-#
-# colnames(test) <- extend.row.dose
-# rownames(test) <- extend.col.dose

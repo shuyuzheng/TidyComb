@@ -4,13 +4,17 @@
 \alias{CalculateMat}
 \title{Chain all calculation about one dose-response matrix}
 \usage{
-CalculateMat(response.mat, noise = TRUE, correction = "non",
-  summary.only = FALSE)
+CalculateMat(
+  response.mat,
+  noise = TRUE,
+  correction = "non",
+  summary.only = FALSE
+)
 }
 \arguments{
-\item{response.mat}{A matrix contain the drug combination reaponse value.
-Its column names are doses of drug added along columns. Its row name are
-doses of drug added along rows. \cr
+\item{response.mat}{A matrix which contains the drug combination reaponse
+value. Its column names are doses of drug added along columns. Its row name
+are doses of drug added along rows. \cr
 \strong{Note}: the matrix should be sorted by: 1. The concentrations along
 the column increase \emph{from left to right}; 2. The concentrations along
 the row increase \emph{from top to bottom}.}
