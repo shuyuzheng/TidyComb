@@ -4,7 +4,7 @@
 \alias{CalculateTemplate}
 \title{Calculate Drug Combination data in template format}
 \usage{
-CalculateTemplate(template, summary.only = FALSE)
+CalculateTemplate(template, summary.only = FALSE, seed = NULL)
 }
 \arguments{
 \item{template}{a dataframe which must contains following columns:
@@ -39,14 +39,9 @@ CalculateTemplate(template, summary.only = FALSE)
 table is calculated and returned, otherwise, for tables will be return.
 Default setting is \code{FALSE}.}
 
-\item{...}{Other arguments required by nested functions. Some important
-arguments are:
- \itemize{
-   \item \code{correction} and \code{noise} inherited from function
-         \code{\link{CalculateMat}};
-   \item \code{Emin} and \code{Emax} inherited from function
-         \code{\link{FitDoseResponse}}.
-}}
+\item{seed}{a integer or NULL. It is used to set the random seed to
+\code{AddNoise} function to make sure the results are reproducible.
+By default, it is set as NULL which means no seed was set.}
 }
 \value{
 A list. It contains 4 tables:

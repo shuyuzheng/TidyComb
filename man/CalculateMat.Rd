@@ -8,7 +8,8 @@ CalculateMat(
   response.mat,
   noise = TRUE,
   correction = "non",
-  summary.only = FALSE
+  summary.only = FALSE,
+  seed = NULL
 )
 }
 \arguments{
@@ -33,6 +34,10 @@ to the "inhibition" values in the matrix. Default is \code{TRUE}.}
 \item{summary.only}{a logical value. If it is \code{TRUE} then only summary
 table is calculated and returned, otherwise, for tables will be return.
 Default setting is \code{FALSE}.}
+
+\item{seed}{a integer or NULL. It is used to set the random seed to
+\code{AddNoise} function to make sure the results are reproducible.
+By default, it is set as NULL which means no seed was set.}
 }
 \value{
 A list contains 4 tables:
@@ -80,7 +85,8 @@ The steps for calculation:
     }
   \item Whole response matrix process
     \enumerate{
-      \item Calculate Synergy Scores with function \code{\link[synergyfinder]{ZIP}},
+      \item Calculate Synergy Scores with function
+      \code{\link[synergyfinder]{ZIP}},
       \code{\link[synergyfinder]{Bliss}}, \code{\link[synergyfinder]{HSA}},
       \code{\link[synergyfinder]{Loewe}} in \code{synergyfinder} package.
       \item Calculate Surface(The landscape of response, synergy scores)

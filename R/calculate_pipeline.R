@@ -42,7 +42,8 @@
 #'     }
 #'   \item Whole response matrix process
 #'     \enumerate{
-#'       \item Calculate Synergy Scores with function \code{\link[synergyfinder]{ZIP}},
+#'       \item Calculate Synergy Scores with function
+#'       \code{\link[synergyfinder]{ZIP}},
 #'       \code{\link[synergyfinder]{Bliss}}, \code{\link[synergyfinder]{HSA}},
 #'       \code{\link[synergyfinder]{Loewe}} in \code{synergyfinder} package.
 #'       \item Calculate Surface(The landscape of response, synergy scores)
@@ -73,6 +74,10 @@
 #' table is calculated and returned, otherwise, for tables will be return.
 #' Default setting is \code{FALSE}.
 #'
+#' @param seed a integer or NULL. It is used to set the random seed to
+#' \code{AddNoise} function to make sure the results are reproducible.
+#' By default, it is set as NULL which means no seed was set.
+#'
 #' @return A list contains 4 tables:
 #'   \itemize{
 #'     \item \strong{synergy} It contains the modified inhibition value and 4
@@ -100,7 +105,7 @@
 #'                                 data = data[data$block_id == 1, ])
 #' res <- CalculateMat(response.mat)
 CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
-                         summary.only = FALSE) {
+                         summary.only = FALSE, seed = NULL) {
 
   options(scipen = 999)
 
@@ -117,7 +122,9 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
   }
 
   # 1.2. Add random noise to original matrix
-  set.seed(1)
+  if (!is.null(seed)){
+    set.seed(seed)
+  }
   if (noise) {
     response.mat <- synergyfinder::AddNoise(response.mat)
   }
@@ -261,14 +268,9 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
 #' table is calculated and returned, otherwise, for tables will be return.
 #' Default setting is \code{FALSE}.
 #'
-#' @param ... Other arguments required by nested functions. Some important
-#' arguments are:
-#'  \itemize{
-#'    \item \code{correction} and \code{noise} inherited from function
-#'          \code{\link{CalculateMat}};
-#'    \item \code{Emin} and \code{Emax} inherited from function
-#'          \code{\link{FitDoseResponse}}.
-#' }
+#' @param seed a integer or NULL. It is used to set the random seed to
+#' \code{AddNoise} function to make sure the results are reproducible.
+#' By default, it is set as NULL which means no seed was set.
 #'
 #' @return A list. It contains 4 tables:
 #'   \itemize{
@@ -292,7 +294,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
 #' data <- read.csv(system.file("template.csv", package = "TidyComb"),
 #'                  stringsAsFactors = FALSE)
 #' res <- CalculateTemplate(data)
-CalculateTemplate <- function(template, summary.only=FALSE) {
+CalculateTemplate <- function(template, summary.only=FALSE, seed = NULL) {
   template <- CheckTemplate(template)
 
   blocks <- unique(template$block_id)
@@ -330,8 +332,8 @@ CalculateTemplate <- function(template, summary.only=FALSE) {
 
     # 2. Do calculation on matrix (with error control)
     tmp <- tryCatch({
-      CalculateMat(response.mat = response.mat,
-                   summary.only = summary.only)
+      CalculateMat(response.mat = response.mat, summary.only = summary.only,
+                   seed = seed)
     }, error = function(e) {
       print(block)
       traceback()
@@ -430,6 +432,10 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #' table is calculated and returned, otherwise, for tables will be return.
 #' Default setting is \code{FALSE}.
 #'
+#' @param seed a integer or NULL. It is used to set the random seed to
+#' \code{AddNoise} function to make sure the results are reproducible.
+#' By default, it is set as NULL which means no seed was set.
+#'
 #' @param ... Other arguments required by nested functions. Some important
 #' arguments are:
 #'  \itemize{
@@ -462,7 +468,8 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #' data <- read.csv(system.file("template.csv", package = "TidyComb"),
 #'                  stringsAsFactors = FALSE)
 #' res <- ParCalculateTemplate(data)
-ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE) {
+ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE,
+                                 seed = NULL) {
   template <- CheckTemplate(template)
   blocks <- unique(template$block_id)
 
@@ -470,7 +477,7 @@ ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE) {
   doParallel::registerDoParallel(cl)
 
   res <- foreach::foreach (i = 1:length(blocks)) %dopar% {
-    set.seed(1)
+
     # 1. Generate response matrix for each block
     result <- multiResultClass()
     response <- template %>%
@@ -482,7 +489,7 @@ ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE) {
 
     # 2. Do calculation on matrix
     tmp <- CalculateMat(response.mat = response.mat,
-                        summary.only = summary.only)
+                        summary.only = summary.only, seed = seed)
     if (summary.only) {
       tmp$block_id = rep(blocks[i], nrow(tmp))
     } else {

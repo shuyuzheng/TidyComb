@@ -32,6 +32,7 @@ CellVersion()
 Version of the Cellosaurus data embedded by TidyComb can be shown wih:
 
 ```{r}
+download.file("ftp://ftp.expasy.org/databases/cellosaurus")
 CellVersion(file = system.file("cellosaurus.xml", package = "TidyComb"))
 ```
 
@@ -43,13 +44,15 @@ CellVersion(file = system.file("cellosaurus.xml", package = "TidyComb"))
 
 ```{r}
 cell_name <- c("U87", "HSTS", "LNCAP")
-MatchCellAcc(cell_name, file = system.file("cellosaurus.xml", package = "TidyComb")) # I'm using the embedded data. You can change is into the file downloaded by yourself
+# I'm using the embedded data. You can change is into the file downloaded by yourself
+MatchCellAcc(cell_name, file = system.file("cellosaurus.xml", package = "TidyComb")) 
 ```
 
 # 3. Get cell line information with cellosaurus accession
 
 ```{r}
-doc <- ParseCell(file = system.file("cellosaurus.xml", package = "TidyComb")) # I'm using the embedded data. You can change is into the file downloaded by yourself
+# I'm using the embedded data. You can change is into the file downloaded by yourself
+doc <- ParseCell(file = system.file("cellosaurus.xml", package = "TidyComb")) 
 GetCellInfo(c("CVCL_0022", "CVCL_0395"), doc)
 ```
 

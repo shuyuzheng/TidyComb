@@ -4,7 +4,7 @@
 \alias{ParCalculateTemplate}
 \title{Parallel Calculate Drug Combination data in template format}
 \usage{
-ParCalculateTemplate(template, cores = 1, summary.only = FALSE)
+ParCalculateTemplate(template, cores = 1, summary.only = FALSE, seed = NULL)
 }
 \arguments{
 \item{template}{a dataframe in the format as template. Columns "block_id",
@@ -17,6 +17,10 @@ the parallel processed}
 \item{summary.only}{a logical value. If it is \code{TRUE} then only summary
 table is calculated and returned, otherwise, for tables will be return.
 Default setting is \code{FALSE}.}
+
+\item{seed}{a integer or NULL. It is used to set the random seed to
+\code{AddNoise} function to make sure the results are reproducible.
+By default, it is set as NULL which means no seed was set.}
 
 \item{...}{Other arguments required by nested functions. Some important
 arguments are:

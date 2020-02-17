@@ -326,20 +326,20 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">template &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="kw">system.file</span>(<span class="st">&quot;template.csv&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;TidyComb&quot;</span>),</a>
 <a class="sourceLine" id="cb2-2" title="2">                     <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb2-3" title="3"><span class="kw">head</span>(template)</a></code></pre></div>
-<pre><code>##   block_id                     drug_row     drug_col cell_line_name conc_r_unit
-## 1    62898             (-)-BLEBBISTATIN TEMOZOLOMIDE            U87          uM
-## 2    62898             (-)-BLEBBISTATIN TEMOZOLOMIDE            U87          uM
-## 3    62898             (-)-BLEBBISTATIN TEMOZOLOMIDE            U87          uM
-## 4    62898             (-)-BLEBBISTATIN TEMOZOLOMIDE            U87          uM
-## 5    62899 (-)-EPIGALLOCATECHIN GALLATE TEMOZOLOMIDE            U87          uM
-## 6    62899 (-)-EPIGALLOCATECHIN GALLATE TEMOZOLOMIDE            U87          uM
-##   conc_c_unit conc_r conc_c inhibition
-## 1          uM      0      0   0.000000
-## 2          uM      0    400   6.892557
-## 3          uM      5      0 -87.251393
-## 4          uM      5    400 -28.644496
-## 5          uM      0      0   0.000000
-## 6          uM      0    400   6.892557</code></pre>
+<pre><code>##   block_id                     drug_row     drug_col conc_r_unit conc_c_unit
+## 1    62898             (-)-BLEBBISTATIN TEMOZOLOMIDE          uM          uM
+## 2    62898             (-)-BLEBBISTATIN TEMOZOLOMIDE          uM          uM
+## 3    62898             (-)-BLEBBISTATIN TEMOZOLOMIDE          uM          uM
+## 4    62898             (-)-BLEBBISTATIN TEMOZOLOMIDE          uM          uM
+## 5    62899 (-)-EPIGALLOCATECHIN GALLATE TEMOZOLOMIDE          uM          uM
+## 6    62899 (-)-EPIGALLOCATECHIN GALLATE TEMOZOLOMIDE          uM          uM
+##   cell_line_name conc_r conc_c inhibition
+## 1            U87      0      0   0.000000
+## 2            U87      0    400   6.892557
+## 3            U87      5      0 -87.251393
+## 4            U87      5    400 -28.644496
+## 5            U87      0      0   0.000000
+## 6            U87      0    400   6.892557</code></pre>
 <p><em>Note</em>: Whithin one block, only one cell_line_name, drug_row, drug_col, conc_r_unit, conc_c_unit. The combination of conc_r or conc_c can not be duplicated in one block. Function <em>CheckTemplate</em> was designed for user to check the format of input data. For example:</p>
 </div>
 <div id="output-data" class="section level1">
@@ -363,13 +363,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <pre><code>##       input_name cellosaurus_accession
 ## text         U87             CVCL_0022
 ## text1        U87             CVCL_GP63
-## text2      H-STS             CVCL_L296
+## text2      A2058             CVCL_1059
 ## text3      LNCAP             CVCL_0395
 ## text4       TMD8             CVCL_A442
 ##                                                                                      synonyms
 ## text     U-87MG ATCC; U-87MG; U-87 MG; U87 MG; U-87-MG; U87-MG; U87MG; U-87; U87; 87 MG; 87MG
 ## text1 U-87MG Uppsala; U-87MG; U-87 MG; U87 MG; U-87-MG; U87-MG; U87MG; U-87; U87; 87 MG; 87MG
-## text2                                                                             H-STS; HSTS
+## text2                                                                   A2058; A 2058; A-2058
 ## text3                               LNCaP; LNCAP; LNCap; Lymph Node Carcinoma of the prostate
 ## text4                                      TMD8; TMD-8; Tokyo Medical and Dental university 8</code></pre>
 <p><strong>Note</strong>: Here we have to manually check the matched table and make sure we use the correct cellosaurus accession for further process. Searching conflict cell lines on <a href="https://web.expasy.org/cellosaurus">ExpasyCellosaurus</a> web page may be helpful.</p>
@@ -386,21 +386,18 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb8-2" title="2">                     <span class="dt">file =</span> <span class="kw">system.file</span>(<span class="st">&quot;cellosaurus.xml&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;TidyComb&quot;</span>))</a></code></pre></div>
 <pre><code>## Checking Cell lines...</code></pre>
 <pre><code>## DrugComb has archived 1676 cell lines.
-## 3 inputted cell line(s) have/has been in DrugComb.
-## 1 inputted cell line(s) are/is not in DrugComb.</code></pre>
-<pre><code>## 100%</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">cell<span class="op">$</span>cell_line</a></code></pre></div>
-<pre><code>##    name    synonyms           disease_name disease_id cellosaurus_accession
-## 1 H-STS H-STS; HSTS Midgut carcinoid tumor      C6422             CVCL_L296
-##   tissue   id
-## 1     NA 1677</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">cell_index &lt;-<span class="st"> </span>cell<span class="op">$</span>cell_id <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-2" title="2"><span class="st">  </span><span class="kw">left_join</span>(cell.match.clean, <span class="dt">by =</span> <span class="st">&quot;cellosaurus_accession&quot;</span>)</a></code></pre></div>
+## 4 inputted cell line(s) have/has been in DrugComb.
+## 0 inputted cell line(s) are/is not in DrugComb.</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">cell<span class="op">$</span>cell_line</a></code></pre></div>
+<pre><code>##   name synonyms disease_name disease_id tissue cellosaurus_accession id
+## 1   NA       NA           NA         NA     NA                    NA NA</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">cell_index &lt;-<span class="st"> </span>cell<span class="op">$</span>cell_id <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="st">  </span><span class="kw">left_join</span>(cell.match.clean, <span class="dt">by =</span> <span class="st">&quot;cellosaurus_accession&quot;</span>)</a></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>‘tissue’ table and ‘tissue_index’ table for table matching in the following steps.</li>
 </ol>
 <p>Function <code>CheckTissue</code> will check whether there are new tissues (to DrugComb database) in new ‘cell_line’ table.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">new_tisse &lt;-<span class="st"> </span><span class="kw">CheckTissue</span>(cell<span class="op">$</span>cell_line<span class="op">$</span>tissue)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">new_tisse &lt;-<span class="st"> </span><span class="kw">CheckTissue</span>(cell<span class="op">$</span>cell_line<span class="op">$</span>tissue)</a></code></pre></div>
 <pre><code>## Checking tissues...</code></pre>
 <pre><code>## There are missing values in input data. Please check the &#39;cell_line&#39; table and  manually fix missing tissues or remove missinvalues from input data with function &#39;na.omit&#39;.</code></pre>
 <p>In this case, the tissue information for cell line “H-STS” is missing. We have to manually include the information into the cell_line table.</p>
@@ -409,15 +406,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>the tissue name must be lower cases.</li>
 <li>If the tissue name is “central_nevours_system”, DrugComb requires more precise classifications: ‘brain’, ‘nervours_system’, or ‘spinal_cord_or_other_CNS’.</li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">cell<span class="op">$</span>cell_line<span class="op">$</span>tissue &lt;-<span class="st"> &quot;liver&quot;</span></a>
-<a class="sourceLine" id="cb18-2" title="2">new_tissue &lt;-<span class="st"> </span><span class="kw">CheckTissue</span>(<span class="kw">c</span>(cell<span class="op">$</span>cell_line<span class="op">$</span>tissue))</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">cell<span class="op">$</span>cell_line<span class="op">$</span>tissue &lt;-<span class="st"> &quot;liver&quot;</span></a>
+<a class="sourceLine" id="cb17-2" title="2">new_tissue &lt;-<span class="st"> </span><span class="kw">CheckTissue</span>(<span class="kw">c</span>(cell<span class="op">$</span>cell_line<span class="op">$</span>tissue))</a></code></pre></div>
 <pre><code>## Checking tissues...</code></pre>
 <pre><code>## DrugComb has archived 33 tissues.
 ## 1 inputted tissue(s) have/has been in DrugComb.
 ## 0 inputted tissue(s) are/is not in DrugComb.</code></pre>
 <p>We can see that there is no new tissues. Function <code>CheckTissue</code> returns the tissue ID for ‘liver’ in DrugComb.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">tissue_index &lt;-<span class="st"> </span>new_tissue<span class="op">$</span>old</a>
-<a class="sourceLine" id="cb21-2" title="2">tissue_index</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">tissue_index &lt;-<span class="st"> </span>new_tissue<span class="op">$</span>old</a>
+<a class="sourceLine" id="cb20-2" title="2">tissue_index</a></code></pre></div>
 <pre><code>##    id tname
 ## 31 31 liver</code></pre>
 <p>If there are new tissues detected, function <code>CheckTissue</code> will return a list which contains number of total tissues currently in DrugComb, tissues in input data wich already in DrugComb, and new tissues. Whith these information, we can easily generate ‘tissue’ table for new tissues.</p>
@@ -429,26 +426,26 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><strong>id</strong>: disease ID</li>
 <li><strong>dname</strong>: disease name</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">new_disease &lt;-<span class="st"> </span><span class="kw">CheckDisease</span>(<span class="kw">select</span>(cell<span class="op">$</span>cell_line, <span class="dt">id =</span> disease_id, <span class="dt">dname =</span> disease_name))</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">new_disease &lt;-<span class="st"> </span><span class="kw">CheckDisease</span>(<span class="kw">select</span>(cell<span class="op">$</span>cell_line, <span class="dt">id =</span> disease_id, <span class="dt">dname =</span> disease_name))</a></code></pre></div>
 <pre><code>## Checking  diseases...</code></pre>
 <pre><code>## DrugComb has archived 227 diseases.
 ## 0 inputted disease(s) have/has been in DrugComb.
-## 1 inputted disease(s) are/is not in DrugComb.</code></pre>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">disease_index &lt;-<span class="st"> </span><span class="kw">rbind.data.frame</span>(new_disease<span class="op">$</span>old, new_disease<span class="op">$</span>new)</a>
-<a class="sourceLine" id="cb26-2" title="2">disease_table &lt;-<span class="st"> </span>new_disease<span class="op">$</span>new</a>
-<a class="sourceLine" id="cb26-3" title="3">disease_table</a></code></pre></div>
-<pre><code>##      id                  dname
-## 1 C6422 Midgut carcinoid tumor</code></pre>
+## 0 inputted disease(s) are/is not in DrugComb.</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">disease_index &lt;-<span class="st"> </span><span class="kw">rbind.data.frame</span>(new_disease<span class="op">$</span>old, new_disease<span class="op">$</span>new)</a>
+<a class="sourceLine" id="cb25-2" title="2">disease_table &lt;-<span class="st"> </span>new_disease<span class="op">$</span>new</a>
+<a class="sourceLine" id="cb25-3" title="3">disease_table</a></code></pre></div>
+<pre><code>## [1] id    dname
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
 <ol start="4" style="list-style-type: decimal">
 <li>Cleaning ‘cell_line’ table</li>
 </ol>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">cell_line_table &lt;-<span class="st"> </span>cell<span class="op">$</span>cell_line <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb28-2" title="2"><span class="st">  </span><span class="kw">left_join</span>(tissue_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;tissue&quot;</span> =<span class="st"> &quot;tname&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb28-3" title="3"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">tissue_id =</span> <span class="st">&quot;id.y&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb28-4" title="4"><span class="st">  </span><span class="kw">select</span>(name, synonyms, cellosaurus_accession, disease_id, <span class="dt">id =</span> id.x, tissue_id)</a>
-<a class="sourceLine" id="cb28-5" title="5">cell_line_table</a></code></pre></div>
-<pre><code>##    name    synonyms cellosaurus_accession disease_id   id tissue_id
-## 1 H-STS H-STS; HSTS             CVCL_L296      C6422 1677        31</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">cell_line_table &lt;-<span class="st"> </span>cell<span class="op">$</span>cell_line <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-2" title="2"><span class="st">  </span><span class="kw">left_join</span>(tissue_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;tissue&quot;</span> =<span class="st"> &quot;tname&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-3" title="3"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">tissue_id =</span> <span class="st">&quot;id.y&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-4" title="4"><span class="st">  </span><span class="kw">select</span>(name, synonyms, cellosaurus_accession, disease_id, <span class="dt">id =</span> id.x, tissue_id)</a>
+<a class="sourceLine" id="cb27-5" title="5">cell_line_table</a></code></pre></div>
+<pre><code>##   name synonyms cellosaurus_accession disease_id id tissue_id
+## 1   NA       NA                    NA         NA NA        31</code></pre>
 </div>
 </div>
 <div id="prepare-drug-information" class="section level1">
@@ -456,11 +453,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="get-correct-cids-for-drugs" class="section level2">
 <h2>2.1 Get correct CIDs for drugs</h2>
 <p>Function <code>GetCid</code> using the PubChem API to get the CIDs for input drug names.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">drug_input &lt;-<span class="st"> </span><span class="kw">na.omit</span>(<span class="kw">unique</span>(<span class="kw">c</span>(template<span class="op">$</span>drug_row, template<span class="op">$</span>drug_col)))</a>
-<a class="sourceLine" id="cb30-2" title="2">drug_cid &lt;-<span class="st"> </span><span class="kw">GetCid</span>(drug_input, <span class="dt">type =</span> <span class="st">&quot;name&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1">drug_input &lt;-<span class="st"> </span><span class="kw">na.omit</span>(<span class="kw">unique</span>(<span class="kw">c</span>(template<span class="op">$</span>drug_row, template<span class="op">$</span>drug_col)))</a>
+<a class="sourceLine" id="cb29-2" title="2">drug_cid &lt;-<span class="st"> </span><span class="kw">GetCid</span>(drug_input, <span class="dt">type =</span> <span class="st">&quot;name&quot;</span>)</a></code></pre></div>
 <pre><code>## Getting CIDs from PubChem...</code></pre>
 <pre><code>## 9% 18% 27% 36% 45% 55% 64% 73% 82% 91% 100%</code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">drug_cid</a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1">drug_cid</a></code></pre></div>
 <pre><code>##                        input_id      cid
 ## 1              (-)-BLEBBISTATIN  5287792
 ## 2  (-)-EPIGALLOCATECHIN GALLATE    65064
@@ -476,8 +473,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 12        IBRUTINIB (PCI-32765) 24821094</code></pre>
 <p><strong>Note</strong>: Function <code>GetCid</code> might return multiple CIDs for some drugs or return <code>NA</code> for some drugs. In these cases, user should manually fix the CIDs.</p>
 <p>In our case drug “ABT-888” get 2 CIDs. Here we keep the first CID.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1">drug_cid &lt;-<span class="st"> </span>drug_cid[<span class="op">!</span><span class="kw">duplicated</span>(drug_cid<span class="op">$</span>input_id), ]</a>
-<a class="sourceLine" id="cb35-2" title="2">drug_cid</a></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1">drug_cid &lt;-<span class="st"> </span>drug_cid[<span class="op">!</span><span class="kw">duplicated</span>(drug_cid<span class="op">$</span>input_id), ]</a>
+<a class="sourceLine" id="cb34-2" title="2">drug_cid</a></code></pre></div>
 <pre><code>##                        input_id      cid
 ## 1              (-)-BLEBBISTATIN  5287792
 ## 2  (-)-EPIGALLOCATECHIN GALLATE    65064
@@ -493,7 +490,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="check-whether-there-are-new-drugs-to-drugcomb" class="section level2">
 <h2>2.2 Check whether there are new drugs to DrugComb</h2>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1">new_drug &lt;-<span class="st"> </span><span class="kw">CheckDrug</span>(drug_cid<span class="op">$</span>cid)</a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1">new_drug &lt;-<span class="st"> </span><span class="kw">CheckDrug</span>(drug_cid<span class="op">$</span>cid)</a></code></pre></div>
 <pre><code>## Checking drugs...</code></pre>
 <pre><code>## DrugComb has archived 4598 drugs.
 ## 9 inputted drug(s) have/has been in DrugComb.
@@ -504,39 +501,39 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ol style="list-style-type: decimal">
 <li>PubChem</li>
 </ol>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">drug_name &lt;-<span class="st"> </span><span class="kw">GetPubNames</span>(<span class="dt">cids =</span> new_drug<span class="op">$</span>new)</a>
-<a class="sourceLine" id="cb40-2" title="2">drug_info &lt;-<span class="st"> </span><span class="kw">GetPubchemPro</span>(<span class="dt">cids =</span> new_drug<span class="op">$</span>new)</a>
-<a class="sourceLine" id="cb40-3" title="3">drug &lt;-<span class="st"> </span><span class="kw">full_join</span>(drug_name, drug_info)</a>
-<a class="sourceLine" id="cb40-4" title="4">pub_phase &lt;-<span class="st"> </span><span class="kw">GetPubPhase</span>(drug<span class="op">$</span>cid)</a>
-<a class="sourceLine" id="cb40-5" title="5">drug &lt;-<span class="st"> </span><span class="kw">left_join</span>(drug, pub_phase, <span class="dt">by =</span> <span class="st">&quot;cid&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1">drug_name &lt;-<span class="st"> </span><span class="kw">GetPubNames</span>(<span class="dt">cids =</span> new_drug<span class="op">$</span>new)</a>
+<a class="sourceLine" id="cb39-2" title="2">drug_info &lt;-<span class="st"> </span><span class="kw">GetPubchemPro</span>(<span class="dt">cids =</span> new_drug<span class="op">$</span>new)</a>
+<a class="sourceLine" id="cb39-3" title="3">drug &lt;-<span class="st"> </span><span class="kw">full_join</span>(drug_name, drug_info)</a>
+<a class="sourceLine" id="cb39-4" title="4">pub_phase &lt;-<span class="st"> </span><span class="kw">GetPubPhase</span>(drug<span class="op">$</span>cid)</a>
+<a class="sourceLine" id="cb39-5" title="5">drug &lt;-<span class="st"> </span><span class="kw">left_join</span>(drug, pub_phase, <span class="dt">by =</span> <span class="st">&quot;cid&quot;</span>)</a></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>ChEMBL</li>
 </ol>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" title="1">chembl &lt;-<span class="st"> </span><span class="kw">GetChembl</span>(drug<span class="op">$</span>inchikey)</a></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">chembl &lt;-<span class="st"> </span><span class="kw">GetChembl</span>(drug<span class="op">$</span>inchikey)</a></code></pre></div>
 <pre><code>## Getting information from ChEMBL...</code></pre>
 <pre><code>## 50% 100%</code></pre>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1">drug &lt;-<span class="st"> </span><span class="kw">left_join</span>(drug, chembl, <span class="dt">by =</span> <span class="st">&quot;inchikey&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1">drug &lt;-<span class="st"> </span><span class="kw">left_join</span>(drug, chembl, <span class="dt">by =</span> <span class="st">&quot;inchikey&quot;</span>)</a></code></pre></div>
 <p>Merge clinical trail phase from PubChem and ChEMBL. Pick the maximum clinical trail phase.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1">drug<span class="op">$</span>phase &lt;-<span class="st"> </span><span class="kw">apply</span>(drug[, <span class="kw">c</span>(<span class="st">&quot;phase&quot;</span>, <span class="st">&quot;chembl_phase&quot;</span>)], <span class="dv">1</span>, <span class="cf">function</span>(x){</a>
-<a class="sourceLine" id="cb45-2" title="2">  <span class="kw">max</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb45-3" title="3">  })</a>
-<a class="sourceLine" id="cb45-4" title="4">drug &lt;-<span class="st"> </span><span class="kw">select</span>(drug, <span class="op">-</span>chembl_phase)</a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1">drug<span class="op">$</span>phase &lt;-<span class="st"> </span><span class="kw">apply</span>(drug[, <span class="kw">c</span>(<span class="st">&quot;phase&quot;</span>, <span class="st">&quot;chembl_phase&quot;</span>)], <span class="dv">1</span>, <span class="cf">function</span>(x){</a>
+<a class="sourceLine" id="cb44-2" title="2">  <span class="kw">max</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb44-3" title="3">  })</a>
+<a class="sourceLine" id="cb44-4" title="4">drug &lt;-<span class="st"> </span><span class="kw">select</span>(drug, <span class="op">-</span>chembl_phase)</a></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>UniChem</li>
 </ol>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" title="1">unichem &lt;-<span class="st"> </span><span class="kw">GetIds</span>(drug<span class="op">$</span>inchikey)</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1">unichem &lt;-<span class="st"> </span><span class="kw">GetIds</span>(drug<span class="op">$</span>inchikey)</a></code></pre></div>
 <pre><code>## Getting identifiers from UniChem...</code></pre>
 <pre><code>## 50% 100%</code></pre>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1">drug &lt;-<span class="st"> </span><span class="kw">left_join</span>(drug, unichem, <span class="dt">by =</span> <span class="st">&quot;inchikey&quot;</span>) </a>
-<a class="sourceLine" id="cb49-2" title="2">drug<span class="op">$</span>chembl_id &lt;-<span class="st"> </span><span class="kw">unlist</span>(<span class="kw">apply</span>(drug[, <span class="kw">c</span>(<span class="st">&quot;chembl_id.x&quot;</span>, <span class="st">&quot;chembl_id.y&quot;</span>)], <span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb49-3" title="3">                        <span class="cf">function</span>(x){</a>
-<a class="sourceLine" id="cb49-4" title="4">                          <span class="cf">if</span> (<span class="kw">length</span>(<span class="kw">na.omit</span>(x)) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
-<a class="sourceLine" id="cb49-5" title="5">                            <span class="kw">return</span>(<span class="ot">NA</span>)</a>
-<a class="sourceLine" id="cb49-6" title="6">                          } <span class="cf">else</span>{</a>
-<a class="sourceLine" id="cb49-7" title="7">                            <span class="kw">return</span>(<span class="kw">paste</span>(<span class="kw">na.omit</span>(x), <span class="dt">collapse =</span> <span class="st">&quot;; &quot;</span>))</a>
-<a class="sourceLine" id="cb49-8" title="8">                          }</a>
-<a class="sourceLine" id="cb49-9" title="9">                        }))</a>
-<a class="sourceLine" id="cb49-10" title="10">drug &lt;-<span class="st"> </span>drug[, <span class="kw">which</span>(<span class="op">!</span><span class="kw">colnames</span>(drug) <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;chembl_id.x&quot;</span>, <span class="st">&quot;chembl_id.y&quot;</span>))]</a></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1">drug &lt;-<span class="st"> </span><span class="kw">left_join</span>(drug, unichem, <span class="dt">by =</span> <span class="st">&quot;inchikey&quot;</span>) </a>
+<a class="sourceLine" id="cb48-2" title="2">drug<span class="op">$</span>chembl_id &lt;-<span class="st"> </span><span class="kw">unlist</span>(<span class="kw">apply</span>(drug[, <span class="kw">c</span>(<span class="st">&quot;chembl_id.x&quot;</span>, <span class="st">&quot;chembl_id.y&quot;</span>)], <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb48-3" title="3">                        <span class="cf">function</span>(x){</a>
+<a class="sourceLine" id="cb48-4" title="4">                          <span class="cf">if</span> (<span class="kw">length</span>(<span class="kw">na.omit</span>(x)) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb48-5" title="5">                            <span class="kw">return</span>(<span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb48-6" title="6">                          } <span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb48-7" title="7">                            <span class="kw">return</span>(<span class="kw">paste</span>(<span class="kw">na.omit</span>(x), <span class="dt">collapse =</span> <span class="st">&quot;; &quot;</span>))</a>
+<a class="sourceLine" id="cb48-8" title="8">                          }</a>
+<a class="sourceLine" id="cb48-9" title="9">                        }))</a>
+<a class="sourceLine" id="cb48-10" title="10">drug &lt;-<span class="st"> </span>drug[, <span class="kw">which</span>(<span class="op">!</span><span class="kw">colnames</span>(drug) <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;chembl_id.x&quot;</span>, <span class="st">&quot;chembl_id.y&quot;</span>))]</a></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>DrugBank and Stitch</li>
 </ol>
@@ -544,14 +541,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ol start="5" style="list-style-type: decimal">
 <li>Add drug id into drug table</li>
 </ol>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1">drug<span class="op">$</span>id &lt;-<span class="st"> </span><span class="kw">seq</span>(new_drug<span class="op">$</span>n <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">length.out =</span> <span class="kw">nrow</span>(drug))</a></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1">drug<span class="op">$</span>id &lt;-<span class="st"> </span><span class="kw">seq</span>(new_drug<span class="op">$</span>n <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">length.out =</span> <span class="kw">nrow</span>(drug))</a></code></pre></div>
 <ol start="6" style="list-style-type: decimal">
 <li>Arrange the column order of drug table and get the output</li>
 </ol>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" title="1">drug &lt;-<span class="st"> </span><span class="kw">select</span>(drug, <span class="dt">dname =</span> <span class="st">&quot;name&quot;</span>, id, chembl_id, inchikey, smiles, cid, </a>
-<a class="sourceLine" id="cb51-2" title="2">               molecular_formula, <span class="dt">clinical_phase =</span> <span class="st">&quot;phase&quot;</span>, <span class="co">#cid_m, cid_s, stitch_name, </span></a>
-<a class="sourceLine" id="cb51-3" title="3">               <span class="dt">drugbank_id =</span> <span class="st">&quot;uni_drugbank&quot;</span>, <span class="dt">kegg_id =</span> <span class="st">&quot;uni_kegg_c&quot;</span>)</a>
-<a class="sourceLine" id="cb51-4" title="4">drug</a></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1">drug &lt;-<span class="st"> </span><span class="kw">select</span>(drug, <span class="dt">dname =</span> <span class="st">&quot;name&quot;</span>, id, chembl_id, inchikey, smiles, cid, </a>
+<a class="sourceLine" id="cb50-2" title="2">               molecular_formula, <span class="dt">clinical_phase =</span> <span class="st">&quot;phase&quot;</span>, <span class="co">#cid_m, cid_s, stitch_name, </span></a>
+<a class="sourceLine" id="cb50-3" title="3">               <span class="dt">drugbank_id =</span> <span class="st">&quot;uni_drugbank&quot;</span>, <span class="dt">kegg_id =</span> <span class="st">&quot;uni_kegg_c&quot;</span>)</a>
+<a class="sourceLine" id="cb50-4" title="4">drug</a></code></pre></div>
 <pre><code>##                 dname   id chembl_id                    inchikey
 ## 1 Acetyl-DL-carnitine 4599        NA RDHQFKQIGNGIED-UHFFFAOYSA-N
 ## 2         912445-05-7 4600        NA DSBSVDCHFMEYBX-FFXKMJQXSA-N
@@ -564,14 +561,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="generate-drug_index-table-for-table-matching-in-the-following-processes" class="section level2">
 <h2>2.4 Generate drug_index table for table matching in the following processes</h2>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" title="1">drug_index &lt;-<span class="st"> </span>drug_cid <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb53-2" title="2"><span class="st">  </span><span class="kw">left_join</span>(new_drug<span class="op">$</span>old, <span class="dt">by =</span> <span class="st">&quot;cid&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb53-3" title="3"><span class="st">  </span><span class="kw">left_join</span>(<span class="kw">select</span>(drug, cid, id), <span class="dt">by =</span> <span class="st">&quot;cid&quot;</span>)</a>
-<a class="sourceLine" id="cb53-4" title="4">drug_index<span class="op">$</span>id &lt;-<span class="st"> </span><span class="kw">apply</span>(drug_index[, <span class="kw">c</span>(<span class="st">&quot;id.x&quot;</span>, <span class="st">&quot;id.y&quot;</span>)], <span class="dv">1</span>, <span class="cf">function</span>(x){</a>
-<a class="sourceLine" id="cb53-5" title="5">  <span class="kw">na.omit</span>(x)</a>
-<a class="sourceLine" id="cb53-6" title="6">})</a>
-<a class="sourceLine" id="cb53-7" title="7">drug_index &lt;-<span class="st"> </span>drug_index[, <span class="kw">which</span>(<span class="op">!</span><span class="kw">colnames</span>(drug_index) <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;id.x&quot;</span>, <span class="st">&quot;id.y&quot;</span>))]</a>
-<a class="sourceLine" id="cb53-8" title="8">drug_index</a></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" title="1">drug_index &lt;-<span class="st"> </span>drug_cid <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb52-2" title="2"><span class="st">  </span><span class="kw">left_join</span>(new_drug<span class="op">$</span>old, <span class="dt">by =</span> <span class="st">&quot;cid&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb52-3" title="3"><span class="st">  </span><span class="kw">left_join</span>(<span class="kw">select</span>(drug, cid, id), <span class="dt">by =</span> <span class="st">&quot;cid&quot;</span>)</a>
+<a class="sourceLine" id="cb52-4" title="4">drug_index<span class="op">$</span>id &lt;-<span class="st"> </span><span class="kw">apply</span>(drug_index[, <span class="kw">c</span>(<span class="st">&quot;id.x&quot;</span>, <span class="st">&quot;id.y&quot;</span>)], <span class="dv">1</span>, <span class="cf">function</span>(x){</a>
+<a class="sourceLine" id="cb52-5" title="5">  <span class="kw">na.omit</span>(x)</a>
+<a class="sourceLine" id="cb52-6" title="6">})</a>
+<a class="sourceLine" id="cb52-7" title="7">drug_index &lt;-<span class="st"> </span>drug_index[, <span class="kw">which</span>(<span class="op">!</span><span class="kw">colnames</span>(drug_index) <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;id.x&quot;</span>, <span class="st">&quot;id.y&quot;</span>))]</a>
+<a class="sourceLine" id="cb52-8" title="8">drug_index</a></code></pre></div>
 <pre><code>##                        input_id      cid   id
 ## 1              (-)-BLEBBISTATIN  5287792 2056
 ## 2  (-)-EPIGALLOCATECHIN GALLATE    65064 2057
@@ -588,30 +585,30 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="calculate-synergy-scores-and-generate-other-files-for-uploading" class="section level1">
 <h1>3. calculate synergy scores and generate other files for uploading</h1>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" title="1">tables &lt;-<span class="st"> </span><span class="kw">CalculateTemplate</span>(template)</a>
-<a class="sourceLine" id="cb55-2" title="2"><span class="kw">names</span>(tables)</a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" title="1">tables &lt;-<span class="st"> </span><span class="kw">CalculateTemplate</span>(template)</a>
+<a class="sourceLine" id="cb54-2" title="2"><span class="kw">names</span>(tables)</a></code></pre></div>
 <pre><code>## [1] &quot;synergy&quot; &quot;surface&quot; &quot;curve&quot;   &quot;summary&quot;</code></pre>
 <p><code>pipeline</code> function generates 5 data frames: * <code>response_with_score</code>: a table containing calculated synergy scores of each interaction block. * <code>response</code>: the <strong>response</strong> table ready for uploading to DrugComb. * <code>summary</code>: the <strong>summary</strong> table ready for uploading to DrugComb. * <code>surface</code>: the <strong>curface</strong> table ready for uploading to DrugComb. * <code>curve</code>: the <strong>curve</strong> table ready for uploading to DrugComb.</p>
 </div>
 <div id="check-and-mark-dose-response-quality-for-each-block" class="section level1">
 <h1>4. Check and mark dose-response quality for each block</h1>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" title="1">bad_quality &lt;-<span class="st"> </span>tables<span class="op">$</span>synergy<span class="op">$</span>block_id[<span class="kw">which</span>(tables<span class="op">$</span>synergy<span class="op">$</span>inhibition <span class="op">&lt;</span><span class="st"> </span><span class="dv">-200</span> <span class="op">|</span></a>
-<a class="sourceLine" id="cb57-2" title="2"><span class="st">                                               </span>tables<span class="op">$</span>synergy<span class="op">$</span>inhibition <span class="op">&gt;</span><span class="st"> </span><span class="dv">200</span>)]</a>
-<a class="sourceLine" id="cb57-3" title="3">bad_quality &lt;-<span class="st"> </span><span class="kw">unique</span>(bad_quality)</a>
-<a class="sourceLine" id="cb57-4" title="4">summary &lt;-<span class="st"> </span>tables<span class="op">$</span>summary <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb57-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">quality =</span> <span class="kw">rep</span>(<span class="ot">NA</span>, <span class="kw">n</span>()))</a>
-<a class="sourceLine" id="cb57-6" title="6"><span class="cf">if</span> (<span class="kw">length</span>(bad_quality) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>){</a>
-<a class="sourceLine" id="cb57-7" title="7">  summary<span class="op">$</span>quality[<span class="kw">which</span>(summary<span class="op">$</span>block_id <span class="op">%in%</span><span class="st"> </span>bad_quality)] &lt;-<span class="st"> &quot;bad&quot;</span></a>
-<a class="sourceLine" id="cb57-8" title="8">}</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" title="1">bad_quality &lt;-<span class="st"> </span>tables<span class="op">$</span>synergy<span class="op">$</span>block_id[<span class="kw">which</span>(tables<span class="op">$</span>synergy<span class="op">$</span>inhibition <span class="op">&lt;</span><span class="st"> </span><span class="dv">-200</span> <span class="op">|</span></a>
+<a class="sourceLine" id="cb56-2" title="2"><span class="st">                                               </span>tables<span class="op">$</span>synergy<span class="op">$</span>inhibition <span class="op">&gt;</span><span class="st"> </span><span class="dv">200</span>)]</a>
+<a class="sourceLine" id="cb56-3" title="3">bad_quality &lt;-<span class="st"> </span><span class="kw">unique</span>(bad_quality)</a>
+<a class="sourceLine" id="cb56-4" title="4">summary &lt;-<span class="st"> </span>tables<span class="op">$</span>summary <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb56-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">quality =</span> <span class="kw">rep</span>(<span class="ot">NA</span>, <span class="kw">n</span>()))</a>
+<a class="sourceLine" id="cb56-6" title="6"><span class="cf">if</span> (<span class="kw">length</span>(bad_quality) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb56-7" title="7">  summary<span class="op">$</span>quality[<span class="kw">which</span>(summary<span class="op">$</span>block_id <span class="op">%in%</span><span class="st"> </span>bad_quality)] &lt;-<span class="st"> &quot;bad&quot;</span></a>
+<a class="sourceLine" id="cb56-8" title="8">}</a></code></pre></div>
 </div>
 <div id="replace-drug-names-with-drug_id-cell_line_name-with-cell_line_id" class="section level1">
 <h1>5. Replace drug names with drug_id, cell_line_name with cell_line_id</h1>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1">curve &lt;-<span class="st"> </span><span class="kw">left_join</span>(tables<span class="op">$</span>curve, drug_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;drug_row&quot;</span> =<span class="st"> &quot;input_id&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb58-2" title="2"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">drug_row_id =</span> <span class="st">&quot;id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb58-3" title="3"><span class="st">  </span><span class="kw">left_join</span>(drug_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;drug_col&quot;</span> =<span class="st"> &quot;input_id&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb58-4" title="4"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">drug_col_id =</span> <span class="st">&quot;id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb58-5" title="5"><span class="st">  </span><span class="kw">select</span>(block_id, drug_row_id, drug_col_id, b, c, d, e, model)</a>
-<a class="sourceLine" id="cb58-6" title="6">curve</a></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" title="1">curve &lt;-<span class="st"> </span><span class="kw">left_join</span>(tables<span class="op">$</span>curve, drug_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;drug_row&quot;</span> =<span class="st"> &quot;input_id&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb57-2" title="2"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">drug_row_id =</span> <span class="st">&quot;id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb57-3" title="3"><span class="st">  </span><span class="kw">left_join</span>(drug_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;drug_col&quot;</span> =<span class="st"> &quot;input_id&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb57-4" title="4"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">drug_col_id =</span> <span class="st">&quot;id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb57-5" title="5"><span class="st">  </span><span class="kw">select</span>(block_id, drug_row_id, drug_col_id, b, c, d, e, model)</a>
+<a class="sourceLine" id="cb57-6" title="6">curve</a></code></pre></div>
 <pre><code>##    block_id drug_row_id drug_col_id          b              c            d
 ## 1     62898          NA          31 -0.4761815  -0.0075188014   6.89861346
 ## 2     62898        2056          NA  0.5608828 -87.3384596993   0.08662413
@@ -642,22 +639,22 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 12   0.008970306  LL.4
 ## 13   0.001133735  LL.4
 ## 14   0.034267126  LL.4</code></pre>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" title="1">summary &lt;-<span class="st"> </span><span class="kw">left_join</span>(summary, drug_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;drug_row&quot;</span> =<span class="st"> &quot;input_id&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb60-2" title="2"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">drug_row_id =</span> <span class="st">&quot;id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb60-3" title="3"><span class="st">  </span><span class="kw">left_join</span>(drug_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;drug_col&quot;</span> =<span class="st"> &quot;input_id&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb60-4" title="4"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">drug_col_id =</span> <span class="st">&quot;id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb60-5" title="5"><span class="st">  </span><span class="kw">left_join</span>(cell_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;cell_line_name&quot;</span> =<span class="st"> &quot;input_name&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb60-6" title="6"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">cell_line_id =</span> <span class="st">&quot;id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb60-7" title="7"><span class="st">  </span><span class="kw">select</span>(block_id, drug_row_id, drug_col_id, cell_line_id, conc_r_unit, </a>
-<a class="sourceLine" id="cb60-8" title="8">         conc_c_unit, synergy_zip, synergy_loewe, synergy_hsa, synergy_bliss,</a>
-<a class="sourceLine" id="cb60-9" title="9">         ic50_row, ic50_col, ri_row, ri_col, css_row, css_col, css, S, quality)</a>
-<a class="sourceLine" id="cb60-10" title="10">summary</a></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" title="1">summary &lt;-<span class="st"> </span><span class="kw">left_join</span>(summary, drug_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;drug_row&quot;</span> =<span class="st"> &quot;input_id&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-2" title="2"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">drug_row_id =</span> <span class="st">&quot;id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-3" title="3"><span class="st">  </span><span class="kw">left_join</span>(drug_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;drug_col&quot;</span> =<span class="st"> &quot;input_id&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-4" title="4"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">drug_col_id =</span> <span class="st">&quot;id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-5" title="5"><span class="st">  </span><span class="kw">left_join</span>(cell_index, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;cell_line_name&quot;</span> =<span class="st"> &quot;input_name&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-6" title="6"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">cell_line_id =</span> <span class="st">&quot;id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-7" title="7"><span class="st">  </span><span class="kw">select</span>(block_id, drug_row_id, drug_col_id, cell_line_id, conc_r_unit, </a>
+<a class="sourceLine" id="cb59-8" title="8">         conc_c_unit, synergy_zip, synergy_loewe, synergy_hsa, synergy_bliss,</a>
+<a class="sourceLine" id="cb59-9" title="9">         ic50_row, ic50_col, ri_row, ri_col, css_row, css_col, css, S, quality)</a>
+<a class="sourceLine" id="cb59-10" title="10">summary</a></code></pre></div>
 <pre><code>##   block_id drug_row_id drug_col_id cell_line_id conc_r_unit conc_c_unit
 ## 1    62898        2056          31         1573          uM          uM
 ## 2    62899        2057          31         1573          uM          uM
 ## 3    62900        2055          31         1573          uM          uM
-## 4        1           1        4600         1677          uM          uM
-## 5        2           1           3         1677          uM          uM
+## 4        1           1        4600            2          uM          uM
+## 5        2           1           3            2          uM          uM
 ## 6     7641        4599          29           33          uM          uM
 ## 7    64716        2058        1833           93          uM          uM
 ##   synergy_zip synergy_loewe synergy_hsa synergy_bliss      ic50_row
@@ -687,16 +684,16 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="output-and-check-data" class="section level1">
 <h1>Output and check data</h1>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" title="1">cell_line_table</a></code></pre></div>
-<pre><code>##    name    synonyms cellosaurus_accession disease_id   id tissue_id
-## 1 H-STS H-STS; HSTS             CVCL_L296      C6422 1677        31</code></pre>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" title="1">tissue_index</a></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" title="1">cell_line_table</a></code></pre></div>
+<pre><code>##   name synonyms cellosaurus_accession disease_id id tissue_id
+## 1   NA       NA                    NA         NA NA        31</code></pre>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" title="1">tissue_index</a></code></pre></div>
 <pre><code>##    id tname
 ## 31 31 liver</code></pre>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" title="1">disease_table</a></code></pre></div>
-<pre><code>##      id                  dname
-## 1 C6422 Midgut carcinoid tumor</code></pre>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" title="1">tables<span class="op">$</span>synergy</a></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" title="1">disease_table</a></code></pre></div>
+<pre><code>## [1] id    dname
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" title="1">tables<span class="op">$</span>synergy</a></code></pre></div>
 <pre><code>##         conc_r      conc_c     inhibition synergy_zip synergy_loewe synergy_hsa
 ## 1    0.0000000   0.0000000  -0.0006264538   0.0000000     0.0000000   0.0000000
 ## 2    0.0000000 400.0000000   6.8917211154   0.0000000     0.0000000   0.0000000
@@ -945,13 +942,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 121     7.9915551    64716
 ## 122     5.3750258    64716
 ## 123    13.1583834    64716</code></pre>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" title="1">summary</a></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" title="1">summary</a></code></pre></div>
 <pre><code>##   block_id drug_row_id drug_col_id cell_line_id conc_r_unit conc_c_unit
 ## 1    62898        2056          31         1573          uM          uM
 ## 2    62899        2057          31         1573          uM          uM
 ## 3    62900        2055          31         1573          uM          uM
-## 4        1           1        4600         1677          uM          uM
-## 5        2           1           3         1677          uM          uM
+## 4        1           1        4600            2          uM          uM
+## 5        2           1           3            2          uM          uM
 ## 6     7641        4599          29           33          uM          uM
 ## 7    64716        2058        1833           93          uM          uM
 ##   synergy_zip synergy_loewe synergy_hsa synergy_bliss      ic50_row
@@ -978,7 +975,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 5      NA
 ## 6      NA
 ## 7      NA</code></pre>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" title="1">tables<span class="op">$</span>surface</a></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" title="1">tables<span class="op">$</span>surface</a></code></pre></div>
 <pre><code>##            conc_r          conc_c inhibition synergy_zip synergy_loewe
 ## 1    0.0000000000   0.00000000000     -0.001       0.000         0.000
 ## 2    0.0000000000 133.33333333333      2.165       0.308        -0.239
@@ -2603,7 +2600,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 809       5.502         7.650    64716
 ## 810       8.541        10.573    64716
 ## 811      11.330        13.158    64716</code></pre>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" title="1">curve</a></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" title="1">curve</a></code></pre></div>
 <pre><code>##    block_id drug_row_id drug_col_id          b              c            d
 ## 1     62898          NA          31 -0.4761815  -0.0075188014   6.89861346
 ## 2     62898        2056          NA  0.5608828 -87.3384596993   0.08662413
@@ -2634,15 +2631,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 12   0.008970306  LL.4
 ## 13   0.001133735  LL.4
 ## 14   0.034267126  LL.4</code></pre>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" title="1"><span class="kw">dir.create</span>(<span class="st">&quot;Upload&quot;</span>)</a>
-<a class="sourceLine" id="cb76-2" title="2"><span class="kw">write.csv</span>(cell_line_table, <span class="st">&quot;Upload/cell_line.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb76-3" title="3"><span class="kw">write.csv</span>(tissue_index, <span class="st">&quot;Upload/tissue.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb76-4" title="4"><span class="kw">write.csv</span>(disease_table, <span class="st">&quot;Upload/disease.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb76-5" title="5"><span class="kw">write.csv</span>(drug, <span class="st">&quot;Upload/drug.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb76-6" title="6"><span class="kw">write.csv</span>(tables<span class="op">$</span>synergy, <span class="st">&quot;Upload/response.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb76-7" title="7"><span class="kw">write.csv</span>(summary, <span class="st">&quot;Upload/summary.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb76-8" title="8"><span class="kw">write.csv</span>(tables<span class="op">$</span>surface, <span class="st">&quot;Upload/surface.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb76-9" title="9"><span class="kw">write.csv</span>(curve, <span class="st">&quot;Upload/curve.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" title="1"><span class="kw">dir.create</span>(<span class="st">&quot;Upload&quot;</span>)</a>
+<a class="sourceLine" id="cb75-2" title="2"><span class="kw">write.csv</span>(cell_line_table, <span class="st">&quot;Upload/cell_line.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb75-3" title="3"><span class="kw">write.csv</span>(tissue_index, <span class="st">&quot;Upload/tissue.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb75-4" title="4"><span class="kw">write.csv</span>(disease_table, <span class="st">&quot;Upload/disease.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb75-5" title="5"><span class="kw">write.csv</span>(drug, <span class="st">&quot;Upload/drug.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb75-6" title="6"><span class="kw">write.csv</span>(tables<span class="op">$</span>synergy, <span class="st">&quot;Upload/response.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb75-7" title="7"><span class="kw">write.csv</span>(summary, <span class="st">&quot;Upload/summary.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb75-8" title="8"><span class="kw">write.csv</span>(tables<span class="op">$</span>surface, <span class="st">&quot;Upload/surface.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb75-9" title="9"><span class="kw">write.csv</span>(curve, <span class="st">&quot;Upload/curve.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p>Tables “study”, “assay” requires manual work for extracting information from data sources. Table “source” relys on these two tables. We can not show the workflow for these 3 tables in this vignette. Please check <a href="https://github.com/DrugComb/TidyComb/wiki">github wiki page for TidyComb</a> for more details.</p>
 </div>
 
