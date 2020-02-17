@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Shuyu Zheng" />
+
+<meta name="date" content="2020-02-17" />
+
+<title>Drug Annotation with TydiComb</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Drug Annotation with TydiComb</h1>
+<h4 class="author">Shuyu Zheng</h4>
+<h4 class="date">2020-02-17</h4>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(TidyComb)</a></code></pre></div>
+<div id="pubchem" class="section level1">
+<h1>1. PubChem</h1>
+<div id="get-cid-from-pubchem" class="section level2">
+<h2>1. Get CID from PubChem</h2>
+<p>GetCid queries PubChem database via <a href="http://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html">PUG REST</a> to search matched CIDs of drugs according to other identifiers. Available identifiers are: name, SMILES, InChIKey.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">GetCid</span>(<span class="kw">c</span>(<span class="st">&quot;aspirin&quot;</span>, <span class="st">&quot;blebbistatin&quot;</span>), <span class="dt">type =</span> <span class="st">&quot;name&quot;</span>)</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="co">#&gt; Getting CIDs from PubChem...</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="co">#&gt; 50% 100%</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="co">#&gt;       input_id     cid</span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="co">#&gt; 1      aspirin    2244</span></a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="co">#&gt; 2 blebbistatin 3476986</span></a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="kw">GetCid</span>(<span class="st">&quot;RDHQFKQIGNGIED-UHFFFAOYSA-N&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;inchikey&quot;</span>)</a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="co">#&gt; Getting CIDs from PubChem...</span></a>
+<a class="sourceLine" id="cb2-9" title="9"><span class="co">#&gt; 100%</span></a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="co">#&gt;                      input_id cid</span></a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="co">#&gt; 1 RDHQFKQIGNGIED-UHFFFAOYSA-N   1</span></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="kw">GetCid</span>(<span class="st">&quot;CC1(CCCN1)C2=NC3=C(C=CC=C3N2)C(=O)N.Cl.Cl&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;smiles&quot;</span>)</a>
+<a class="sourceLine" id="cb2-13" title="13"><span class="co">#&gt; Getting CIDs from PubChem...</span></a>
+<a class="sourceLine" id="cb2-14" title="14"><span class="co">#&gt; 100%</span></a>
+<a class="sourceLine" id="cb2-15" title="15"><span class="co">#&gt;                                    input_id      cid</span></a>
+<a class="sourceLine" id="cb2-16" title="16"><span class="co">#&gt; 1 CC1(CCCN1)C2=NC3=C(C=CC=C3N2)C(=O)N.Cl.Cl 25193407</span></a></code></pre></div>
+</div>
+<div id="get-drug-name-or-synonyms" class="section level2">
+<h2>2. Get drug name or synonyms</h2>
+<p>Drug name and synonyms from CID</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">GetPubNames</span>(<span class="kw">c</span>(<span class="dv">2244</span>, <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="co">#&gt;    cid                name</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="co">#&gt; 1 2244             aspirin</span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="co">#&gt; 2    1 Acetyl-DL-carnitine</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co">#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    synonyms</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="co">#&gt; 1 aspirin; ACETYLSALICYLIC ACID; 50-78-2; 2-Acetoxybenzoic acid; 2-(Acetyloxy)benzoic acid; Acetylsalicylate; o-Acetoxybenzoic acid; Acylpyrin; O-Acetylsalicylic acid; Polopiryna; Easprin; Ecotrin; Acenterine; Acetophen; Acetosal; Colfarit; Salicylic acid acetate; o-Carboxyphenyl acetate; Enterosarein; Aceticyl; Acetonyl; Acetosalin; Acetylin; Aspergum; Aspirdrops; Benaspir; Micristin; Pharmacin; Premaspin; Salcetogen; Temperal; Ecolen; Empirin; Endydol; Rhodine; Saletin; Rheumintabletten; Solprin acid; Acidum acetylsalicylicum; Acetisal; Acetylsal; Aspirine; Bialpirina; Bialpirinia; Claradin; Clariprin; Entericin; Enterophen; Enterosarine; Globentyl; Measurin; Neuronika; Salacetin; Solpyron; Acesal; Acisal; Asagran; Asteric; Cemirit; Decaten; Duramax; Extren; Globoid; Helicon; Idragin; Levius; Pirseal; Rhonal; Solfrin; Adiro; Aspec; Aspro; Novid; Yasta; Acetosalic acid; Triple-sal; Spira-Dine; ZORprin; Bi-prin; Acido acetilsalicilico; Acide acetylsalicylique; Acetilum acidulatum; Acimetten; Delgesic; Entrophen; Persistin; 2-acetyloxybenzoic acid; 2-Carboxyphenyl acetate; Acetilsalicilico; Dolean pH 8; A.S.A. empirin; XAXA; Contrheuma retard; Acetylsalicylsaure; Benzoic acid, 2-(acetyloxy)-; Endosprin; Kapsazal; Bayer; ASA; 8-hour Bayer; Solprin; Triaminicin; Acetysal; Asatard; Istopirin; Magnecyl; Medisyl; Polopirin; Tasprin; Ronal; Bayer Buffered; Aspro Clear; Bayer Plus; Nu-seals aspirin; Rheumin tabletten; Salicylic acid, acetate; Acido O-acetil-benzoico; aspirin (acetylsalicylic acid); Kyselina acetylsalicylova; 2-Acetoxybenzenecarboxylic acid; St. Joseph Aspirin for Adults; A.S.A.; St. Joseph; Aspirina 03; Kyselina 2-acetoxybenzoova; Acetylsalycilic acid; acetyl salicylic acid; SP 189; Bayer Aspirin 8 Hour; Acetard; Asprin; AC 5230; Bayer Children&#39;s Aspirin; Acetylsalicylsaeure; Acetylsalicylsaure [German]; Azetylsalizylsaeure; S-211; UNII-R16CO5Y76E; acide 2-(acetyloxy)benzoique; Benzoicacid, 2-(acetyloxy)-; Solupsan; Empirin with Codeine; CCRIS 3243; HSDB 652; ECM; Acide acetylsalicylique [French]; Acido acetilsalicilico [Italian]; CHEBI:15365; 2-(acetyloxy)benzoate; Kyselina acetylsalicylova [Czech]; Acido O-acetil-benzoico [Italian]; Kyselina 2-acetoxybenzoova [Czech]; Bayer Extra Strength Aspirin for Migraine Pain; EINECS 200-064-1; NSC 27223; o-(Acetyloxy)benzoic acid; Acetylsalicylic acid, 99%; Bayer Enteric 325 mg Regular Strength; BRN 0779271; Bayer Enteric 81 mg Adult Low Strength; Bayer Enteric 500 mg Arthritis Strength; AI3-02956; R16CO5Y76E; Aspirin form II; BSYNRYMUTXBXSQ-UHFFFAOYSA-N; component of Midol; NSC27223; component of Synirin; MFCD00002430; component of Zactirin; component of Coricidin; component of Persistin; component of Robaxisal; o-Acetoxybenzoate; NCGC00015067-04; o-acetyl-salicylic acid; DSSTox_CID_108; component of Ascodeen-30; WLN: QVR BOV1; DSSTox_RID_75372; DSSTox_GSID_20108; component of Darvon with A.S.A; Aloxiprimum; Asaphen; Aspalon; Durlaza; AspirinTest2; Nu-seals; component of St. Joseph Cold Tablets; Aspir-Mox; Durlaza ER; AcetylsalicylicAcid; CAS-50-78-2; Acetoxybenzoic acid; Acetysalicylic acid; AIN; SMR000059138; Ascoden-30; Acetylsalicyclic acid; Aspirin [BAN:JAN]; SR-01000075668; Aspirin [USP:BAN:JAN]; Bay E4465; Aspropharm; Cardioaspirin; Cardioaspirina; Acetyonyl; Asacard; Ascolong; Colsprin; Miniasal; Salospir; Acesan; Toldex; Azetylsalizylsaure; 1oxr; 2-Acetoxybenzoate; 99512-66-0; Aspirin,(S); Aspalon (JAN); Easprin (TN); acetyl-salicylic acid; Aspirin USP-26; acetyl salicyclic acid; o-(Acetyloxy)benzoate; Percodan (Salt/Mix); Ascriptin (Salt/Mix); Micrainin (Salt/Mix); 2-acetoxy benzoic acid; PubChem20190; Spectrum_001245; 2-Acetylsalicyclic acid; ACMC-209kpz; Salicylic acid, acetyl-; CHEMBL25; Spectrum2_001899; Spectrum3_001295; Spectrum4_000099; Spectrum5_000740; Aspirin (JP17/USP); Lopac-A-5376; Salycylacetylsalicylic acid; Epitope ID:114151; Percodan Demi (Salt/Mix); Soma Compound (Salt/Mix); ZINC53; aspirin-acetylsalicylic-acid; EC 200-064-1; Aspirin USP (3080); cid_2244; Pravigard PAC (Salt/Mix); SCHEMBL1353; 2-(Acetyloxy)-benzoic acid; A.S.A; Aspirin USP (2080B); Bay-e-4465; Lopac0_000038; KBioGR_000398; KBioGR_002271; KBioSS_001725; KBioSS_002272; 4-10-00-00138 (Beilstein Handbook Reference); KSC269M6D; MLS001055329; MLS001066332; MLS001336045; MLS001336046; BIDD:GT0118; DivK1c_000555; SPECTRUM1500130; SPBio_001838; Acetylsalicylic acid, &gt;=99%; GTPL4139; (non-d)Acetylsalicylic Acid-d3; O-Acetylsalicylic acid; Aspirin; DTXSID5020108; Acetylsalicylic acid-carboxy-14c; BDBM22360; CTK1G9661; HMS501L17; KBio1_000555; KBio2_001725; KBio2_002271; KBio2_004293; KBio2_004839; KBio2_006861; KBio2_007407; KBio3_002149; KBio3_002751; KS-00000ULP; Empirin with Codeine (Salt/Mix); Acetylsalicylic acid, &gt;=99.0%; cMAP_000006; component of Zactirin (Salt/Mix); NINDS_000555; HMS1920E13; HMS2090G03; HMS2091K13; HMS2233L18; HMS3260G17; HMS3372N15; HMS3656N14; HMS3715P19; Pharmakon1600-01500130; BCP21790; STR01551; Tox21_110076; Tox21_202117; Tox21_300146; Tox21_500038; ANW-31125; BBL005469; CCG-39490; LS-143; NSC-27223; NSC406186; NSC755899; s3017; SBB015069; STL137674; AKOS000118884; component of Ascodeen-30 (Salt/Mix); Tox21_110076_1; CS-2001; DB00945; LP00038; MCULE-3199019536; NSC-406186; NSC-755899; PL-2200; RTX-012224; BAY-1019036; IDI1_000555; Acetylsalicylic acid, analytical standard; NCGC00015067-01; NCGC00015067-02; NCGC00015067-03; NCGC00015067-05; NCGC00015067-06; NCGC00015067-07; NCGC00015067-08; NCGC00015067-09; NCGC00015067-10; NCGC00015067-11; NCGC00015067-12; NCGC00015067-13; NCGC00015067-14; NCGC00090977-01; NCGC00090977-02; NCGC00090977-03; NCGC00090977-04; NCGC00090977-05; NCGC00090977-06; NCGC00090977-07; NCGC00254034-01; NCGC00259666-01; NCGC00260723-01; Aspirin, meets USP testing specifications; H740; HY-14654; NCI60_002222; SC-18564; SC-61857; ST075414; SBI-0050027.P004; AB1003266; DS-017139; UNM-0000306102; component of Darvon with A.S.A (Salt/Mix); EU-0100038; FT-0655181; SW199665-2; 1777-EP2269989A1; 1777-EP2269990A1; 1777-EP2272825A2; 1777-EP2275420A1; 1777-EP2277865A1; 1777-EP2280008A2; 1777-EP2281563A1; 1777-EP2281815A1; 1777-EP2281818A1; 1777-EP2292227A2; 1777-EP2295055A2; 1777-EP2298764A1; 1777-EP2298765A1; 1777-EP2298768A1; 1777-EP2298776A1; 1777-EP2305219A1; 1777-EP2305260A1; 1777-EP2305640A2; 1777-EP2305652A2; 1777-EP2308510A1; 1777-EP2311453A1; 1777-EP2314590A1; 1777-EP2314593A1; 1777-EP2316459A1; 1777-EP2371811A2; 6474-EP1441224A2; 6474-EP2272832A1; 6474-EP2275420A1; 6474-EP2277861A1; 6474-EP2277875A2; 6474-EP2298757A2; 6474-EP2298764A1; 6474-EP2298765A1; 6474-EP2314585A1; A 5376; Acetylsalicylic Acid 1.0 mg/ml in Acetonitrile; C01405; D00109; Q18216; 24189-EP2295409A1; 24189-EP2314590A1; AB00051918-08; AB00051918_09; AB00051918_10; 170197-EP2275413A1; 170197-EP2287156A1; 186947-EP2270113A1; 186947-EP2272935A1; Arthritis Pain Formula Maximum Strength (Salt/Mix); METHANONE,(2-CHLORO-3-PYRIDINYL)CYCLOBUTYL-; SR-01000075668-1; SR-01000075668-4; SR-01000075668-6; Acetylsalicylic acid, Vetec(TM) reagent grade, &gt;=99%; Aspirin, British Pharmacopoeia (BP) Reference Standard; F2191-0068; Z234893989; 2-Acetoxybenzoic acid; O-Acetylsalicylic acid; ASA; Aspirin; Aspirin, United States Pharmacopeia (USP) Reference Standard; D41527A7-A9EB-472D-A7FC-312821130549; Acetylsalicylic acid, European Pharmacopoeia (EP) Reference Standard; Acetylsalicylic acid, BioReagent, plant cell culture tested, &gt;=99.0%; Acetylsalicylic acid for peak identification, European Pharmacopoeia (EP) Reference Standard; InChI=1/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12; 11126-35-5; 156865-15-5; Aspirin (Acetyl Salicylic Acid), Pharmaceutical Secondary Standard; Certified Reference Material</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="co">#&gt; 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Acetyl-DL-carnitine; acetylcarnitine; DL-O-Acetylcarnitine; Acetyl carnitine; DL-Acetylcarnitine; (+/-)-acetylcarnitine; 3-(acetyloxy)-4-(trimethylazaniumyl)butanoate; Ammonium, (3-carboxy-2-hydroxypropyl)trimethyl-, hydroxide, inner salt, acetate, DL-; 870-77-9; 14992-62-2; O-acetylcarnitine; 1-Propanaminium, 2-(acetoxy)-3-carboxy-N,N,N-trimethyl-, hydroxide, inner salt, (+-)- (9CI); L-ACETYLCARNITINE; 1-Propanaminium, 2-(acetyloxy)-3-carboxy-N,N,N-trimethyl-, inner salt; CAR(2:0); bmse000142; SCHEMBL69781; DTXSID2048117; CHEBI:73024; LMFA07070060; LS-17075; HY-126358; LS-173362; 3-(acetyloxy)-4-(trimethylammonio)butanoate; CS-0102945; Q27140241; 1-Propanaminium, 2-(acetoxy)-3-carboxy-N,N,N-trimethyl-, hydroxide, inner salt, (+-)-</span></a></code></pre></div>
+<p>Drug name and synonyms from Name</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">names &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Aspirin&quot;</span>, <span class="st">&quot;5-FU&quot;</span>)</a>
+<a class="sourceLine" id="cb4-2" title="2">synonyms &lt;-<span class="st"> </span><span class="kw">GetPubSynonymFromName</span>(names)</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co">#&gt; Getting names from PubChem...</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="co">#&gt; 50% completed 100% completed</span></a></code></pre></div>
+</div>
+<div id="get-drug-property-from-cid" class="section level2">
+<h2>3. Get drug property from CID</h2>
+<p>Drug properties</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">GetPubchemPro</span>(<span class="kw">c</span>(<span class="dv">2244</span>, <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="co">#&gt; Getting drug properties from PubChem...</span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="co">#&gt;    cid                    inchikey                           smiles</span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="co">#&gt; 1 2244 BSYNRYMUTXBXSQ-UHFFFAOYSA-N         CC(=O)OC1=CC=CC=C1C(=O)O</span></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="co">#&gt; 2    1 RDHQFKQIGNGIED-UHFFFAOYSA-N CC(=O)OC(CC(=O)[O-])C[N+](C)(C)C</span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="co">#&gt;   molecular_formula</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="co">#&gt; 1            C9H8O4</span></a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="co">#&gt; 2          C9H17NO4</span></a></code></pre></div>
+<p>Max clinital trial phase: `GetPubPhase</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">GetPubPhase</span>(<span class="kw">c</span>(<span class="dv">2244</span>, <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="co">#&gt; Getting clinical phases from PubChem...</span></a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="co">#&gt; 50% completed 100% completed</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="co">#&gt;    cid phase</span></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="co">#&gt; 1 2244     4</span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="co">#&gt; 2    1     4</span></a></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>ChEMBL</li>
+</ol>
+<p>Check the database version information of ChEMBL</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">ChemblVersion</span>()</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="co">#&gt;          activities         api_version   chembl_db_version chembl_release_date </span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="co">#&gt;          &quot;15504603&quot;           &quot;2.7.9b0&quot;         &quot;ChEMBL_25&quot;        &quot;2018-12-10&quot; </span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="co">#&gt;    compound_records   disinct_compounds        publications              status </span></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="co">#&gt;           &quot;2335417&quot;           &quot;1879206&quot;             &quot;72271&quot;                &quot;UP&quot; </span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="co">#&gt;             targets </span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="co">#&gt;             &quot;12482&quot;</span></a></code></pre></div>
+<p>Get ChEMBL ID and max clinical trial with InChI Key</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">GetChembl</span>(<span class="st">&quot;PMATZTZNYRCHOR-CGLBZJNRSA-N&quot;</span>)</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="co">#&gt; Getting information from ChEMBL...</span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="co">#&gt; 100%</span></a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="co">#&gt;                      inchikey chembl_id chembl_phase</span></a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="co">#&gt; 1 PMATZTZNYRCHOR-CGLBZJNRSA-N CHEMBL160            4</span></a></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>UniChem</li>
+</ol>
+<p>Get DrugBank ID, KEGG compound ID, and ChEMBL ID with InChI Key from UniChem</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">GetIds</span>(<span class="dt">inchikey =</span> <span class="st">&quot;BSYNRYMUTXBXSQ-UHFFFAOYSA-N&quot;</span>)</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="co">#&gt; Getting identifiers from UniChem...</span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="co">#&gt; 100%</span></a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="co">#&gt;                      inchikey uni_drugbank uni_kegg_c chembl_id</span></a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="co">#&gt; 1 BSYNRYMUTXBXSQ-UHFFFAOYSA-N      DB00945     C01405  CHEMBL25</span></a></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

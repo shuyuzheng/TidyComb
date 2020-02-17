@@ -1,0 +1,84 @@
+---
+title: "Drug Annotation with TydiComb"
+author: "Shuyu Zheng"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Drug Annotation with TydiComb}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(TidyComb)
+```
+
+# 1. PubChem
+
+## 1. Get CID from PubChem
+
+GetCid queries PubChem database via [PUG REST](http://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html) to search matched CIDs of drugs according to other identifiers. Available identifiers are: name, SMILES, InChIKey.
+
+```{r}
+GetCid(c("aspirin", "blebbistatin"), type = "name")
+GetCid("RDHQFKQIGNGIED-UHFFFAOYSA-N", type = "inchikey")
+GetCid("CC1(CCCN1)C2=NC3=C(C=CC=C3N2)C(=O)N.Cl.Cl", type = "smiles")
+```
+
+## 2. Get drug name or synonyms 
+
+Drug name and synonyms from CID
+
+```{r}
+GetPubNames(c(2244, 1))
+```
+
+Drug name and synonyms from Name
+
+```{r}
+names <- c("Aspirin", "5-FU")
+synonyms <- GetPubSynonymFromName(names)
+```
+
+
+## 3. Get drug property from CID
+Drug properties
+
+```{r}
+GetPubchemPro(c(2244, 1))
+```
+
+Max clinital trial phase: `GetPubPhase
+
+```{r}
+GetPubPhase(c(2244, 1))
+```
+
+2. ChEMBL
+
+Check the database version information of ChEMBL
+
+```{r}
+ChemblVersion()
+```
+
+Get ChEMBL ID and max clinical trial with InChI Key
+
+```{r}
+GetChembl("PMATZTZNYRCHOR-CGLBZJNRSA-N")
+```
+
+3. UniChem
+
+Get DrugBank ID, KEGG compound ID, and ChEMBL ID with InChI Key from UniChem
+
+```{r}
+GetIds(inchikey = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N")
+```
+
