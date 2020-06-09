@@ -32,7 +32,7 @@ CellVersion()
 Version of the Cellosaurus data embedded by TidyComb can be shown wih:
 
 ```{r}
-download.file("ftp://ftp.expasy.org/databases/cellosaurus")
+download.file("ftp://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml")
 CellVersion(file = system.file("cellosaurus.xml", package = "TidyComb"))
 ```
 
