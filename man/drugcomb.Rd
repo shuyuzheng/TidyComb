@@ -4,14 +4,16 @@
 \name{drugcomb}
 \alias{drugcomb}
 \title{Identifiers in DrugComb}
-\format{A list with 5 data frames:
+\format{
+A list with 5 data frames:
 \describe{
   \item{cell_line}{Contains 2 variables: cellosaurus_accession, id.}
   \item{drug}{Contains 2 variables: id, cid.}
   \item{disease}{Contains 2 variables: id, name.}
   \item{tissue}{Contains 2 variables: name, id.}
   \item{study}{Contains 1 variable: id.}
-}}
+}
+}
 \source{
 url{https://drugcomb.fimm.fi/}
 }

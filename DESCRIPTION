@@ -1,7 +1,7 @@
 Package: TidyComb
 Type: Package
 Title: Preparing drug combination data for DrugComb 
-Version: 0.0.6
+Version: 0.0.7
 Date: 2020-02-17
 Author: person("Shuyu", "Zheng", email = "shuyu.zheng@helsinki.fi",
     role = c("aut", "cre")) 
@@ -22,7 +22,7 @@ Imports:
     XML, RCurl, jsonlite, dplyr, plyr, reshape2, drc, nleqslv, gplots,
     magrittr, stats, utils, foreach, doParallel, rlang, adabag,
     ape, synergyfinder (>= 2.0.1)
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 Suggests: 
     testthat, knitr, rmarkdown
 VignetteBuilder: knitr
