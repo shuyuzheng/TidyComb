@@ -80,7 +80,7 @@
 #'
 #' @return A list contains 4 tables:
 #'   \itemize{
-#'     \item \strong{synergy} It contains the modified inhibition value and 4
+#'     \item \strong{response} It contains the modified inhibition value and 4
 #'     type of synergy scores of each drug dose response pair.
 #'     \item \strong{summary} It contains summarized information of each
 #'     blocks: synergy scores, css, ri, S
@@ -173,11 +173,11 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
   hsa <- synergyfinder::HSA(response.mat)
   bliss <- synergyfinder::Bliss(response.mat)
 
-  synergy <- lapply(list(response.mat, zip, loewe, hsa, bliss), reshape2::melt)
-  synergy <- Reduce(function(x, y) {
-    merge(x = x, y = y, by = c("Var1", "Var2"))}, synergy)
+  response <- lapply(list(response.mat, zip, loewe, hsa, bliss), reshape2::melt)
+  response <- Reduce(function(x, y) {
+    merge(x = x, y = y, by = c("Var1", "Var2"))}, response)
 
-  colnames(synergy) <- c("conc_r", "conc_c", "inhibition", "synergy_zip",
+  colnames(response) <- c("conc_r", "conc_c", "inhibition", "synergy_zip",
                          "synergy_loewe", "synergy_hsa", "synergy_bliss")
 
   if (!summary.only) {
@@ -211,20 +211,24 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
 
   css <- mean(c(col.css, row.css), na.rm = TRUE)
 
-  S <- css - sum(col.ri, row.ri)
+  # Synergy scores from CSS and RI
+  S_sum <- css - sum(col.ri, row.ri)
+  S_max <- css - max(c(col.ri, row.ri))
+  S_mean <- css - mean(c(col.ri, row.ri))
 
-  sum <- synergy %>%
+  sum <- response %>%
     dplyr::filter(conc_r != 0 & conc_c != 0) %>%
     dplyr::select(-conc_r, -conc_c, -inhibition) %>%
     apply(2, mean, na.rm = TRUE)
 
   sum <- data.frame(t(sum), ic50_row = row.ic50 , ic50_col = col.ic50,
                     ri_row = row.ri, ri_col = col.ri, css_row = row.css,
-                    css_col = col.css, css = css, S = S)
+                    css_col = col.css, css = css, S_sum = S_sum, S_max = S_max,
+                    S_mean = S_mean)
   if (summary.only) {
     return(sum)
   } else{
-    res <- list(synergy = synergy, surface = surface,
+    res <- list(response = response, surface = surface,
                 summary = sum, curve = curves)
     return(res)
   }
@@ -274,7 +278,7 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
 #'
 #' @return A list. It contains 4 tables:
 #'   \itemize{
-#'     \item \strong{synergy} It contains the modified response value and 4
+#'     \item \strong{response} It contains the modified response value and 4
 #'     type of synergy scores of each drug dose response pair.
 #'     \item \strong{summary} It contains summarized information of each
 #'     blocks: synergy scores, css, ri, S
@@ -305,16 +309,17 @@ CalculateTemplate <- function(template, summary.only=FALSE, seed = NULL) {
                         synergy_loewe = numeric(), ic50_row = numeric() ,
                         ic50_col = numeric(), ri_row = numeric(),
                         ri_col = numeric(), css_row = numeric(),
-                        css_col = numeric(), css = numeric(), S = numeric(),
+                        css_col = numeric(), css = numeric(), S_sum = numeric(),
+                        S_max = numeric(), S_mean = numeric(),
                         stringsAsFactors = FALSE)
 
   if (!summary.only) {
-    synergy <- data.frame(block_id = integer(), conc_r = numeric(),
+    response <- data.frame(block_id = integer(), conc_r = numeric(),
                           conc_c = numeric(), inhibition = numeric(),
                           synergy_zip = numeric(), synergy_bliss = numeric(),
                           synergy_loewe = numeric(), synergy_hsa = numeric(),
                           stringsAsFactors = FALSE)
-    surface <- synergy
+    surface <- response
     curve <- data.frame(block_id = integer(), b = numeric(),
                         c = numeric(), d = numeric(), e = numeric(),
                         model = numeric(), drug.row = numeric(),
@@ -376,7 +381,7 @@ CalculateTemplate <- function(template, summary.only=FALSE, seed = NULL) {
                                  "row")] <- as.character(info$drug_row)
 
       # 4. Append new tables to containers
-      synergy <- rbind.data.frame(synergy, tmp$synergy)
+      response <- rbind.data.frame(response, tmp$response)
       surface <- rbind.data.frame(surface, tmp$surface)
       curve <- rbind.data.frame(curve, tmp$curve)
       summary <- rbind.data.frame(summary, tmp$summary)
@@ -399,16 +404,16 @@ CalculateTemplate <- function(template, summary.only=FALSE, seed = NULL) {
   } else {
     curve <- dplyr::select(curve, block_id, drug_row, drug_col, b, c, d, e, model)
 
-    return(list(synergy = synergy, surface = surface,
+    return(list(response = response, surface = surface,
                 curve = curve, summary = summary))
   }
 }
 
 
-multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
+multiResultClass <- function(response=NULL, summary=NULL, surface = NULL,
                              curve = NULL) {
   me <- list(
-    synergy = synergy,
+    response = response,
     summary = summary,
     surface = surface,
     curve = curve
@@ -448,7 +453,7 @@ multiResultClass <- function(synergy=NULL, summary=NULL, surface = NULL,
 #'
 #' @return A list. It contains 4 tables:
 #'   \itemize{
-#'     \item \strong{synergy} It contains the modified inhibition value and 4
+#'     \item \strong{response} It contains the modified inhibition value and 4
 #'     type of synergy scores of each drug dose response pair.
 #'     \item \strong{summary} It contains summarized information of each
 #'     blocks: synergy scores, css, ri, S
@@ -532,7 +537,7 @@ ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE,
                                  b, c, d, e, model)
 
       # 5. collect tables
-      result$synergy <- tmp$synergy
+      result$response <- tmp$response
       result$surface <- tmp$surface
       result$summary <- tmp$summary
       result$curve <- tmp$curve
@@ -555,8 +560,8 @@ ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE,
     res2 <- Reduce(function(x, y) {rbind.data.frame(x, y)}, res)
   } else {
     res2 <- list()
-    res2$synergy <- Reduce(function(x, y) {rbind.data.frame(x, y)},
-                           lapply(res, "[[" , "synergy"))
+    res2$response <- Reduce(function(x, y) {rbind.data.frame(x, y)},
+                           lapply(res, "[[" , "response"))
     res2$surface <- Reduce(function(x, y) {rbind.data.frame(x, y)},
                            lapply(res, "[[" , "surface"))
     res2$summary <- Reduce(function(x, y) {rbind.data.frame(x, y)},
