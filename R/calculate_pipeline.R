@@ -328,10 +328,10 @@ CalculateTemplate <- function(template, summary.only=FALSE, seed = NULL) {
 
   for (block in blocks) {
     # 1. Generate response matrix for each block
-    response <- template %>%
+    response.df <- template %>%
       dplyr::filter(block_id == block)
 
-    response.mat <- response %>%
+    response.mat <- response.df %>%
       dplyr::select(conc_r, conc_c, inhibition) %>%
       reshape2::acast(conc_r ~ conc_c, value.var = "inhibition")
 
@@ -355,7 +355,7 @@ CalculateTemplate <- function(template, summary.only=FALSE, seed = NULL) {
 
 
     # 3. Add information to summary table
-    info <- response %>%
+    info <- response.df %>%
       dplyr::select(drug_row, drug_col, cell_line_name,
                     conc_r_unit, conc_c_unit) %>%
       unique()
