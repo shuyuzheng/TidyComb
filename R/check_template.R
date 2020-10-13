@@ -97,6 +97,18 @@ CheckTemplate <- function(template){
          "remove the duplicated rows and re-upload the data.")
   }
 
+  # Existing of single drug dose response in one block
+
+  tmp <- template[which(template$conc_c == 0 | template$conc_r == 0), ]
+  tmp <- setdiff(template$block_id, tmp$block_id)
+
+  if (length(tmp) != 0) {
+    stop("The single drug dose responses are missing in the block: ",
+         paste(tmp, collapse = ", "), ".\n",
+         "Please add the missing monotherapy responses for these blocks and ",
+         "re-upload the file.")
+  }
+
   gc()
   return(template)
 }
