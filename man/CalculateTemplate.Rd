@@ -46,7 +46,7 @@ By default, it is set as NULL which means no seed was set.}
 \value{
 A list. It contains 4 tables:
   \itemize{
-    \item \strong{synergy} It contains the modified response value and 4
+    \item \strong{response} It contains the modified response value and 4
     type of synergy scores of each drug dose response pair.
     \item \strong{summary} It contains summarized information of each
     blocks: synergy scores, css, ri, S

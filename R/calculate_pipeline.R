@@ -395,7 +395,7 @@ CalculateTemplate <- function(template, summary.only=FALSE, seed = NULL) {
     # Clean temporary file
     tmp <- NULL
     info <- data.frame()
-    response <- data.frame()
+    response.df <- data.frame()
     response.mat <- matrix()
   }
 
@@ -474,7 +474,7 @@ multiResultClass <- function(response=NULL, summary=NULL, surface = NULL,
 #'                  stringsAsFactors = FALSE)
 #' res <- ParCalculateTemplate(data)
 ParCalculateTemplate <- function(template, cores = 1, summary.only = FALSE,
-                                 seed = NULL) {
+                                 seed = NULL, ...) {
   template <- CheckTemplate(template)
   blocks <- unique(template$block_id)
 

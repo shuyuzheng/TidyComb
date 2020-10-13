@@ -4,7 +4,13 @@
 \alias{ParCalculateTemplate}
 \title{Parallel Calculate Drug Combination data in template format}
 \usage{
-ParCalculateTemplate(template, cores = 1, summary.only = FALSE, seed = NULL)
+ParCalculateTemplate(
+  template,
+  cores = 1,
+  summary.only = FALSE,
+  seed = NULL,
+  ...
+)
 }
 \arguments{
 \item{template}{a dataframe in the format as template. Columns "block_id",
@@ -35,7 +41,7 @@ arguments are:
 \value{
 A list. It contains 4 tables:
   \itemize{
-    \item \strong{synergy} It contains the modified inhibition value and 4
+    \item \strong{response} It contains the modified inhibition value and 4
     type of synergy scores of each drug dose response pair.
     \item \strong{summary} It contains summarized information of each
     blocks: synergy scores, css, ri, S
