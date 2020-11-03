@@ -50,3 +50,7 @@ approach such bulk queries.
 \examples{
 GetCid("aspirin", "name", quiet = TRUE)
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

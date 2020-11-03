@@ -1,7 +1,12 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng<shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 # TidyComb
 # Functions for retrieving or updating publication information from PubMed.
-# Copyright Shuyu Zheng
-
 
 #'Get publication information from Pubmed
 #'
@@ -49,6 +54,10 @@
 #'   reposted.
 #'   \item \strong{doi} The Digital Object Identifier (DOI) of the publication.
 #' }
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 #'

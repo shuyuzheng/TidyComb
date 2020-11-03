@@ -1,7 +1,12 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng<shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 # TidyComb
 # Functions for retrieving or updating drug information from UniChem.
-# Copyright Shuyu Zheng
-
 
 #' Get other identifiers from InChIKey
 #'
@@ -18,6 +23,10 @@
 #' @return A data frame with first column is the identifier passed to \code{ids}
 #' argument and following columns are indentifiers of all resources integrated
 #' by UniChem.
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 #'
@@ -82,6 +91,10 @@ GetIds <- function(inchikey) {
 #' \item{name}{Name of the resources.}
 #' \item{src_id}{"src_id" of the resources.}
 #' \item{description}{A brief description of the content of the source.}
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 #'

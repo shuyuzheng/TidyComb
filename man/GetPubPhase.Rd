@@ -28,3 +28,7 @@ accordint to CIDs.
 \examples{
 clinical.phase <- GetPubPhase(c(1,2,3,4, 2244))
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

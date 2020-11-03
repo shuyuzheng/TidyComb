@@ -27,3 +27,7 @@ accordint to CIDs.
 \examples{
 property <- GetPubchemPro(c(1,2,3,4))
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

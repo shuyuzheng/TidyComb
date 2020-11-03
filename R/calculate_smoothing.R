@@ -1,10 +1,32 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng <shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 # TidyComb
 # Functions for calculating drug combination response or synergy surface
-# Copyright Shuyu Zheng
 #
 # Functions on this page:
 # smoothing
 
+#' Smoothing the dose response or synergy score surface
+#'
+#' This function will add the data points into the existing score matrix to make
+#' the surface in 3D visualization smoothly. Kriging algotithom is used for
+#' imputation.
+#'
+#' @param scores.mat matrix, the matix for response valuses or synergy scores.
+#' @param len integer, the number of data points will be added between two
+#' neighbor dosages in original matrix.
+#'
+#' @return The matrix with addational data points.
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 smoothing <-  function (scores.mat, len = 2) {
 
   options(scipen = 999)

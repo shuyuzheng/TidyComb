@@ -21,3 +21,7 @@ the current version ChEMBL database.
 \examples{
 # print(ChemblVersion())
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

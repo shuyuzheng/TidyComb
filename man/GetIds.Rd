@@ -27,3 +27,7 @@ Services}.
 \examples{
 aspirin <- GetIds(inchikey = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N")
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

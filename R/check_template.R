@@ -1,3 +1,10 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng<shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 #' Check the input template
 #'
 #' \code{CheckTemplate} function check the template inputted from users to
@@ -10,7 +17,11 @@
 #' @param template a data frame. It is the input data from users for analysis
 #'
 #' @return Non
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @export
 #' @examples
 #' data <- read.csv(system.file("template.csv", package = "TidyComb"),

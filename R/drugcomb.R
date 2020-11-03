@@ -1,3 +1,10 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng<shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 #' Identifiers in DrugComb
 #'
 #' A list containing the identifiers of drugs, diseases, tissues, cell_lines,

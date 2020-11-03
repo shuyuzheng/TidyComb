@@ -1,6 +1,12 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng <shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 # TidyComb
 # Functions for retrieving or updating drug information from PubChem database.
-# Copyright Shuyu Zheng
 
 #' Match CID according to other identifiers
 #'
@@ -40,6 +46,10 @@
 #'   \item \code{input_id} The identifiers input by user.
 #'   \item \code{cid} The matched CID.
 #' }
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 #'
@@ -115,6 +125,10 @@ GetCid <- function(ids, type , quiet = TRUE) {
 #'   \item \strong{synonyms} Synonyms retrieved from PubChem
 #' }
 #'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @export
 #'
 #' @examples
@@ -173,6 +187,10 @@ GetPubNames <- function(cids, quiet = TRUE){
 #' }
 #' @export
 #'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @examples
 #' property <- GetPubchemPro(c(1,2,3,4))
 GetPubchemPro <- function(cids) {
@@ -218,6 +236,10 @@ GetPubchemPro <- function(cids) {
 #'   \item \strong{phase} Max clinical trial phase of matched drugs.
 #' }
 #' @export
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @examples
 #' clinical.phase <- GetPubPhase(c(1,2,3,4, 2244))
@@ -305,6 +327,10 @@ GetPubPhase <- function(cids, quiet = TRUE) {
 #'   are separated by ";".
 #' }
 #'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @export
 #'
 #' @examples
@@ -358,7 +384,10 @@ GetPubSynonymFromName <- function(names) {
 #'     is \code{NA}.
 #'   }
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @export
 #'
 #' @examples

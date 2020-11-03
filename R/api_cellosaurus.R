@@ -1,3 +1,10 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng <shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 # TidyComb
 # Functions for retrieving or updating celline information from Cellosaurus.
 #
@@ -32,7 +39,9 @@
 #' @return A named character vector. It contains: version, date of update,
 #' number of archived cell lines and number of archived publications.
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 CellVersion <- function(
@@ -78,7 +87,9 @@ CellVersion <- function(
 #' \strong{not} up-to-date, the local file will be updated with online
 #' Cellosaurus data.
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 UpdateCell <- function(file) {
@@ -120,10 +131,13 @@ UpdateCell <- function(file) {
 #'
 #' @param file File path to a Cellosaurus xml file.
 #'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @return An XMLNode containing all cell lines' information archieved in
 #' Cellosaurus dataset.
 #' @export
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 
 ParseCell <- function(file) {
   doc <- XML::xmlInternalTreeParse(file)
@@ -149,8 +163,11 @@ ParseCell <- function(file) {
 #' @return An XMLNodeSet containing matched cell lines in the dataset. If no
 #' cell line is matched, a NULL list will be return.
 #'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @export
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 
 GetCell <- function(node, ids, type = "name"){
   if(type == "name"){
@@ -191,7 +208,11 @@ GetCell <- function(node, ids, type = "name"){
 #'   \item \code{synonyms} synonyms of the cell line separated by semicolons.
 #' }
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
+#' @export
 
 GetCellName <- function(node) {
   tryCatch({
@@ -227,7 +248,9 @@ GetCellName <- function(node) {
 #' @param node An XMLInternalElementNode with only one cell line's information
 #' which was extracted from Cellosaurus xml file.
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @return A data frame contains two variables:
 #' \item{disease}{name of the cell line associated disease.}
@@ -259,7 +282,9 @@ GetDisease <- function(node){
 #' @param node An XMLInternalElementNode with only one cell line's information
 #' which was extracted from Cellosaurus xml file.
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @return A character. The tissue name of cell line according to CClE category.
 GetTissue <- function(node){
@@ -291,7 +316,9 @@ GetTissue <- function(node){
 #'
 #' @return A character. The Cellosaurus accession ID of cell line
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 
 GetAccession <- function(node){
   tryCatch({
@@ -331,7 +358,9 @@ GetAccession <- function(node){
 #'
 #' @return  cell line information selected by \code{info}
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 

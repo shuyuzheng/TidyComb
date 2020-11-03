@@ -1,3 +1,10 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng <shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 #' TidyComb: Preparing drug combination data for DrugComb
 #'
 #' This package wrapped the functions that could be used to tidy drug

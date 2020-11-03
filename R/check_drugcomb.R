@@ -1,3 +1,10 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng <shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 # TidyComb
 # Functions for checking current status of DrugComb
 #
@@ -42,7 +49,9 @@
 #'   lines that \emph{are not yet} in DrugComb.
 #' }
 #'
-#' @author ShuyuZheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 CheckCell <- function(test) {
@@ -81,7 +90,9 @@ CheckCell <- function(test) {
 #'   \emph{are not yet} in DrugComb.
 #' }
 #'
-#' @author ShuyuZheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 CheckTissue <- function(test) {
@@ -138,7 +149,9 @@ CheckTissue <- function(test) {
 #'   \emph{are not yet} in DrugComb.
 #' }
 #'
-#' @author ShuyuZheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 CheckDisease <- function(disease_df) {
@@ -178,7 +191,9 @@ CheckDisease <- function(disease_df) {
 #'   in DrugComb.
 #' }
 #'
-#' @author ShuyuZheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 CheckDrug <- function(cids) {

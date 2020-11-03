@@ -1,3 +1,10 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng<shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 # TidyComb
 # Functions for pipe all calculation togather
 #
@@ -92,7 +99,9 @@
 #'  If \code{summary.only} is \code{TRUE}, it will return only the "summary"
 #'  data frame.
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @importFrom magrittr %>%
 #'
@@ -288,7 +297,9 @@ CalculateMat <- function(response.mat, noise = TRUE, correction = "non",
 #'     synergy scores of each drug dose response pair.
 #'  }
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
@@ -463,7 +474,9 @@ multiResultClass <- function(response=NULL, summary=NULL, surface = NULL,
 #'     synergy scores of each drug dose response pair.
 #'  }
 #'
-#' @author Shuyu Zheng{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @importFrom magrittr %>%
 #' @importFrom foreach %dopar%

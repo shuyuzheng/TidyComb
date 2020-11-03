@@ -28,5 +28,6 @@ It will return the total number of drugs have been archived in DrugComb as
 well as which drugs are already or not yet archived in DrugComb.
 }
 \author{
-ShuyuZheng \email{shuyu.zheng@helsinki.fi}
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }

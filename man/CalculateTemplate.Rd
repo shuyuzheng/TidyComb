@@ -65,5 +65,6 @@ data <- read.csv(system.file("template.csv", package = "TidyComb"),
 res <- CalculateTemplate(data)
 }
 \author{
+Jing Tang \email{jing.tang@helsinki.fi}
 Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }

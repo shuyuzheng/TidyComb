@@ -23,3 +23,7 @@ A list with 2 data frames:
 \description{
 Generate "cell_line" and "cell_id" tables
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

@@ -26,5 +26,6 @@ to find entries that matches the names provided in the \code{names}
 parameter.
 }
 \author{
+Jing Tang \email{jing.tang@helsinki.fi}
 Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }

@@ -25,3 +25,7 @@ A data frame contains:
 \description{
 Match cell line name with cellosaurus accession
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

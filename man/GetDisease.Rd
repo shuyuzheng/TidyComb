@@ -28,5 +28,6 @@ this function with \code{apply} or \code{sapply} can extract disease
 information from an XMLNodeSet object.
 }
 \author{
+Jing Tang \email{jing.tang@helsinki.fi}
 Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }

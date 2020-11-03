@@ -1,3 +1,10 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng<shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 # TidyComb
 # Functions for generating "cell_line" table for DrugComb databse.
 #
@@ -20,6 +27,10 @@
 #'   \item \strong{all_name} All names for the mached cell lines, including
 #'   primary name and synonyms.
 #' }
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 #'
@@ -69,6 +80,11 @@ MatchCellAcc <- function(names, file){
 #' }
 #'
 #' @importFrom magrittr %>%
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 #' @export
 #'
 GenerateCell <- function(acc, file){

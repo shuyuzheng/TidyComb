@@ -1,3 +1,10 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng <shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 # TidyComb
 # Functions for retrieving or updating drug information from ChEMBL database.
 #
@@ -16,6 +23,10 @@
 #'
 #' @return A vector of named characters contains the update information of
 #' ChEMBL.
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 #'
@@ -47,6 +58,10 @@ ChemblVersion <- function(){
 #'  \item{inchikey}{Inputted standard InChIKey of drugs.}
 #'  \item{chembl_id}{ChEMBL ID of the matched drugs.}
 #'  \item{chembl_phase}{Max clinical trial phase of the matched drugs.}
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 #'
@@ -128,6 +143,10 @@ GetChembl <- function(ids, quiet = TRUE) {
 #' @return A data frame contains 2 columns:
 #'  \item{chembl_id}{Inputted ChEMBL ID of drugs.}
 #'  \item{chembl_phase}{Max clinical trial phase of the matched drugs.}
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 #'

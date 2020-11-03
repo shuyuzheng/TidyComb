@@ -34,5 +34,6 @@ ID, disease, disease_id, tissue) of the inputted cell lines and wrap them
 into a data frame.
 }
 \author{
+Jing Tang \email{jing.tang@helsinki.fi}
 Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }

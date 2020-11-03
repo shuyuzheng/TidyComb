@@ -31,3 +31,7 @@ phase".
 \examples{
 drug.info <- GetChemblPhase("CHEMBL25")
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

@@ -18,3 +18,7 @@ Obtain all resources and corresponding \code{src_ids} currently in UniChem
 \examples{
 resource <- GetAllSrcIds()
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

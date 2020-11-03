@@ -30,3 +30,7 @@ searching for synonyms of drug.
 \examples{
 GetPubNames("2244")
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

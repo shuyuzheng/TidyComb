@@ -29,5 +29,6 @@ will check the online dataset version. If you'd like to check the version of
 a local file, please pass the path of file to argument \code{file}.
 }
 \author{
+Jing Tang \email{jing.tang@helsinki.fi}
 Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }

@@ -104,5 +104,6 @@ response.mat <- reshape2::acast(conc_r~conc_c, value.var = "inhibition",
 res <- CalculateMat(response.mat)
 }
 \author{
+Jing Tang \email{jing.tang@helsinki.fi}
 Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }

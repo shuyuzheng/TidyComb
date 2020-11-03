@@ -58,3 +58,7 @@ application to our servers:
 \examples{
 study <- GetPubmed(c(26551875, 15627163), email = "shuyu.zheng1992@gmail.com")
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

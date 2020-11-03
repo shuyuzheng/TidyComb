@@ -31,3 +31,7 @@ identifier is standard InChIKey.
 \examples{
 drug.info <- GetChembl("PMATZTZNYRCHOR-CGLBZJNRSA-N")
 }
+\author{
+Jing Tang \email{jing.tang@helsinki.fi}
+Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+}

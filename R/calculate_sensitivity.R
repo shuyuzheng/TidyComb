@@ -1,3 +1,10 @@
+################################################################################
+# Copyright Shuyu Zheng and Jing Tang - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+# Written by Shuyu Zheng <shuyu.zheng@helsinki.fi>, November 2020
+################################################################################
+
 # TidyComb
 # Functions for calculating cell line's sensitivity to drugs or drug combination
 #
@@ -115,18 +122,29 @@ CalculateSens <- function(df, pred = FALSE) {
   gc()
 }
 
-# CSS - scoreCurve
-# New function used to score sensitivities given either a single-agent or a
-# fixed conc (combination) columns.
-# The function calculates the AUC of the log10-scaled dose-response curve.
-
-# IMPORTANT: note that with L.4() calls, this value is already logged since the
-# input concentrations are also logged.
-# c1:log10(min conc) (this is the minimal nonzero concentration)
-# c2:log10(max conc) (this is the maximal concentration)
-# t: threshold (usually set to zero)
-# own_log: log(1+10^(b*(c-x)))
-
+#' CSS facilitate function - scoreCurve for curves fitted by LL.4
+#'
+#' New function used to score sensitivities given either a single-agent or a
+#' fixed conc (combination) columns. The function calculates the AUC of the
+#' log10-scaled dose-response curve. \strong{IMPORTANT:} note that with
+#' \code{\link[drc]{LL.4()}} calls, this value is already logged since the
+#' input concentrations are logged.
+#'
+#' @param b numeric, fitted parameter b from \code{\link[drc]{LL.4()}} model
+#' @param c numeric, fitted parameter c from \code{\link[drc]{LL.4()}} model
+#' @param d numeric, fitted parameter d from \code{\link[drc]{LL.4()}} model
+#' @param m numeric, relative IC50 for the curve. log10(e), where e is the
+#'   fitted parameter e from \code{\link[drc]{LL.4()}} model
+#' @param c1 numeric, log10(min conc) (this is the minimal nonzero concentration)
+#' @param c2 numeric, log10(max conc) (this is the maximal concentration)
+#' @param t numeric, threshold (usually set to zero)
+#'
+#' @return numeric, RI or CSS scores
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 scoreCurve <- function(b, c, d, m, c1, c2, t) {
   # y <- c + (d - c) / (1 + (e / x) ^ (-b)) # LL.4
   # b <- coef[1]
@@ -145,18 +163,49 @@ scoreCurve <- function(b, c, d, m, c1, c2, t) {
   return(sens)
 }
 
+#' CSS facilitate function - log calculation (nature based) LL.4 version
+#'
+#' #' This function calculates ln(1+10^(b*(c-x))) to be used in \code{scoreCurve}
+#' function
+#'
+#' @param b fitted parameter b from \code{\link[drc]{L.4()}} model
+#' @param c fitted parameter c from \code{\link[drc]{L.4()}} model
+#' @param x relative IC50 for the curve. log10(e), where e is the
+#'   fitted parameter e from \code{\link[drc]{L.4()}} model
+#'
+#' @return ln(1+10^(b*(c-x)))
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 own_log = function(b, c, x)
 {
   arg = 1 + 10^(b*(c-x))
   if(is.infinite(arg)==T) res = b*(c-x)*log(10) else res = log(arg)
   return(res)
 }
-# CSS - scoreCurve for L.4() model
-# New function used to score sensitivities given either a single-agent or a
-# fixed conc (combination) columns.
-# The function calculates the AUC of the log10-scaled dose-response curve
-# own_log2: log(1+exp(x))
 
+#' CSS facilitate function - scoreCurve for curves fitted by L.4
+#'
+#' This function is used to score sensitivities given either a single-agent or a
+#' fixed conc (combination) columns. The function calculates the AUC of the
+#' log10-scaled dose-response curve.
+#'
+#' @param b numeric, fitted parameter b from \code{\link[drc]{L.4()}} model
+#' @param c numeric, fitted parameter c from \code{\link[drc]{L.4()}} model
+#' @param d numeric, fitted parameter d from \code{\link[drc]{L.4()}} model
+#' @param e numeric, fitted parameter e from \code{\link[drc]{L.4()}} model
+#' @param c1 numeric, log10(min conc) (this is the minimal nonzero concentration)
+#' @param c2 numeric, log10(max conc) (this is the maximal concentration)
+#' @param t numeric, threshold (usually set to zero)
+#'
+#' @return numeric, RI or CSS scores
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
 scoreCurve.L4 <- function(b, c, d, e, c1, c2, t) {
   # y <- c + (d - c) / (1 + exp(b * (x - e))) # L4
   # b <- coef[1]
@@ -172,10 +221,21 @@ scoreCurve.L4 <- function(b, c, d, e, c1, c2, t) {
   return(sens)
 }
 
-# own_log2, natural base
-# calculate log(1+exp(x)) to be used in scoreCurve.L4 function
-own_log2 = function(x)
-{
+#' CSS facilitate function - log (nature based) calculation L.4 version
+#'
+#' This function calculates ln(1+exp(x)) to be used in \link{scoreCurve.L4}
+#' function
+#'
+#' @param x relative IC50 for the curve. The fitted parameter e from
+#'  \code{\link[drc]{L.4()}} model
+#'
+#' @return ln(1+exp(x))
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
+own_log2 <- function(x){
   arg = 1 + exp(x)
   if(is.infinite(arg)==T) res = x else res = log(arg)
   return(res)
@@ -358,7 +418,9 @@ CalculateIC50 <- function(coef, type, max.conc){
 #' @return A numeric value. It is the response value of cell line to the drug at
 #' inputted dose.
 #'
-#' @author Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 #'
 #' @export
 PredictResponse <- function(df, dose) {

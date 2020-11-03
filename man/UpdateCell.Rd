@@ -34,5 +34,6 @@ Warning: The local file will be overwritted when updating data. If you'd like
 to keep the old version of dataset, please backup it before updating.
 }
 \author{
+Jing Tang \email{jing.tang@helsinki.fi}
 Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }

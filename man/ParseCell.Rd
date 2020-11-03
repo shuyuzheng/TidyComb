@@ -32,5 +32,6 @@ reuirement of memory. We recommend to download the dataset to a local file
 and then parse this local file by using this function.
 }
 \author{
+Jing Tang \email{jing.tang@helsinki.fi}
 Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
 }
