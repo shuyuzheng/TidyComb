@@ -120,8 +120,8 @@ GetCid <- function(ids, type , quiet = TRUE) {
 #' @return A Data frame contains:
 #' \itemize{
 #'   \item \strong{cid} Inputted CIDs.
-#'   \item \strong{name} The first name in the synonyms list retrieved from
-#'   PubChem.
+#'   \item \strong{name} The first name whose length is less than 40 characters
+#'   in the synonyms list retrieved from PubChem.
 #'   \item \strong{synonyms} Synonyms retrieved from PubChem
 #' }
 #'
@@ -133,7 +133,7 @@ GetCid <- function(ids, type , quiet = TRUE) {
 #'
 #' @examples
 #' GetPubNames("2244")
-GetPubNames <- function(cids, quiet = TRUE){
+GetPubNames <- function(cids, quiet = FALSE){
   if (!quiet) {
     message("Getting names from PubChem...")
   }
@@ -155,11 +155,40 @@ GetPubNames <- function(cids, quiet = TRUE){
       url <- sprintf(url.base, compound)
       res <- jsonlite::fromJSON(url)
       cid <- c(cid, res[[1]][[1]]$CID)
-      name <- c(name, unlist(res[[1]][[1]]$Synonym)[1])
+      names <- unlist(res[[1]][[1]]$Synonym)
+      j <- 1
+      dname <- paste0(rep(1, 41), collapse = "")
+      while(nchar(dname) > 40 & j < length(names)){
+        dname <- names[j]
+        j <- j + 1
+      }
+      if (nchar(dname) > 40){
+        dname <- names[1]
+      }
+      name <- c(name, dname)
       synonyms <- c(synonyms,
-                    paste0(unlist(res[[1]][[1]]$Synonym), collapse = "; "))
+                    paste0(names, collapse = "; "))
     }, error = function(e){
-      print(e)
+      if (!quiet){
+        print(e)
+      }
+      url <- sub("/synonyms", "", url)
+      res <- jsonlite::fromJSON(url)
+      cid <<- c(cid, res$PC_Compounds$id$id$cid)
+      tmp <- res$PC_Compounds$props[[1]]
+      names <- unique(tmp$value$sval[which(tmp$urn$label == "IUPAC Name")])
+      j <- 0
+      dname <- paste0(rep(1, 41), collapse = "")
+      while(nchar(dname) > 40 & j < length(names)){
+        j <- j + 1
+        dname <- names[j]
+      }
+      if (nchar(dname) > 40){
+        dname <- names[1]
+      }
+      name <<- c(name, dname)
+      synonyms <<- c(synonyms,
+                    paste0(names, collapse = "; "))
     }, finally = Sys.sleep(0.2)
     )
     i <- i + 1
@@ -348,10 +377,9 @@ GetPubSynonymFromName <- function(names) {
   synonyms <- NULL
   n <- length(names)
   for (i in 1:n) {
+    message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
+    utils::flush.console()
     tryCatch({
-      message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
-      utils::flush.console()
-
       url <- sprintf(url.base, names[i])
       res <- jsonlite::fromJSON(url)
       input_name <- c(input_name, names[i])
@@ -396,18 +424,22 @@ UpdateCid <- function(cids) {
   url.base <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/",
                      "compound/%s/JSON")
   output <- NULL
+  n <- length(cids)
 
-    for (cid in cids) {
-      tmp <- data.frame(old_cid = cid, new_cid = NA, stringsAsFactors = FALSE)
+    for (i in 1:n) {
+      message(round(i/n, 2)*100, "% completed", "\r", appendLF = FALSE)
+      utils::flush.console()
+      tmp <- data.frame(old_cid = cids[i], new_cid = NA, stringsAsFactors = FALSE)
       new_cid <- NA
       tryCatch({
-        url <- sprintf(url.base, cid)
+        url <- sprintf(url.base, cids[i])
         res <- jsonlite::fromJSON(url)
         if ("Preferred Compound" %in% res$Record$Section$TOCHeading) {
           new_cid <- res$Record$Section$Information[[1]]$Value$Number
         }
       }, error = function(e) {
-        print(e)
+        print(paste0("Error on ", cids[i], ": ",  e))
+        new_cid <- NA
       }, finally = Sys.sleep(0.2)
       )
 

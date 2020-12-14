@@ -17,8 +17,8 @@ progress will be shutted down.}
 A Data frame contains:
 \itemize{
   \item \strong{cid} Inputted CIDs.
-  \item \strong{name} The first name in the synonyms list retrieved from
-  PubChem.
+  \item \strong{name} The first name whose length is less than 40 characters
+  in the synonyms list retrieved from PubChem.
   \item \strong{synonyms} Synonyms retrieved from PubChem
 }
 }

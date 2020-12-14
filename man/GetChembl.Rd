@@ -4,20 +4,26 @@
 \alias{GetChembl}
 \title{Get information from ChEMBL}
 \usage{
-GetChembl(ids, quiet = TRUE)
+GetChembl(ids, info = c("chembl_id", "phase"), quiet = TRUE)
 }
 \arguments{
 \item{ids}{A vector of characters contains the InChIKey of drugs.
 \emph{Note:} the leading and tailing whitespaces are not allowed.}
 
+\item{info}{A vector of characters contains the information user want to get
+from ChEMBL database. The available values are:
+ \item{"phase"} {Maximun clinical phase for input compounds.}
+ \item{"molecular_formula"} {Molecula formula for input compounds.}
+ \item{"inchikey"} {Standard InChIKey for input compounds.}
+ \item{"smiles"} {Canonical SMILES for input compounds.}
+ \item{"chembl_id"} {ChEMBL ID for input compounds.}}
+
 \item{quiet}{A logical value. If it is \code{TRUE}, the error messages will
 not show during runing the function.}
 }
 \value{
-A data frame contains 3 columns:
- \item{inchikey}{Inputted standard InChIKey of drugs.}
- \item{chembl_id}{ChEMBL ID of the matched drugs.}
- \item{chembl_phase}{Max clinical trial phase of the matched drugs.}
+A data frame contains reqired information for drugs and one column
+"input_id" for input identifier.
 }
 \description{
 \code{GetChembl} retrieves ChEMBL ID and max clinical trial phase of drugs
@@ -29,7 +35,8 @@ accordint to standard InChIKey.
 identifier is standard InChIKey.
 }
 \examples{
-drug.info <- GetChembl("PMATZTZNYRCHOR-CGLBZJNRSA-N")
+drug.info <- GetChembl("PMATZTZNYRCHOR-CGLBZJNRSA-N",
+                       info = c("phase", "chembl_id", "inchikey"))
 }
 \author{
 Jing Tang \email{jing.tang@helsinki.fi}
