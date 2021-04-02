@@ -4,7 +4,7 @@
 \alias{GetPubNames}
 \title{Get drug synonyms from PubChem}
 \usage{
-GetPubNames(cids, quiet = TRUE)
+GetPubNames(cids, quiet = FALSE)
 }
 \arguments{
 \item{cids}{A vector of characters or integers containing CID of drugs for

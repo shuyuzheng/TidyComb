@@ -7,14 +7,14 @@
 scoreCurve(b, c, d, m, c1, c2, t)
 }
 \arguments{
-\item{b}{numeric, fitted parameter b from \code{\link[drc]{LL.4()}} model}
+\item{b}{numeric, fitted parameter b from \code{\link[drc]{LL.4}} model}
 
-\item{c}{numeric, fitted parameter c from \code{\link[drc]{LL.4()}} model}
+\item{c}{numeric, fitted parameter c from \code{\link[drc]{LL.4}} model}
 
-\item{d}{numeric, fitted parameter d from \code{\link[drc]{LL.4()}} model}
+\item{d}{numeric, fitted parameter d from \code{\link[drc]{LL.4}} model}
 
 \item{m}{numeric, relative IC50 for the curve. log10(e), where e is the
-fitted parameter e from \code{\link[drc]{LL.4()}} model}
+fitted parameter e from \code{\link[drc]{LL.4}} model}
 
 \item{c1}{numeric, log10(min conc) (this is the minimal nonzero concentration)}
 
@@ -29,7 +29,7 @@ numeric, RI or CSS scores
 New function used to score sensitivities given either a single-agent or a
 fixed conc (combination) columns. The function calculates the AUC of the
 log10-scaled dose-response curve. \strong{IMPORTANT:} note that with
-\code{\link[drc]{LL.4()}} calls, this value is already logged since the
+\code{\link[drc]{LL.4}} calls, this value is already logged since the
 input concentrations are logged.
 }
 \author{

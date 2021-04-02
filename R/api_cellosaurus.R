@@ -62,6 +62,23 @@ CellVersion <- function(
   return(version)
 }
 
+
+#' Download the xml file for Cellosaurus database
+#'
+#' This function will download the xml file for Cellosaurus data from
+#' https://ftp.expasy.org/databases/cellosaurus
+#'
+#' @param file A character value. It indicates the path and name of the file to
+#'   save the downloaded data.
+#'
+#' @return NULL
+#' @export
+#'
+DownloadCellosaurus <- function(file){
+  url <- "https://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml"
+  utils::download.file(url, file)
+}
+
 #' Update local Cellosaurus XML file
 #'
 #' \code{UpdateCell} checks and compares the versions of online and
@@ -100,6 +117,7 @@ UpdateCell <- function(file) {
             version.online, "\n",
             " Local file is under version ", version.local, "\n",
             "Updating local files for you, please wait for a monment...")
+    url <- "https://ftp.expasy.org/databases/cellosaurus/cellosaurus.xml"
     utils::download.file(url, file)
     message("Local Cellosaurus file hase been up to date now!")
   } else if (version.local == version.online) {

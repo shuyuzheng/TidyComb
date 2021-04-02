@@ -8,7 +8,7 @@ own_log2(x)
 }
 \arguments{
 \item{x}{relative IC50 for the curve. The fitted parameter e from
-\code{\link[drc]{L.4()}} model}
+\code{\link[drc]{L.4}} model}
 }
 \value{
 ln(1+exp(x))

@@ -127,14 +127,14 @@ CalculateSens <- function(df, pred = FALSE) {
 #' New function used to score sensitivities given either a single-agent or a
 #' fixed conc (combination) columns. The function calculates the AUC of the
 #' log10-scaled dose-response curve. \strong{IMPORTANT:} note that with
-#' \code{\link[drc]{LL.4()}} calls, this value is already logged since the
+#' \code{\link[drc]{LL.4}} calls, this value is already logged since the
 #' input concentrations are logged.
 #'
-#' @param b numeric, fitted parameter b from \code{\link[drc]{LL.4()}} model
-#' @param c numeric, fitted parameter c from \code{\link[drc]{LL.4()}} model
-#' @param d numeric, fitted parameter d from \code{\link[drc]{LL.4()}} model
+#' @param b numeric, fitted parameter b from \code{\link[drc]{LL.4}} model
+#' @param c numeric, fitted parameter c from \code{\link[drc]{LL.4}} model
+#' @param d numeric, fitted parameter d from \code{\link[drc]{LL.4}} model
 #' @param m numeric, relative IC50 for the curve. log10(e), where e is the
-#'   fitted parameter e from \code{\link[drc]{LL.4()}} model
+#'   fitted parameter e from \code{\link[drc]{LL.4}} model
 #' @param c1 numeric, log10(min conc) (this is the minimal nonzero concentration)
 #' @param c2 numeric, log10(max conc) (this is the maximal concentration)
 #' @param t numeric, threshold (usually set to zero)
@@ -168,10 +168,10 @@ scoreCurve <- function(b, c, d, m, c1, c2, t) {
 #' #' This function calculates ln(1+10^(b*(c-x))) to be used in \code{scoreCurve}
 #' function
 #'
-#' @param b fitted parameter b from \code{\link[drc]{L.4()}} model
-#' @param c fitted parameter c from \code{\link[drc]{L.4()}} model
+#' @param b fitted parameter b from \code{\link[drc]{L.4}} model
+#' @param c fitted parameter c from \code{\link[drc]{L.4}} model
 #' @param x relative IC50 for the curve. log10(e), where e is the
-#'   fitted parameter e from \code{\link[drc]{L.4()}} model
+#'   fitted parameter e from \code{\link[drc]{L.4}} model
 #'
 #' @return ln(1+10^(b*(c-x)))
 #'
@@ -192,10 +192,10 @@ own_log = function(b, c, x)
 #' fixed conc (combination) columns. The function calculates the AUC of the
 #' log10-scaled dose-response curve.
 #'
-#' @param b numeric, fitted parameter b from \code{\link[drc]{L.4()}} model
-#' @param c numeric, fitted parameter c from \code{\link[drc]{L.4()}} model
-#' @param d numeric, fitted parameter d from \code{\link[drc]{L.4()}} model
-#' @param e numeric, fitted parameter e from \code{\link[drc]{L.4()}} model
+#' @param b numeric, fitted parameter b from \code{\link[drc]{L.4}} model
+#' @param c numeric, fitted parameter c from \code{\link[drc]{L.4}} model
+#' @param d numeric, fitted parameter d from \code{\link[drc]{L.4}} model
+#' @param e numeric, fitted parameter e from \code{\link[drc]{L.4}} model
 #' @param c1 numeric, log10(min conc) (this is the minimal nonzero concentration)
 #' @param c2 numeric, log10(max conc) (this is the maximal concentration)
 #' @param t numeric, threshold (usually set to zero)
@@ -227,7 +227,7 @@ scoreCurve.L4 <- function(b, c, d, e, c1, c2, t) {
 #' function
 #'
 #' @param x relative IC50 for the curve. The fitted parameter e from
-#'  \code{\link[drc]{L.4()}} model
+#'  \code{\link[drc]{L.4}} model
 #'
 #' @return ln(1+exp(x))
 #'
@@ -314,6 +314,7 @@ RIConfidenceInterval <- function(pred, iter = 100){
 
   return (res)
 }
+
 #' Impute missing value at IC50 concentration of drug
 #'
 #' \code{ImputeIC50} uses the particular experiment's values to predict the

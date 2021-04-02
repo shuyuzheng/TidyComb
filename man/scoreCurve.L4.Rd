@@ -7,13 +7,13 @@
 scoreCurve.L4(b, c, d, e, c1, c2, t)
 }
 \arguments{
-\item{b}{numeric, fitted parameter b from \code{\link[drc]{L.4()}} model}
+\item{b}{numeric, fitted parameter b from \code{\link[drc]{L.4}} model}
 
-\item{c}{numeric, fitted parameter c from \code{\link[drc]{L.4()}} model}
+\item{c}{numeric, fitted parameter c from \code{\link[drc]{L.4}} model}
 
-\item{d}{numeric, fitted parameter d from \code{\link[drc]{L.4()}} model}
+\item{d}{numeric, fitted parameter d from \code{\link[drc]{L.4}} model}
 
-\item{e}{numeric, fitted parameter e from \code{\link[drc]{L.4()}} model}
+\item{e}{numeric, fitted parameter e from \code{\link[drc]{L.4}} model}
 
 \item{c1}{numeric, log10(min conc) (this is the minimal nonzero concentration)}
 

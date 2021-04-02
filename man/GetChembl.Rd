@@ -12,11 +12,13 @@ GetChembl(ids, info = c("chembl_id", "phase"), quiet = TRUE)
 
 \item{info}{A vector of characters contains the information user want to get
 from ChEMBL database. The available values are:
- \item{"phase"} {Maximun clinical phase for input compounds.}
- \item{"molecular_formula"} {Molecula formula for input compounds.}
- \item{"inchikey"} {Standard InChIKey for input compounds.}
- \item{"smiles"} {Canonical SMILES for input compounds.}
- \item{"chembl_id"} {ChEMBL ID for input compounds.}}
+  \itemize{
+    \item \strong{"phase"} {Maximun clinical phase for input compounds.}
+    \item \strong{"molecular_formula"} {Molecula formula for input compounds.}
+    \item \strong{"inchikey"} {Standard InChIKey for input compounds.}
+    \item \strong{"smiles"} {Canonical SMILES for input compounds.}
+    \item \strong{"chembl_id"} {ChEMBL ID for input compounds.}
+  }}
 
 \item{quiet}{A logical value. If it is \code{TRUE}, the error messages will
 not show during runing the function.}

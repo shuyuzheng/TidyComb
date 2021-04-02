@@ -7,12 +7,12 @@
 own_log(b, c, x)
 }
 \arguments{
-\item{b}{fitted parameter b from \code{\link[drc]{L.4()}} model}
+\item{b}{fitted parameter b from \code{\link[drc]{L.4}} model}
 
-\item{c}{fitted parameter c from \code{\link[drc]{L.4()}} model}
+\item{c}{fitted parameter c from \code{\link[drc]{L.4}} model}
 
 \item{x}{relative IC50 for the curve. log10(e), where e is the
-fitted parameter e from \code{\link[drc]{L.4()}} model}
+fitted parameter e from \code{\link[drc]{L.4}} model}
 }
 \value{
 ln(1+10^(b*(c-x)))

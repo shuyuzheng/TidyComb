@@ -58,7 +58,7 @@ MatchCellAcc <- function(names, file){
     acc <- rbind.data.frame(acc, tmp)
   }
 
-  acc <- acc[, c("input_name", "cellosaurus_accession", "synonyms")]
+  acc <- acc[, c("input_name", "name","cellosaurus_accession", "synonyms")]
 
   return(acc)
 }
@@ -123,4 +123,62 @@ GenerateCell <- function(acc, file){
   cell_id <- rbind.data.frame(cell_id, exist.cell$old)
   return(list(cell_line = cell_line,
               cell_id = cell_id))
+}
+
+#' Annotate cell lien from cell line name
+#'
+#' @param cell A vector of characters contains cell line names.
+#'
+#' @param file The path to Cellosaurus XML file which was posted on
+#' \url{https://web.expasy.org/cellosaurus/}
+#'
+#' @return  A list with 2 data frames:
+#' \itemize{
+#'   \item \strong{cell_line} The cell_line table prepared for uploading.
+#'   \item \strong{cell_id} The DrugComb IDs for new cell lines.
+#' }
+#'
+#' @importFrom magrittr %>%
+#'
+#' @author
+#' Jing Tang \email{jing.tang@helsinki.fi}
+#' Shuyu Zheng \email{shuyu.zheng@helsinki.fi}
+#'
+#' @export
+#'
+AnnotateCell <- function(cell_names, file){
+  doc <- ParseCell(file)
+  annotation_table <- NULL
+  for (name in cell_names){
+    cell <- GetCell(doc, ids = name, type = "name")
+    if (is.null(cell)){
+      tmp <- data.frame(
+        input_name = name,
+        name = NA,
+        synonyms = NA,
+        cellosaurus_accession = NA,
+        tissue = NA,
+        disease_name = NA,
+        disease_id = NA,
+        stringsAsFactors = FALSE
+      )
+      annotation_table <- rbind.data.frame(annotation_table, tmp)
+      next()
+    }
+
+    tmp <- lapply(cell, function(node){
+      acc_tmp <- GetAccession(node)
+      acc_tmp <- data.frame(cellosaurus_accession = acc_tmp,
+                            stringsAsFactors = FALSE)
+      info_tmp <- GetCellInfo(accessions = acc_tmp, node)
+    })
+    tmp <- Reduce(function(x, y){rbind.data.frame(x, y)}, tmp)
+    tmp$input_name <- rep_len(name, nrow(tmp))
+    annotation_table <- rbind.data.frame(annotation_table, tmp)
+  }
+
+  annotation_table <- annotation_table[, c("input_name", "name", "synonyms",
+                                           "cellosaurus_accession", "tissue",
+                                           "disease_name", "disease_id")]
+  return(annotation_table)
 }
